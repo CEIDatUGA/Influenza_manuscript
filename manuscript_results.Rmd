@@ -1,0 +1,2530 @@
+---
+title: "Final manuscript"
+author: "Victor Felix"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document: default
+---
+
+This document summarizes the results of the 12 models that were developed: AUTO ARIMA, AUTO ADJACENT, AUTO EPIWEEK, ES27 TEMPERATURE, ES27 ARIMA, ES27 ADJACENT, ES27 EPIWEEK, ES64 TEMPERATURE, ES64 ARIMA, ES64 ADJACENT, ES64 EPIWEEK, ES64 TEMPERATURE. It has a series of histograms and maps that compare the results of these models based on their WIS. You can read more about the specific covariates and ensemble techniques of these models in their own Rmarkdown documents. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Loading libraries.
+
+```{r}
+library("tidyr")
+library("MMWRweek")
+library("data.table")
+library("caret")
+library("purrr")
+library("dplyr")
+library("tseries")
+library("gtools")
+library("forecast")
+library("scoringutils")
+library("covidHubUtils")
+library("parallel")
+library("future")#https://cran.r-project.org/web/packages/future/vignettes/future-4-issues.html
+library("listenv")
+library("epitools")
+library("ggplot2")
+library("sf")
+library("forcats")
+library("ggplot2")
+library("sf")
+library("dplyr")
+library("scales")  # For `breaks_extended`
+library("ggplot2")
+library("broom")
+library("fields")
+
+```
+
+Loading the results of each model and the shapefiles of the maps.
+
+```{r}
+load("NHSH_hospitalizations_seed_nolog_correct/ES_ARIMA/ARIMA_MODELS_influenza_hospitalization_nolog.Rdata")
+load("NHSH_hospitalizations_seed_nolog_correct/ES_ADJACENT/ADJACENT_MODELS_influenza_hospitalization_nolog.Rdata")
+load("NHSH_hospitalizations_seed_nolog_correct/ES_EPIWEEK/EPIWEEK_MODELS_influenza_hospitalization_nolog.Rdata")
+load("NHSH_hospitalizations_seed_nolog_correct/ES_TEMPERATURE/TEMPERATURE_MODELS_influenza_hospitalization_nolog.Rdata")
+load("NHSH_hospitalizations_seed_nolog_correct/ES_AVERAGE/AVERAGE_MODELS_influenza_hospitalization_nolog.Rdata")
+
+states <- read_sf("NHSH_hospitalizations_seed_nolog_correct/shapefiles/cb_2018_us_state_500k.shp")
+
+states <- states %>%
+  rename(STATE = NAME)
+
+```
+
+------------
+1 Week ahead
+------------
+```{r}
+
+# Creating new columns with Epidemiological weeks based on target_end_week
+AUTO_ARIMA_WEEK1$epiweek <- MMWRweek(AUTO_ARIMA_WEEK1$target_end_date)$MMWRweek
+AUTO_ADJACENT_WEEK1$epiweek <- MMWRweek(AUTO_ADJACENT_WEEK1$target_end_date)$MMWRweek
+AUTO_EPIWEEK_WEEK1$epiweek <- MMWRweek(AUTO_EPIWEEK_WEEK1$target_end_date)$MMWRweek
+AUTO_TEMPERATURE_WEEK1$epiweek <- MMWRweek(AUTO_TEMPERATURE_WEEK1$target_end_date)$MMWRweek
+AUTO_AVERAGE_WEEK1$epiweek <- MMWRweek(AUTO_AVERAGE_WEEK1$target_end_date)$MMWRweek
+
+ES27_ARIMA_WEEK1$epiweek <- MMWRweek(ES27_ARIMA_WEEK1$target_end_date)$MMWRweek
+ES27_ADJACENT_WEEK1$epiweek <- MMWRweek(ES27_ADJACENT_WEEK1$target_end_date)$MMWRweek
+ES27_EPIWEEK_WEEK1$epiweek <- MMWRweek(ES27_EPIWEEK_WEEK1$target_end_date)$MMWRweek
+ES27_TEMPERATURE_WEEK1$epiweek <- MMWRweek(ES27_TEMPERATURE_WEEK1$target_end_date)$MMWRweek
+ES27_AVERAGE_WEEK1$epiweek <- MMWRweek(ES27_AVERAGE_WEEK1$target_end_date)$MMWRweek
+
+ES64_ARIMA_WEEK1$epiweek <- MMWRweek(ES64_ARIMA_WEEK1$target_end_date)$MMWRweek
+ES64_ADJACENT_WEEK1$epiweek <- MMWRweek(ES64_ADJACENT_WEEK1$target_end_date)$MMWRweek
+ES64_EPIWEEK_WEEK1$epiweek <- MMWRweek(ES64_EPIWEEK_WEEK1$target_end_date)$MMWRweek
+ES64_TEMPERATURE_WEEK1$epiweek <- MMWRweek(ES64_TEMPERATURE_WEEK1$target_end_date)$MMWRweek
+ES64_AVERAGE_WEEK1$epiweek <- MMWRweek(ES64_AVERAGE_WEEK1$target_end_date)$MMWRweek
+
+# Dataframe that will be analysed for 1 Week Ahead
+df_W1_NoLg <- data.frame(
+  STATE = AUTO_ARIMA_WEEK1$State,
+  Julian_date = AUTO_ARIMA_WEEK1$target_end_date,
+  epiweek = AUTO_ARIMA_WEEK1$epiweek,
+  AUTO_AR_NoLg=AUTO_ARIMA_WEEK1$WIS, 
+  AUTO_ADJ_NoLg=AUTO_ADJACENT_WEEK1$WIS, 
+  AUTO_EPI_NoLg=AUTO_EPIWEEK_WEEK1$WIS,
+  AUTO_TEMP_NoLg=AUTO_TEMPERATURE_WEEK1$WIS,
+  AUTO_AVG_NoLg=AUTO_AVERAGE_WEEK1$WIS,
+  ES27_AR_NoLg=ES27_ARIMA_WEEK1$WIS, 
+  ES27_ADJ_NoLg=ES27_ADJACENT_WEEK1$WIS, 
+  ES27_EPI_NoLg=ES27_EPIWEEK_WEEK1$WIS,
+  ES27_TEMP_NoLg=ES27_TEMPERATURE_WEEK1$WIS,
+  ES27_AVG_NoLg=ES27_AVERAGE_WEEK1$WIS,
+  ES64_AR_NoLg=ES64_ARIMA_WEEK1$WIS, 
+  ES64_ADJ_NoLg=ES64_ADJACENT_WEEK1$WIS, 
+  ES64_EPI_NoLg=ES64_EPIWEEK_WEEK1$WIS,
+  ES64_TEMP_NoLg=ES64_TEMPERATURE_WEEK1$WIS,
+  ES64_AVG_NoLg=ES64_AVERAGE_WEEK1$WIS
+)
+
+head(df_W1_NoLg)
+```
+
+------------
+2 Weeks ahead
+-------------
+```{r}
+# Creating new columns with Epidemiological weeks based on target_end_week
+AUTO_ARIMA_WEEK2$epiweek <- MMWRweek(AUTO_ARIMA_WEEK2$target_end_date)$MMWRweek
+AUTO_ADJACENT_WEEK2$epiweek <- MMWRweek(AUTO_ADJACENT_WEEK2$target_end_date)$MMWRweek
+AUTO_EPIWEEK_WEEK2$epiweek <- MMWRweek(AUTO_EPIWEEK_WEEK2$target_end_date)$MMWRweek
+AUTO_TEMPERATURE_WEEK2$epiweek <- MMWRweek(AUTO_TEMPERATURE_WEEK2$target_end_date)$MMWRweek
+AUTO_AVERAGE_WEEK2$epiweek <- MMWRweek(AUTO_AVERAGE_WEEK2$target_end_date)$MMWRweek
+
+ES27_ARIMA_WEEK2$epiweek <- MMWRweek(ES27_ARIMA_WEEK2$target_end_date)$MMWRweek
+ES27_ADJACENT_WEEK2$epiweek <- MMWRweek(ES27_ADJACENT_WEEK2$target_end_date)$MMWRweek
+ES27_EPIWEEK_WEEK2$epiweek <- MMWRweek(ES27_EPIWEEK_WEEK2$target_end_date)$MMWRweek
+ES27_TEMPERATURE_WEEK2$epiweek <- MMWRweek(ES27_TEMPERATURE_WEEK2$target_end_date)$MMWRweek
+ES27_AVERAGE_WEEK2$epiweek <- MMWRweek(ES27_AVERAGE_WEEK2$target_end_date)$MMWRweek
+
+ES64_ARIMA_WEEK2$epiweek <- MMWRweek(ES64_ARIMA_WEEK2$target_end_date)$MMWRweek
+ES64_ADJACENT_WEEK2$epiweek <- MMWRweek(ES64_ADJACENT_WEEK2$target_end_date)$MMWRweek
+ES64_EPIWEEK_WEEK2$epiweek <- MMWRweek(ES64_EPIWEEK_WEEK2$target_end_date)$MMWRweek
+ES64_TEMPERATURE_WEEK2$epiweek <- MMWRweek(ES64_TEMPERATURE_WEEK2$target_end_date)$MMWRweek
+ES64_AVERAGE_WEEK2$epiweek <- MMWRweek(ES64_AVERAGE_WEEK2$target_end_date)$MMWRweek
+
+# Dataframe that will be analysed for 2 Weeks Ahead
+df_W2_NoLg <- data.frame(
+  STATE = AUTO_ARIMA_WEEK2$State,
+  Julian_date = AUTO_ARIMA_WEEK2$target_end_date,
+  epiweek = AUTO_ARIMA_WEEK2$epiweek,
+  AUTO_AR_NoLg=AUTO_ARIMA_WEEK2$WIS, 
+  AUTO_ADJ_NoLg=AUTO_ADJACENT_WEEK2$WIS, 
+  AUTO_EPI_NoLg=AUTO_EPIWEEK_WEEK2$WIS,
+  AUTO_TEMP_NoLg=AUTO_TEMPERATURE_WEEK2$WIS,
+  AUTO_AVG_NoLg=AUTO_AVERAGE_WEEK2$WIS,
+  
+  ES27_AR_NoLg=ES27_ARIMA_WEEK2$WIS, 
+  ES27_ADJ_NoLg=ES27_ADJACENT_WEEK2$WIS, 
+  ES27_EPI_NoLg=ES27_EPIWEEK_WEEK2$WIS,
+  ES27_TEMP_NoLg=ES27_TEMPERATURE_WEEK2$WIS,
+  ES27_AVG_NoLg=ES27_AVERAGE_WEEK2$WIS,
+  
+  ES64_AR_NoLg=ES64_ARIMA_WEEK2$WIS, 
+  ES64_ADJ_NoLg=ES64_ADJACENT_WEEK2$WIS, 
+  ES64_EPI_NoLg=ES64_EPIWEEK_WEEK2$WIS,
+  ES64_TEMP_NoLg=ES64_TEMPERATURE_WEEK2$WIS,
+  ES64_AVG_NoLg=ES64_AVERAGE_WEEK2$WIS
+  
+)
+
+head(df_W2_NoLg)
+```
+
+-------------
+3 Weeks ahead
+-------------
+```{r}
+# Creating new columns with Epidemiological weeks based on target_end_week
+AUTO_ARIMA_WEEK3$epiweek <- MMWRweek(AUTO_ARIMA_WEEK3$target_end_date)$MMWRweek
+AUTO_ADJACENT_WEEK3$epiweek <- MMWRweek(AUTO_ADJACENT_WEEK3$target_end_date)$MMWRweek
+AUTO_EPIWEEK_WEEK3$epiweek <- MMWRweek(AUTO_EPIWEEK_WEEK3$target_end_date)$MMWRweek
+AUTO_TEMPERATURE_WEEK3$epiweek <- MMWRweek(AUTO_TEMPERATURE_WEEK3$target_end_date)$MMWRweek
+AUTO_AVERAGE_WEEK3$epiweek <- MMWRweek(AUTO_AVERAGE_WEEK3$target_end_date)$MMWRweek
+
+ES27_ARIMA_WEEK3$epiweek <- MMWRweek(ES27_ARIMA_WEEK3$target_end_date)$MMWRweek
+ES27_ADJACENT_WEEK3$epiweek <- MMWRweek(ES27_ADJACENT_WEEK3$target_end_date)$MMWRweek
+ES27_EPIWEEK_WEEK3$epiweek <- MMWRweek(ES27_EPIWEEK_WEEK3$target_end_date)$MMWRweek
+ES27_TEMPERATURE_WEEK3$epiweek <- MMWRweek(ES27_TEMPERATURE_WEEK3$target_end_date)$MMWRweek
+ES27_AVERAGE_WEEK3$epiweek <- MMWRweek(ES27_AVERAGE_WEEK3$target_end_date)$MMWRweek
+
+ES64_ARIMA_WEEK3$epiweek <- MMWRweek(ES64_ARIMA_WEEK3$target_end_date)$MMWRweek
+ES64_ADJACENT_WEEK3$epiweek <- MMWRweek(ES64_ADJACENT_WEEK3$target_end_date)$MMWRweek
+ES64_EPIWEEK_WEEK3$epiweek <- MMWRweek(ES64_EPIWEEK_WEEK3$target_end_date)$MMWRweek
+ES64_TEMPERATURE_WEEK3$epiweek <- MMWRweek(ES64_TEMPERATURE_WEEK3$target_end_date)$MMWRweek
+ES64_AVERAGE_WEEK3$epiweek <- MMWRweek(ES64_AVERAGE_WEEK3$target_end_date)$MMWRweek
+
+
+# Dataframe that will be analysed for 3 Weeks Ahead
+df_W3_NoLg <- data.frame(
+  STATE = AUTO_ARIMA_WEEK3$State,
+  Julian_date = AUTO_ARIMA_WEEK3$target_end_date,
+  epiweek = AUTO_ARIMA_WEEK3$epiweek,
+  AUTO_AR_NoLg=AUTO_ARIMA_WEEK3$WIS, 
+  AUTO_ADJ_NoLg=AUTO_ADJACENT_WEEK3$WIS, 
+  AUTO_EPI_NoLg=AUTO_EPIWEEK_WEEK3$WIS,
+  AUTO_TEMP_NoLg=AUTO_TEMPERATURE_WEEK3$WIS,
+  AUTO_AVG_NoLg=AUTO_AVERAGE_WEEK3$WIS,
+    
+  ES27_AR_NoLg=ES27_ARIMA_WEEK3$WIS, 
+  ES27_ADJ_NoLg=ES27_ADJACENT_WEEK3$WIS, 
+  ES27_EPI_NoLg=ES27_EPIWEEK_WEEK3$WIS,
+  ES27_TEMP_NoLg=ES27_TEMPERATURE_WEEK3$WIS,
+  ES27_AVG_NoLg=ES27_AVERAGE_WEEK3$WIS,
+    
+  ES64_AR_NoLg=ES64_ARIMA_WEEK3$WIS, 
+  ES64_ADJ_NoLg=ES64_ADJACENT_WEEK3$WIS, 
+  ES64_EPI_NoLg=ES64_EPIWEEK_WEEK3$WIS,
+  ES64_TEMP_NoLg=ES64_TEMPERATURE_WEEK3$WIS,
+  ES64_AVG_NoLg=ES64_AVERAGE_WEEK3$WIS
+)
+
+head(df_W3_NoLg)
+```
+
+-------------
+4 Weeks ahead
+-------------
+```{r}
+# Creating new columns with Epidemiological weeks based on target_end_week
+AUTO_ARIMA_WEEK4$epiweek <- MMWRweek(AUTO_ARIMA_WEEK4$target_end_date)$MMWRweek
+AUTO_ADJACENT_WEEK4$epiweek <- MMWRweek(AUTO_ADJACENT_WEEK4$target_end_date)$MMWRweek
+AUTO_EPIWEEK_WEEK4$epiweek <- MMWRweek(AUTO_EPIWEEK_WEEK4$target_end_date)$MMWRweek
+AUTO_TEMPERATURE_WEEK4$epiweek <- MMWRweek(AUTO_TEMPERATURE_WEEK4$target_end_date)$MMWRweek
+AUTO_AVERAGE_WEEK4$epiweek <- MMWRweek(AUTO_AVERAGE_WEEK4$target_end_date)$MMWRweek
+
+ES27_ARIMA_WEEK4$epiweek <- MMWRweek(ES27_ARIMA_WEEK4$target_end_date)$MMWRweek
+ES27_ADJACENT_WEEK4$epiweek <- MMWRweek(ES27_ADJACENT_WEEK4$target_end_date)$MMWRweek
+ES27_EPIWEEK_WEEK4$epiweek <- MMWRweek(ES27_EPIWEEK_WEEK4$target_end_date)$MMWRweek
+ES27_TEMPERATURE_WEEK4$epiweek <- MMWRweek(ES27_TEMPERATURE_WEEK4$target_end_date)$MMWRweek
+ES27_AVERAGE_WEEK4$epiweek <- MMWRweek(ES27_AVERAGE_WEEK4$target_end_date)$MMWRweek
+
+ES64_ARIMA_WEEK4$epiweek <- MMWRweek(ES64_ARIMA_WEEK4$target_end_date)$MMWRweek
+ES64_ADJACENT_WEEK4$epiweek <- MMWRweek(ES64_ADJACENT_WEEK4$target_end_date)$MMWRweek
+ES64_EPIWEEK_WEEK4$epiweek <- MMWRweek(ES64_EPIWEEK_WEEK4$target_end_date)$MMWRweek
+ES64_TEMPERATURE_WEEK4$epiweek <- MMWRweek(ES64_TEMPERATURE_WEEK4$target_end_date)$MMWRweek
+ES64_AVERAGE_WEEK4$epiweek <- MMWRweek(ES64_AVERAGE_WEEK4$target_end_date)$MMWRweek
+
+# Dataframe that will be analysed for 4 Weeks Ahead
+df_W4_NoLg <- data.frame(
+  STATE = AUTO_ARIMA_WEEK4$State,
+  Julian_date = AUTO_ARIMA_WEEK4$target_end_date,
+  epiweek = AUTO_ARIMA_WEEK4$epiweek,
+  AUTO_AR_NoLg=AUTO_ARIMA_WEEK4$WIS, 
+  AUTO_ADJ_NoLg=AUTO_ADJACENT_WEEK4$WIS, 
+  AUTO_EPI_NoLg=AUTO_EPIWEEK_WEEK4$WIS,
+  AUTO_TEMP_NoLg=AUTO_TEMPERATURE_WEEK4$WIS,
+  AUTO_AVG_NoLg=AUTO_AVERAGE_WEEK4$WIS, 
+  
+  ES27_AR_NoLg=ES27_ARIMA_WEEK4$WIS, 
+  ES27_ADJ_NoLg=ES27_ADJACENT_WEEK4$WIS, 
+  ES27_EPI_NoLg=ES27_EPIWEEK_WEEK4$WIS,
+  ES27_TEMP_NoLg=ES27_TEMPERATURE_WEEK4$WIS,
+  ES27_AVG_NoLg=ES27_AVERAGE_WEEK4$WIS,  
+  
+  ES64_AR_NoLg=ES64_ARIMA_WEEK4$WIS, 
+  ES64_ADJ_NoLg=ES64_ADJACENT_WEEK4$WIS, 
+  ES64_EPI_NoLg=ES64_EPIWEEK_WEEK4$WIS,
+  ES64_TEMP_NoLg=ES64_TEMPERATURE_WEEK4$WIS,
+  ES64_AVG_NoLg=ES64_AVERAGE_WEEK4$WIS  
+)
+
+head(df_W4_NoLg)
+```
+
+
+Filter only the flu season
+
+```{r}
+# Filter the dataframe for epiweek >= 40 or epiweek <= 20
+filtered_df_W1_NoLg <- df_W1_NoLg %>%
+  filter(epiweek >= 40 | epiweek <= 20)
+
+# Display the filtered dataset
+head(filtered_df_W1_NoLg)
+
+
+# Filter the dataframe for epiweek >= 40 or epiweek <= 20
+filtered_df_W2_NoLg <- df_W2_NoLg %>%
+  filter(epiweek >= 40 | epiweek <= 20)
+
+# Display the filtered dataset
+head(filtered_df_W2_NoLg)
+
+# Filter the dataframe for epiweek >= 40 or epiweek <= 20
+filtered_df_W3_NoLg <- df_W3_NoLg %>%
+  filter(epiweek >= 40 | epiweek <= 20)
+
+# Display the filtered dataset
+head(filtered_df_W3_NoLg)
+
+# Filter the dataframe for epiweek >= 40 or epiweek <= 20
+filtered_df_W4_NoLg <- df_W4_NoLg %>%
+  filter(epiweek >= 40 | epiweek <= 20)
+
+# Display the filtered dataset
+head(filtered_df_W4_NoLg)
+```
+
+
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Combine all datasets and add a column to identify them
+df_combined_ <- bind_rows(
+  df_W1_NoLg %>% mutate(Dataset = "W1"),
+  df_W2_NoLg %>% mutate(Dataset = "W2"),
+  df_W3_NoLg %>% mutate(Dataset = "W3"),
+  df_W4_NoLg %>% mutate(Dataset = "W4")
+) %>%
+  select(STATE, epiweek, AUTO_AR_NoLg, Dataset, Julian_date) %>%
+  rename(WIS = AUTO_AR_NoLg)  # Rename for consistency
+
+# Define the epiweek values to highlight
+highlight_weeks <- c(21, 41)
+
+# Get corresponding Julian dates for these epiweeks
+highlight_dates <- df_combined_ %>%
+  filter(epiweek %in% highlight_weeks) %>%
+  select(epiweek, Julian_date) %>%
+  distinct()
+
+# Plot
+plt0 <- ggplot(df_combined_, aes(x = Julian_date, y = WIS, group = STATE)) + 
+  geom_vline(data = highlight_dates, aes(xintercept = Julian_date), color = "red", linetype = "dashed", size = 1) +  
+  geom_line(color = "black", size = 0.2) +  
+  facet_wrap(~ Dataset, ncol = 2, scales = "free_y") +  
+  theme_minimal() +  
+  labs(title = "Baseline Model WIS for 48 states on the contiguous U.S.",#,
+#       subtitle = "Dashed red lines indicates epidemiological weeks outsise of the influenza season",
+       x = "Month", 
+       y = "WIS") +  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+        legend.position = "none") + 
+  scale_x_date(labels = scales::date_format("%b"), breaks = "2 month")  # Format x-axis to show months and set monthly breaks
+
+# Print the plot
+plt0
+
+
+ggsave(plt0, height = 5, width = 6, filename="fig0.jpg")  
+```
+
+Calculate mean weighted interval score for all forecast weeks on each model.
+
+```{r}
+
+# Define the function
+calculate_mean_wis <- function(data) {
+  data %>%
+    group_by(STATE) %>%
+    summarize(
+      AUTO_AR_NoLg = mean(AUTO_AR_NoLg, na.rm = TRUE),
+      AUTO_ADJ_NoLg = mean(AUTO_ADJ_NoLg, na.rm = TRUE),
+      AUTO_EPI_NoLg = mean(AUTO_EPI_NoLg, na.rm = TRUE),
+      AUTO_TMP_NoLg = mean(AUTO_TEMP_NoLg, na.rm = TRUE),
+      AUTO_AVG_NoLg = mean(AUTO_AVG_NoLg, na.rm = TRUE),
+      ES27_AR_NoLg = mean(ES27_AR_NoLg, na.rm = TRUE),
+      ES27_ADJ_NoLg = mean(ES27_ADJ_NoLg, na.rm = TRUE),
+      ES27_EPI_NoLg = mean(ES27_EPI_NoLg, na.rm = TRUE),
+      ES27_TMP_NoLg = mean(ES27_TEMP_NoLg, na.rm = TRUE),
+      ES27_AVG_NoLg = mean(ES27_AVG_NoLg, na.rm = TRUE),
+      ES64_AR_NoLg = mean(ES64_AR_NoLg, na.rm = TRUE),
+      ES64_ADJ_NoLg = mean(ES64_ADJ_NoLg, na.rm = TRUE),
+      ES64_EPI_NoLg = mean(ES64_EPI_NoLg, na.rm = TRUE),
+      ES64_TMP_NoLg = mean(ES64_TEMP_NoLg, na.rm = TRUE),
+      ES64_AVG_NoLg = mean(ES64_AVG_NoLg, na.rm = TRUE)
+      
+      
+    )
+}
+
+# Now you can use the function with any dataframe
+W1_NoLg <- calculate_mean_wis(filtered_df_W1_NoLg)
+W2_NoLg <- calculate_mean_wis(filtered_df_W2_NoLg)
+W3_NoLg <- calculate_mean_wis(filtered_df_W3_NoLg)
+W4_NoLg <- calculate_mean_wis(filtered_df_W4_NoLg)
+
+# Display the resulting dataframe
+head(W1_NoLg)
+head(W2_NoLg)
+head(W3_NoLg)
+head(W4_NoLg)
+
+```
+
+Here we have boxplots of the mean(WIS) by each state. 
+
+```{r}
+# Combine the data into one data frame
+combined_data <- data.frame(
+  week = rep(c("W1", "W2", "W3", "W4"), each = 48 * 15),
+  
+  Models = rep(c("AUTO_AR", "ES27_AR", "ES64_AR", "AUTO_ADJ", "ES27_ADJ", "ES64_ADJ", "AUTO_TMP", "ES27_TMP", "ES64_TMP", "AUTO_EPI", "ES27_EPI", "ES64_EPI","AUTO_AVG", "ES27_AVG", "ES64_AVG"), each=48, times = 4),
+  
+  value = c(W1_NoLg$AUTO_AR_NoLg, W1_NoLg$ES27_AR_NoLg, W1_NoLg$ES64_AR_NoLg, 
+            W1_NoLg$AUTO_ADJ_NoLg, W1_NoLg$ES27_ADJ_NoLg, W1_NoLg$ES64_ADJ_NoLg, 
+            W1_NoLg$AUTO_TMP_NoLg, W1_NoLg$ES27_TMP_NoLg, W1_NoLg$ES64_TMP_NoLg, 
+            W1_NoLg$AUTO_EPI_NoLg, W1_NoLg$ES27_EPI_NoLg, W1_NoLg$ES64_EPI_NoLg,
+            W1_NoLg$AUTO_AVG_NoLg, W1_NoLg$ES27_AVG_NoLg, W1_NoLg$ES64_AVG_NoLg,
+              
+            W2_NoLg$AUTO_AR_NoLg, W2_NoLg$ES27_AR_NoLg, W2_NoLg$ES64_AR_NoLg, 
+            W2_NoLg$AUTO_ADJ_NoLg, W2_NoLg$ES27_ADJ_NoLg, W2_NoLg$ES64_ADJ_NoLg, 
+            W2_NoLg$AUTO_TMP_NoLg, W2_NoLg$ES27_TMP_NoLg, W2_NoLg$ES64_TMP_NoLg, 
+            W2_NoLg$AUTO_EPI_NoLg, W2_NoLg$ES27_EPI_NoLg, W2_NoLg$ES64_EPI_NoLg,
+            W2_NoLg$AUTO_AVG_NoLg, W2_NoLg$ES27_AVG_NoLg, W2_NoLg$ES64_AVG_NoLg,
+            
+            W3_NoLg$AUTO_AR_NoLg, W3_NoLg$ES27_AR_NoLg, W3_NoLg$ES64_AR_NoLg,
+            W3_NoLg$AUTO_ADJ_NoLg, W3_NoLg$ES27_ADJ_NoLg, W3_NoLg$ES64_ADJ_NoLg, 
+            W3_NoLg$AUTO_TMP_NoLg, W3_NoLg$ES27_TMP_NoLg, W3_NoLg$ES64_TMP_NoLg, 
+            W3_NoLg$AUTO_EPI_NoLg, W3_NoLg$ES27_EPI_NoLg, W3_NoLg$ES64_EPI_NoLg,
+            W3_NoLg$AUTO_AVG_NoLg, W3_NoLg$ES27_AVG_NoLg, W3_NoLg$ES64_AVG_NoLg,
+            
+            W4_NoLg$AUTO_AR_NoLg, W4_NoLg$ES27_AR_NoLg, W4_NoLg$ES64_AR_NoLg,
+            W4_NoLg$AUTO_ADJ_NoLg, W4_NoLg$ES27_ADJ_NoLg, W4_NoLg$ES64_ADJ_NoLg, 
+            W4_NoLg$AUTO_TMP_NoLg, W4_NoLg$ES27_TMP_NoLg, W4_NoLg$ES64_TMP_NoLg, 
+            W4_NoLg$AUTO_EPI_NoLg, W4_NoLg$ES27_EPI_NoLg, W4_NoLg$ES64_EPI_NoLg,
+            W4_NoLg$AUTO_AVG_NoLg, W4_NoLg$ES27_AVG_NoLg, W4_NoLg$ES64_AVG_NoLg
+            )
+)
+
+# Create a new column for categories
+combined_data <- combined_data %>%
+  mutate(category = case_when(
+    grepl("AR", Models) ~ "AR",
+    grepl("EPI", Models) ~ "EPI",
+    grepl("TMP", Models) ~ "TMP",
+    grepl("ADJ", Models) ~ "ADJ",
+    grepl("AVG", Models) ~ "AVG",
+  ))
+
+# Define color ramps for each category
+colors_ar <- c("#a6cee3","#226e83", "#08306b")
+colors_adj <- c("#fb9a99","red3", "#a11c3e")
+colors_epi <- c("#cab2d6", "purple2", "#5e2b7b")
+colors_tmp <- c("lightgreen","green3","#319045")
+
+# Create a custom color mapping for each variable
+custom_colors <- c(
+  "AUTO_AR" = colors_ar[1], "ES27_AR" = colors_ar[2], "ES64_AR" = colors_ar[3],
+  "AUTO_EPI" = colors_epi[1], "ES27_EPI" = colors_epi[2], "ES64_EPI" = colors_epi[3],
+  "AUTO_TMP" = colors_tmp[1], "ES27_TMP" = colors_tmp[2], "ES64_TMP" = colors_tmp[3],
+  "AUTO_ADJ" = colors_adj[1], "ES27_ADJ" = colors_adj[2], "ES64_ADJ" = colors_adj[3],
+  "AUTO_AVG" = colors_adj[1], "ES27_AVG" = colors_adj[2], "ES64_AVG" = colors_adj[3]
+)
+
+  # Create the box plot with additional facet for categories
+plt1<-  ggplot(combined_data, aes(x = week, y = value, fill = Models)) +
+    geom_boxplot(color = "black") +
+    scale_fill_manual(values = custom_colors) +
+    facet_wrap(category ~ Models , nrow = 2) +
+    labs(
+      title = "A) Models without log-back transformations",
+      x = "",
+      y = "Mean Weighted Interval Score (WIS)"
+    ) +
+  scale_y_continuous(limits = c(0, 650)) +  # Set y-axis range
+    theme_minimal()
+plt1
+ggsave(plt1, height = 8, width = 10, filename="fig1A.jpg")  
+```
+
+
+Loading the results of each model and the shapefiles of the maps.
+
+```{r}
+load("NHSH_hospitalizations_seed/ES_ARIMA/ARIMA_MODELS_influenza_hospitalization.Rdata")
+load("NHSH_hospitalizations_seed/ES_ADJACENT/ADJACENT_MODELS_influenza_hospitalization.Rdata")
+load("NHSH_hospitalizations_seed/ES_EPIWEEK/EPIWEEK_MODELS_influenza_hospitalization.Rdata")
+load("NHSH_hospitalizations_seed/ES_TEMPERATURE/TEMPERATURE_MODELS_influenza_hospitalization.Rdata")
+load("NHSH_hospitalizations_seed/ES_AVERAGE/AVERAGE_MODELS_influenza_hospitalization.Rdata")
+
+states <- read_sf("NHSH_hospitalizations_seed/shapefiles/cb_2018_us_state_500k.shp")
+
+states <- states %>%
+  rename(STATE = NAME)
+
+```
+
+------------
+1 Week ahead
+------------
+```{r}
+# Creating new columns with Epidemiological weeks based on target_end_week
+AUTO_ARIMA_WEEK1$epiweek <- MMWRweek(AUTO_ARIMA_WEEK1$target_end_date)$MMWRweek
+AUTO_ADJACENT_WEEK1$epiweek <- MMWRweek(AUTO_ADJACENT_WEEK1$target_end_date)$MMWRweek
+AUTO_EPIWEEK_WEEK1$epiweek <- MMWRweek(AUTO_EPIWEEK_WEEK1$target_end_date)$MMWRweek
+AUTO_TEMPERATURE_WEEK1$epiweek <- MMWRweek(AUTO_TEMPERATURE_WEEK1$target_end_date)$MMWRweek
+AUTO_AVERAGE_WEEK1$epiweek <- MMWRweek(AUTO_AVERAGE_WEEK1$target_end_date)$MMWRweek
+
+ES27_ARIMA_WEEK1$epiweek <- MMWRweek(ES27_ARIMA_WEEK1$target_end_date)$MMWRweek
+ES27_ADJACENT_WEEK1$epiweek <- MMWRweek(ES27_ADJACENT_WEEK1$target_end_date)$MMWRweek
+ES27_EPIWEEK_WEEK1$epiweek <- MMWRweek(ES27_EPIWEEK_WEEK1$target_end_date)$MMWRweek
+ES27_TEMPERATURE_WEEK1$epiweek <- MMWRweek(ES27_TEMPERATURE_WEEK1$target_end_date)$MMWRweek
+ES27_AVERAGE_WEEK1$epiweek <- MMWRweek(ES27_AVERAGE_WEEK1$target_end_date)$MMWRweek
+
+ES64_ARIMA_WEEK1$epiweek <- MMWRweek(ES64_ARIMA_WEEK1$target_end_date)$MMWRweek
+ES64_ADJACENT_WEEK1$epiweek <- MMWRweek(ES64_ADJACENT_WEEK1$target_end_date)$MMWRweek
+ES64_EPIWEEK_WEEK1$epiweek <- MMWRweek(ES64_EPIWEEK_WEEK1$target_end_date)$MMWRweek
+ES64_TEMPERATURE_WEEK1$epiweek <- MMWRweek(ES64_TEMPERATURE_WEEK1$target_end_date)$MMWRweek
+ES64_AVERAGE_WEEK1$epiweek <- MMWRweek(ES64_AVERAGE_WEEK1$target_end_date)$MMWRweek
+
+# Dataframe that will be analysed for 1 Week Ahead
+df_W1 <- data.frame(
+  STATE = AUTO_ARIMA_WEEK1$State,
+  Julian_date = AUTO_ARIMA_WEEK1$target_end_date,
+  epiweek = AUTO_ARIMA_WEEK1$epiweek,
+  AUTO_AR=AUTO_ARIMA_WEEK1$WIS, 
+  AUTO_ADJ=AUTO_ADJACENT_WEEK1$WIS, 
+  AUTO_EPI=AUTO_EPIWEEK_WEEK1$WIS,
+  AUTO_TEMP=AUTO_TEMPERATURE_WEEK1$WIS,
+  AUTO_AVG=AUTO_AVERAGE_WEEK1$WIS,
+  
+  ES27_AR=ES27_ARIMA_WEEK1$WIS, 
+  ES27_ADJ=ES27_ADJACENT_WEEK1$WIS, 
+  ES27_EPI=ES27_EPIWEEK_WEEK1$WIS,
+  ES27_TEMP=ES27_TEMPERATURE_WEEK1$WIS,
+  ES27_AVG=ES27_AVERAGE_WEEK1$WIS,  
+  
+  ES64_AR=ES64_ARIMA_WEEK1$WIS, 
+  ES64_ADJ=ES64_ADJACENT_WEEK1$WIS, 
+  ES64_EPI=ES64_EPIWEEK_WEEK1$WIS,
+  ES64_TEMP=ES64_TEMPERATURE_WEEK1$WIS,
+  ES64_AVG=ES64_AVERAGE_WEEK1$WIS  
+)
+
+head(df_W1)
+```
+
+------------
+2 Weeks ahead
+-------------
+```{r}
+# Creating new columns with Epidemiological weeks based on target_end_week
+AUTO_ARIMA_WEEK2$epiweek <- MMWRweek(AUTO_ARIMA_WEEK2$target_end_date)$MMWRweek
+AUTO_ADJACENT_WEEK2$epiweek <- MMWRweek(AUTO_ADJACENT_WEEK2$target_end_date)$MMWRweek
+AUTO_EPIWEEK_WEEK2$epiweek <- MMWRweek(AUTO_EPIWEEK_WEEK2$target_end_date)$MMWRweek
+AUTO_TEMPERATURE_WEEK2$epiweek <- MMWRweek(AUTO_TEMPERATURE_WEEK2$target_end_date)$MMWRweek
+AUTO_AVERAGE_WEEK2$epiweek <- MMWRweek(AUTO_AVERAGE_WEEK2$target_end_date)$MMWRweek
+
+ES27_ARIMA_WEEK2$epiweek <- MMWRweek(ES27_ARIMA_WEEK2$target_end_date)$MMWRweek
+ES27_ADJACENT_WEEK2$epiweek <- MMWRweek(ES27_ADJACENT_WEEK2$target_end_date)$MMWRweek
+ES27_EPIWEEK_WEEK2$epiweek <- MMWRweek(ES27_EPIWEEK_WEEK2$target_end_date)$MMWRweek
+ES27_TEMPERATURE_WEEK2$epiweek <- MMWRweek(ES27_TEMPERATURE_WEEK2$target_end_date)$MMWRweek
+ES27_AVERAGE_WEEK2$epiweek <- MMWRweek(ES27_AVERAGE_WEEK2$target_end_date)$MMWRweek
+
+ES64_ARIMA_WEEK2$epiweek <- MMWRweek(ES64_ARIMA_WEEK2$target_end_date)$MMWRweek
+ES64_ADJACENT_WEEK2$epiweek <- MMWRweek(ES64_ADJACENT_WEEK2$target_end_date)$MMWRweek
+ES64_EPIWEEK_WEEK2$epiweek <- MMWRweek(ES64_EPIWEEK_WEEK2$target_end_date)$MMWRweek
+ES64_TEMPERATURE_WEEK2$epiweek <- MMWRweek(ES64_TEMPERATURE_WEEK2$target_end_date)$MMWRweek
+ES64_AVERAGE_WEEK2$epiweek <- MMWRweek(ES64_AVERAGE_WEEK2$target_end_date)$MMWRweek
+
+# Dataframe that will be analysed for 2 Week Ahead
+df_W2 <- data.frame(
+  STATE = AUTO_ARIMA_WEEK2$State,
+  Julian_date = AUTO_ARIMA_WEEK2$target_end_date,
+  epiweek = AUTO_ARIMA_WEEK2$epiweek,
+  AUTO_AR=AUTO_ARIMA_WEEK2$WIS, 
+  AUTO_ADJ=AUTO_ADJACENT_WEEK2$WIS, 
+  AUTO_EPI=AUTO_EPIWEEK_WEEK2$WIS,
+  AUTO_TEMP=AUTO_TEMPERATURE_WEEK2$WIS,
+  AUTO_AVG=AUTO_AVERAGE_WEEK2$WIS,
+  
+  ES27_AR=ES27_ARIMA_WEEK2$WIS, 
+  ES27_ADJ=ES27_ADJACENT_WEEK2$WIS, 
+  ES27_EPI=ES27_EPIWEEK_WEEK2$WIS,
+  ES27_TEMP=ES27_TEMPERATURE_WEEK2$WIS,
+  ES27_AVG=ES27_AVERAGE_WEEK2$WIS,  
+  
+  ES64_AR=ES64_ARIMA_WEEK2$WIS, 
+  ES64_ADJ=ES64_ADJACENT_WEEK2$WIS, 
+  ES64_EPI=ES64_EPIWEEK_WEEK2$WIS,
+  ES64_TEMP=ES64_TEMPERATURE_WEEK2$WIS,
+  ES64_AVG=ES64_AVERAGE_WEEK2$WIS  
+)
+
+head(df_W2)
+```
+
+-------------
+3 Weeks ahead
+-------------
+```{r}
+# Creating new columns with Epidemiological weeks based on target_end_week
+AUTO_ARIMA_WEEK3$epiweek <- MMWRweek(AUTO_ARIMA_WEEK3$target_end_date)$MMWRweek
+AUTO_ADJACENT_WEEK3$epiweek <- MMWRweek(AUTO_ADJACENT_WEEK3$target_end_date)$MMWRweek
+AUTO_EPIWEEK_WEEK3$epiweek <- MMWRweek(AUTO_EPIWEEK_WEEK3$target_end_date)$MMWRweek
+AUTO_TEMPERATURE_WEEK3$epiweek <- MMWRweek(AUTO_TEMPERATURE_WEEK3$target_end_date)$MMWRweek
+AUTO_AVERAGE_WEEK3$epiweek <- MMWRweek(AUTO_AVERAGE_WEEK3$target_end_date)$MMWRweek
+
+ES27_ARIMA_WEEK3$epiweek <- MMWRweek(ES27_ARIMA_WEEK3$target_end_date)$MMWRweek
+ES27_ADJACENT_WEEK3$epiweek <- MMWRweek(ES27_ADJACENT_WEEK3$target_end_date)$MMWRweek
+ES27_EPIWEEK_WEEK3$epiweek <- MMWRweek(ES27_EPIWEEK_WEEK3$target_end_date)$MMWRweek
+ES27_TEMPERATURE_WEEK3$epiweek <- MMWRweek(ES27_TEMPERATURE_WEEK3$target_end_date)$MMWRweek
+ES27_AVERAGE_WEEK3$epiweek <- MMWRweek(ES27_AVERAGE_WEEK3$target_end_date)$MMWRweek
+
+ES64_ARIMA_WEEK3$epiweek <- MMWRweek(ES64_ARIMA_WEEK3$target_end_date)$MMWRweek
+ES64_ADJACENT_WEEK3$epiweek <- MMWRweek(ES64_ADJACENT_WEEK3$target_end_date)$MMWRweek
+ES64_EPIWEEK_WEEK3$epiweek <- MMWRweek(ES64_EPIWEEK_WEEK3$target_end_date)$MMWRweek
+ES64_TEMPERATURE_WEEK3$epiweek <- MMWRweek(ES64_TEMPERATURE_WEEK3$target_end_date)$MMWRweek
+ES64_AVERAGE_WEEK3$epiweek <- MMWRweek(ES64_AVERAGE_WEEK3$target_end_date)$MMWRweek
+
+# Dataframe that will be analysed for 2 Week Ahead
+df_W3 <- data.frame(
+  STATE = AUTO_ARIMA_WEEK3$State,
+  Julian_date = AUTO_ARIMA_WEEK3$target_end_date,
+  epiweek = AUTO_ARIMA_WEEK3$epiweek,
+  AUTO_AR=AUTO_ARIMA_WEEK3$WIS, 
+  AUTO_ADJ=AUTO_ADJACENT_WEEK3$WIS, 
+  AUTO_EPI=AUTO_EPIWEEK_WEEK3$WIS,
+  AUTO_TEMP=AUTO_TEMPERATURE_WEEK3$WIS,
+  AUTO_AVG=AUTO_AVERAGE_WEEK3$WIS,
+  
+  ES27_AR=ES27_ARIMA_WEEK3$WIS, 
+  ES27_ADJ=ES27_ADJACENT_WEEK3$WIS, 
+  ES27_EPI=ES27_EPIWEEK_WEEK3$WIS,
+  ES27_TEMP=ES27_TEMPERATURE_WEEK3$WIS,
+  ES27_AVG=ES27_AVERAGE_WEEK3$WIS,  
+  
+  ES64_AR=ES64_ARIMA_WEEK3$WIS, 
+  ES64_ADJ=ES64_ADJACENT_WEEK3$WIS, 
+  ES64_EPI=ES64_EPIWEEK_WEEK3$WIS,
+  ES64_TEMP=ES64_TEMPERATURE_WEEK3$WIS,
+  ES64_AVG=ES64_AVERAGE_WEEK3$WIS  
+)
+
+head(df_W3)
+
+```
+
+-------------
+4 Weeks ahead
+-------------
+```{r}
+# Creating new columns with Epidemiological weeks based on target_end_week
+AUTO_ARIMA_WEEK4$epiweek <- MMWRweek(AUTO_ARIMA_WEEK4$target_end_date)$MMWRweek
+AUTO_ADJACENT_WEEK4$epiweek <- MMWRweek(AUTO_ADJACENT_WEEK4$target_end_date)$MMWRweek
+AUTO_EPIWEEK_WEEK4$epiweek <- MMWRweek(AUTO_EPIWEEK_WEEK4$target_end_date)$MMWRweek
+AUTO_TEMPERATURE_WEEK4$epiweek <- MMWRweek(AUTO_TEMPERATURE_WEEK4$target_end_date)$MMWRweek
+AUTO_AVERAGE_WEEK4$epiweek <- MMWRweek(AUTO_AVERAGE_WEEK4$target_end_date)$MMWRweek
+
+ES27_ARIMA_WEEK4$epiweek <- MMWRweek(ES27_ARIMA_WEEK4$target_end_date)$MMWRweek
+ES27_ADJACENT_WEEK4$epiweek <- MMWRweek(ES27_ADJACENT_WEEK4$target_end_date)$MMWRweek
+ES27_EPIWEEK_WEEK4$epiweek <- MMWRweek(ES27_EPIWEEK_WEEK4$target_end_date)$MMWRweek
+ES27_TEMPERATURE_WEEK4$epiweek <- MMWRweek(ES27_TEMPERATURE_WEEK4$target_end_date)$MMWRweek
+ES27_AVERAGE_WEEK4$epiweek <- MMWRweek(ES27_AVERAGE_WEEK4$target_end_date)$MMWRweek
+
+ES64_ARIMA_WEEK4$epiweek <- MMWRweek(ES64_ARIMA_WEEK4$target_end_date)$MMWRweek
+ES64_ADJACENT_WEEK4$epiweek <- MMWRweek(ES64_ADJACENT_WEEK4$target_end_date)$MMWRweek
+ES64_EPIWEEK_WEEK4$epiweek <- MMWRweek(ES64_EPIWEEK_WEEK4$target_end_date)$MMWRweek
+ES64_TEMPERATURE_WEEK4$epiweek <- MMWRweek(ES64_TEMPERATURE_WEEK4$target_end_date)$MMWRweek
+ES64_AVERAGE_WEEK4$epiweek <- MMWRweek(ES64_AVERAGE_WEEK4$target_end_date)$MMWRweek
+
+# Dataframe that will be analysed for 2 Week Ahead
+df_W4 <- data.frame(
+  STATE = AUTO_ARIMA_WEEK4$State,
+  Julian_date = AUTO_ARIMA_WEEK4$target_end_date,
+  epiweek = AUTO_ARIMA_WEEK4$epiweek,
+  AUTO_AR=AUTO_ARIMA_WEEK4$WIS, 
+  AUTO_ADJ=AUTO_ADJACENT_WEEK4$WIS, 
+  AUTO_EPI=AUTO_EPIWEEK_WEEK4$WIS,
+  AUTO_TEMP=AUTO_TEMPERATURE_WEEK4$WIS,
+  AUTO_AVG=AUTO_AVERAGE_WEEK4$WIS,
+  
+  ES27_AR=ES27_ARIMA_WEEK4$WIS, 
+  ES27_ADJ=ES27_ADJACENT_WEEK4$WIS, 
+  ES27_EPI=ES27_EPIWEEK_WEEK4$WIS,
+  ES27_TEMP=ES27_TEMPERATURE_WEEK4$WIS,
+  ES27_AVG=ES27_AVERAGE_WEEK4$WIS,  
+  
+  ES64_AR=ES64_ARIMA_WEEK4$WIS, 
+  ES64_ADJ=ES64_ADJACENT_WEEK4$WIS, 
+  ES64_EPI=ES64_EPIWEEK_WEEK4$WIS,
+  ES64_TEMP=ES64_TEMPERATURE_WEEK4$WIS,
+  ES64_AVG=ES64_AVERAGE_WEEK4$WIS  
+)
+
+head(df_W4)
+```
+
+
+Filter only the flu season
+
+```{r}
+# Filter the dataframe for epiweek >= 40 or epiweek <= 20
+filtered_df_W1 <- df_W1 %>%
+  filter(epiweek >= 40 | epiweek <= 20)
+
+# Display the filtered dataset
+head(filtered_df_W1)
+
+
+# Filter the dataframe for epiweek >= 40 or epiweek <= 20
+filtered_df_W2 <- df_W2 %>%
+  filter(epiweek >= 40 | epiweek <= 20)
+
+# Display the filtered dataset
+head(filtered_df_W2)
+
+# Filter the dataframe for epiweek >= 40 or epiweek <= 20
+filtered_df_W3 <- df_W3 %>%
+  filter(epiweek >= 40 | epiweek <= 20)
+
+# Display the filtered dataset
+head(filtered_df_W3)
+
+# Filter the dataframe for epiweek >= 40 or epiweek <= 20
+filtered_df_W4 <- df_W4 %>%
+  filter(epiweek >= 40 | epiweek <= 20)
+
+# Display the filtered dataset
+head(filtered_df_W4)
+```
+
+Calculate mean weighted interval score for all forecast weeks on each model.
+
+```{r}
+
+# Define the function
+calculate_mean_wis <- function(data) {
+  data %>%
+    group_by(STATE) %>%
+    summarize(
+      AUTO_AR_Lg = mean(AUTO_AR, na.rm = TRUE),
+      AUTO_ADJ_Lg = mean(AUTO_ADJ, na.rm = TRUE),
+      AUTO_EPI_Lg = mean(AUTO_EPI, na.rm = TRUE),
+      AUTO_TMP_Lg = mean(AUTO_TEMP, na.rm = TRUE),
+      ES27_AR_Lg = mean(ES27_AR, na.rm = TRUE),
+      ES27_ADJ_Lg = mean(ES27_ADJ, na.rm = TRUE),
+      ES27_EPI_Lg = mean(ES27_EPI, na.rm = TRUE),
+      ES27_TMP_Lg = mean(ES27_TEMP, na.rm = TRUE),
+      ES64_AR_Lg = mean(ES64_AR, na.rm = TRUE),
+      ES64_ADJ_Lg = mean(ES64_ADJ, na.rm = TRUE),
+      ES64_EPI_Lg = mean(ES64_EPI, na.rm = TRUE),
+      ES64_TMP_Lg = mean(ES64_TEMP, na.rm = TRUE)
+    )
+}
+
+# Now you can use the function with any dataframe
+W1_Lg <- calculate_mean_wis(filtered_df_W1)
+W2_Lg <- calculate_mean_wis(filtered_df_W2)
+W3_Lg <- calculate_mean_wis(filtered_df_W3)
+W4_Lg <- calculate_mean_wis(filtered_df_W4)
+
+# Display the resulting dataframe
+head(W1_Lg)
+head(W2_Lg)
+head(W3_Lg)
+head(W4_Lg)
+```
+
+
+Here we have boxplots of the mean(WIS) by each state. 
+
+```{r}
+# Combine the data into one data frame
+combined_data <- data.frame(
+  week = rep(c("W1", "W2", "W3", "W4"), each = 48 * 15),
+  
+  Models = rep(c("AUTO_AR_Lg", "ES27_AR_Lg", "ES64_AR_Lg", "AUTO_ADJ_Lg", "ES27_ADJ_Lg", "ES64_ADJ_Lg", "AUTO_TMP_Lg", "ES27_TMP_Lg", "ES64_TMP_Lg", "AUTO_EPI_Lg", "ES27_EPI_Lg", "ES64_EPI_Lg"), each=48, times = 4),
+  
+  value = c(W1_Lg$AUTO_AR_Lg, W1_Lg$ES27_AR_Lg, W1_Lg$ES64_AR_Lg, W1_Lg$AUTO_ADJ_Lg, W1_Lg$ES27_ADJ_Lg, W1_Lg$ES64_ADJ_Lg, W1_Lg$AUTO_TMP_Lg, W1_Lg$ES27_TMP_Lg, W1_Lg$ES64_TMP_Lg, W1_Lg$AUTO_EPI_Lg, W1_Lg$ES27_EPI_Lg, W1_Lg$ES64_EPI_Lg,
+            
+            W2_Lg$AUTO_AR_Lg, W2_Lg$ES27_AR_Lg, W2_Lg$ES64_AR_Lg, W2_Lg$AUTO_ADJ_Lg, W2_Lg$ES27_ADJ_Lg, W2_Lg$ES64_ADJ_Lg, W2_Lg$AUTO_TMP_Lg, W2_Lg$ES27_TMP_Lg, W2_Lg$ES64_TMP_Lg, W2_Lg$AUTO_EPI_Lg, W2_Lg$ES27_EPI_Lg, W2_Lg$ES64_EPI_Lg,
+            
+            W3_Lg$AUTO_AR_Lg, W3_Lg$ES27_AR_Lg, W3_Lg$ES64_AR_Lg, W3_Lg$AUTO_ADJ_Lg, W3_Lg$ES27_ADJ_Lg, W3_Lg$ES64_ADJ_Lg, W3_Lg$AUTO_TMP_Lg, W3_Lg$ES27_TMP_Lg, W3_Lg$ES64_TMP_Lg, W3_Lg$AUTO_EPI_Lg, W3_Lg$ES27_EPI_Lg, W3_Lg$ES64_EPI_Lg,
+            
+            W4_Lg$AUTO_AR_Lg, W4_Lg$ES27_AR_Lg, W4_Lg$ES64_AR_Lg, W4_Lg$AUTO_ADJ_Lg, W4_Lg$ES27_ADJ_Lg, W4_Lg$ES64_ADJ_Lg, W4_Lg$AUTO_TMP_Lg, W4_Lg$ES27_TMP_Lg, W4_Lg$ES64_TMP_Lg, W4_Lg$AUTO_EPI_Lg, W4_Lg$ES27_EPI_Lg, W4_Lg$ES64_EPI_Lg)
+)
+
+# Create a new column for categories
+combined_data <- combined_data %>%
+  mutate(category = case_when(
+    grepl("AR", Models) ~ "AR",
+    grepl("EPI", Models) ~ "EPI",
+    grepl("TMP", Models) ~ "TMP",
+    grepl("ADJ", Models) ~ "ADJ"
+  ))
+
+# Define color ramps for each category
+colors_ar <- c("#a6cee3","#226e83", "#08306b")
+colors_adj <- c("#fb9a99","red3", "#a11c3e")
+colors_epi <- c("#cab2d6", "purple2", "#5e2b7b")
+colors_tmp <- c("lightgreen","green3","#319045")
+
+# Create a custom color mapping for each variable
+custom_colors <- c(
+  "AUTO_AR_Lg" = colors_ar[1], "ES27_AR_Lg" = colors_ar[2], "ES64_AR_Lg" = colors_ar[3],
+  "AUTO_EPI_Lg" = colors_epi[1], "ES27_EPI_Lg" = colors_epi[2], "ES64_EPI_Lg" = colors_epi[3],
+  "AUTO_TMP_Lg" = colors_tmp[1], "ES27_TMP_Lg" = colors_tmp[2], "ES64_TMP_Lg" = colors_tmp[3],
+  "AUTO_ADJ_Lg" = colors_adj[1], "ES27_ADJ_Lg" = colors_adj[2], "ES64_ADJ_Lg" = colors_adj[3]
+)
+
+  # Create the box plot with additional facet for categories
+plt2<-  ggplot(combined_data, aes(x = week, y = value, fill = Models)) +
+    geom_boxplot(color = "black") +
+    scale_fill_manual(values = custom_colors) +
+    facet_wrap(category ~ Models , nrow = 2) +
+    labs(
+      title = "B)Models with log-back transformations",
+      x = "",
+      y = "Weighted Interval Score (WIS)"
+    ) +
+  scale_y_continuous(limits = c(0, 650)) +  # Set y-axis range
+    theme_minimal()
+plt2
+ggsave(plt2, height = 8, width = 10, filename="Fig1B.jpg")  
+```
+
+COMBINING THE RESULTS WITH LOG AND NO LOG TRASNFORMATION
+
+```{r}
+W1<-merge(W1_Lg,W1_NoLg, by = "STATE")
+W2<-merge(W2_Lg,W2_NoLg, by = "STATE")
+W3<-merge(W3_Lg,W3_NoLg, by = "STATE")
+W4<-merge(W4_Lg,W4_NoLg, by = "STATE")
+
+```
+
+
+Here we have boxplots of the mean(WIS) by each state. 
+
+
+Here I include a column with the best model result based on the lowest mean(WIS) of each state.
+
+```{r}
+# BEST RESULT
+
+# Extract the columns of interest 
+cols <- colnames(W1)[-1]
+# Initialize a vector to store results
+W1$Best_Result <- character(nrow(W1))
+
+# Give me the model with lower WIS value in the best result column
+for (i in 1:nrow(W1)) {
+  # Find the column name with the minimum value for each row
+  W1$Best_Result[i] <- cols[which.min(W1[i, cols])]
+}
+
+# REORDER BY FREQUENCY
+W1$Best_Result <- fct_infreq(W1$Best_Result)
+# Create a new column to classify the model type
+W1$Model_Type <- ifelse(grepl("_NoLg$", W1$Best_Result), "Without log-back transformation", "With log-back transformation")
+
+# Print the first rows
+head(W1)
+
+
+################################################
+
+# Extract the columns of interest 
+cols <- colnames(W2)[-1]
+# Initialize a vector to store results
+W2$Best_Result <- character(nrow(W2))
+# Give me the model with lower WIS value in the best result column
+for (i in 1:nrow(W2)) {
+  # Find the column name with the minimum value for each row
+  W2$Best_Result[i] <- cols[which.min(W2[i, cols])]
+}
+
+# REORDER BY FREQUENCY
+W2$Best_Result <- fct_infreq(W2$Best_Result)
+# Create a new column to classify the model type
+W2$Model_Type <- ifelse(grepl("_NoLg$", W2$Best_Result), "Without log-back transformation", "With log-back transformation")
+
+# Print merged results
+head(W2)
+
+######################################
+# BEST RESULT
+# Extract the columns of interest 
+cols <- colnames(W3)[-1]
+# Initialize a vector to store results
+W3$Best_Result <- character(nrow(W3))
+
+# Give me the model with lower WIS value in the best result column
+for (i in 1:nrow(W3)) {
+  # Find the column name with the minimum value for each row
+  W3$Best_Result[i] <- cols[which.min(W3[i, cols])]
+}
+
+# REORDER BY FREQUENCY
+W3$Best_Result <- fct_infreq(W3$Best_Result)
+# Create a new column to classify the model type
+W3$Model_Type <- ifelse(grepl("_NoLg$", W3$Best_Result), "Without log-back transformation", "With log-back transformation")
+
+# Print merged results
+head(W3)
+
+###################################
+# BEST RESULT
+# Extract the columns of interest
+cols <- colnames(W4)[-1]
+# Initialize a vector to store results
+W4$Best_Result <- character(nrow(W4))
+# Give me the model with lower WIS value in the best result column
+for (i in 1:nrow(W4)) {
+  # Find the column name with the minimum value for each row
+  W4$Best_Result[i] <- cols[which.min(W4[i, cols])]
+}
+W4$Best_Result <- fct_infreq(W4$Best_Result)
+# Create a new column to classify the model type
+W4$Model_Type <- ifelse(grepl("_NoLg$", W4$Best_Result), "Without log-back transformation", "With log-back transformation")
+# Print merged results
+head(W4)
+
+```
+
+Now, let's plot the best models by each state for each forecast horizon (1-4 weeks ahead). 
+
+```{r}
+
+# Create a custom color mapping for each variable
+custom_colors <- c(
+  "AUTO_AR_Lg" = colors_ar[1], "ES27_AR_Lg" = colors_ar[2], "ES64_AR_Lg" = colors_ar[3],
+  "AUTO_EPI_Lg" = colors_epi[1], "ES27_EPI_Lg" = colors_epi[2], "ES64_EPI_Lg" = colors_epi[3],
+  "AUTO_TMP_Lg" = colors_tmp[1], "ES27_TMP_Lg" = colors_tmp[2], "ES64_TMP_Lg" = colors_tmp[3],
+  "AUTO_ADJ_Lg" = colors_adj[1], "ES27_ADJ_Lg" = colors_adj[2], "ES64_ADJ_Lg" = colors_adj[3],
+  
+  
+  "AUTO_AR_NoLg" = colors_ar[1], "ES27_AR_NoLg" = colors_ar[2], "ES64_AR_NoLg" = colors_ar[3],
+  "AUTO_EPI_NoLg" = colors_epi[1], "ES27_EPI_NoLg" = colors_epi[2], "ES64_EPI_NoLg" = colors_epi[3],
+  "AUTO_TMP_NoLg" = colors_tmp[1], "ES27_TMP_NoLg" = colors_tmp[2], "ES64_TMP_NoLg" = colors_tmp[3],
+  "AUTO_ADJ_NoLg" = colors_adj[1], "ES27_ADJ_NoLg" = colors_adj[2], "ES64_ADJ_NoLg" = colors_adj[3]
+)
+
+# --------- WEEK1 MODELS ------------- #
+plot1<- ggplot(W1, aes(x = Best_Result, fill = Best_Result)) +  
+  geom_bar() +  
+  scale_fill_manual(values = custom_colors) +  
+  labs(title = "Best model on the 48 U.S. states (W1)",       
+       x = "", y = "Number of states") +  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
+  facet_wrap(~ Model_Type, scales = "free_x")
+
+plot1
+
+#ggsave("week1_best_models.jpg", plot1)
+
+# --------- WEEK2 MODELS ------------- #
+plot2<-ggplot(W2, aes(x = Best_Result, fill = Best_Result))  +  
+  geom_bar() +  
+  scale_fill_manual(values = custom_colors) +  
+  labs(title = "Best model on the 48 U.S. states (W2)",       
+       x = "", y = "Number of states") +  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
+  facet_wrap(~ Model_Type, scales = "free_x")
+
+#ggsave("week2_best_models.jpg", plot2)
+
+plot2
+# --------- WEEK3 MODELS ------------- #
+plot3<-ggplot(W3, aes(x = Best_Result, fill = Best_Result))  +  
+  geom_bar() +  
+  scale_fill_manual(values = custom_colors) +  
+  labs(title = "Best model on the 48 U.S. states (W3)",       
+       x = "", y = "Number of states") +  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
+  facet_wrap(~ Model_Type, scales = "free_x")
+plot3
+
+#ggsave("week3_best_models.jpg", plot3)
+
+# --------- WEEK4 MODELS ------------- #
+plot4<-ggplot(W4, aes(x = Best_Result, fill = Best_Result)) +  
+  geom_bar() +  
+  scale_fill_manual(values = custom_colors) +  
+  labs(title = "Best model on the 48 U.S. states (W4)",       
+       x = "", y = "Number of states") +  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
+  facet_wrap(~ Model_Type, scales = "free_x")
+plot4
+#ggsave("week4_best_models.jpg", plot4)
+
+
+W1
+```
+
+Let's plot all results 
+
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Add a column to indicate the week ahead
+W1$Week_Ahead <- "W1"
+W2$Week_Ahead <- "W2"
+W3$Week_Ahead <- "W3"
+W4$Week_Ahead <- "W4"
+
+# Combine all weeks into one dataframe
+all_weeks <- bind_rows(W1, W2, W3, W4)
+
+# Create the plot
+combined_plot <- ggplot(all_weeks, aes(x = Best_Result, fill = Best_Result)) +
+  geom_bar() +
+  scale_fill_manual(values = custom_colors) +
+  labs(title = "Best model based on the lowest mean WIS on 48 U.S. states",
+       x = "", y = "Number of states") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_grid(Week_Ahead ~ Model_Type, scales = "free_x")
+
+# Save and display the plot
+ggsave("Fig2.jpg", combined_plot, width = 10, height = 8)
+print(combined_plot)
+
+```
+ 
+ Wilcox test with Holm p-value ajustment 
+
+1 WEEK AHEAD
+
+```{r}
+library(lme4)
+library(ez)
+
+# Reshape the data into long format
+long_data <- W1 %>%
+  pivot_longer(cols = c(-STATE,-Best_Result,-Model_Type,-Week_Ahead) , names_to = "Type", values_to = "Value")#%>%
+#  mutate(Type = recode(Type, "AUTO_AR" = "AUTO_AAR"))
+
+
+wide_data <- long_data %>%
+  pivot_wider(names_from = Type, values_from = Value)
+
+
+# Get all model types except "AUTO_AAR"
+model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR_NoLg","Best_Result","Model_Type","Week_Ahead"))
+
+# Perform Wilcoxon test for each model type against AUTO_AAR
+wilcox_results <- map_df(model_types, function(model) {
+  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR_NoLg, paired = TRUE, p.adjust.method ="holm")
+  data.frame(Model = model, p_value = test$p.value, W = test$statistic)
+})
+
+# View results
+p_values<-wilcox_results$p_value 
+
+p_values<-p.adjust(p_values, method = "holm")
+
+p_values<-data.frame(p_values)
+
+#########################################################################
+p_df1 <- data.frame(Model = model_types, PValue = p_values, WeekAhead=1)
+p_df1 <-drop_na(p_df1)
+p_df1
+
+```
+
+2 WEEKS AHEAD Post Hoc Wilcox test
+
+```{r}
+# Reshape the data into long format
+long_data <- W2 %>%
+  pivot_longer(cols = c(-STATE,-Best_Result,-Model_Type,-Week_Ahead) , names_to = "Type", values_to = "Value")#%>%
+                          
+################################
+wide_data <- long_data %>%
+  pivot_wider(names_from = Type, values_from = Value)
+
+# Get all model types except "AUTO_AAR"
+model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR_NoLg","Best_Result","Model_Type","Week_Ahead"))
+
+# Perform Wilcoxon test for each model type against AUTO_AAR
+wilcox_results <- map_df(model_types, function(model) {
+  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR_NoLg, paired = TRUE, p.adjust.method ="holm")
+  data.frame(Model = model, p_value = test$p.value, W = test$statistic)
+})
+
+# View results
+print(wilcox_results)
+
+p_values<-wilcox_results$p_value 
+p_values<-p.adjust(p_values, method = "holm")
+p_values<-data.frame(p_values)
+
+#########################################################################
+p_df2 <- data.frame(Model = model_types, PValue = p_values, WeekAhead=2)
+p_df2 <-drop_na(p_df2)
+p_df2
+
+```
+
+3 WEEKS AHEAD Post Hoc Wilcox test
+
+```{r}
+# Reshape the data into long format
+long_data <- W3 %>%
+  pivot_longer(cols = c(-STATE,-Best_Result,-Model_Type,-Week_Ahead) , names_to = "Type", values_to = "Value")#%>%
+
+######################
+wide_data <- long_data %>%
+  pivot_wider(names_from = Type, values_from = Value)
+
+# Get all model types except "AUTO_AAR"
+model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR_NoLg","Best_Result","Model_Type","Week_Ahead"))
+
+# Perform Wilcoxon test for each model type against AUTO_AAR
+wilcox_results <- map_df(model_types, function(model) {
+  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR_NoLg, paired = TRUE, p.adjust.method ="holm")
+  data.frame(Model = model, p_value = test$p.value, W = test$statistic)
+})
+
+# View results
+print(wilcox_results)
+
+p_values<-wilcox_results$p_value 
+p_values<-p.adjust(p_values, method = "holm")
+p_values<-data.frame(p_values)
+
+#########################################################################
+p_df3 <- data.frame(Model = model_types, PValue = p_values, WeekAhead=3)
+p_df3 <-drop_na(p_df3)
+p_df3
+```
+
+4 WEEKS AHEAD Post Hoc Wilcox test
+
+```{r}
+# Reshape the data into long format
+long_data <- W4 %>%
+  pivot_longer(cols = c(-STATE,-Best_Result,-Model_Type,-Week_Ahead) , names_to = "Type", values_to = "Value")#%>%
+#  mutate(Type = recode(Type, "AUTO_AR" = "AUTO_AR"))
+
+######################
+wide_data <- long_data %>%
+  pivot_wider(names_from = Type, values_from = Value)
+
+
+# Get all model types except "AUTO_AAR"
+model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR_NoLg","Best_Result","Model_Type","Week_Ahead"))
+
+# Perform Wilcoxon test for each model type against AUTO_AAR
+wilcox_results <- map_df(model_types, function(model) {
+  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR_NoLg, paired = TRUE, p.adjust.method ="holm")
+  data.frame(Model = model, p_value = test$p.value, W = test$statistic)
+})
+
+# View results
+print(wilcox_results)
+
+p_values<-wilcox_results$p_value 
+
+p_values<-p.adjust(p_values, method = "holm")
+
+p_values<-data.frame(p_values)
+
+#########################################################################
+p_df4 <- data.frame(Model = model_types, PValue = p_values, WeekAhead=4)
+p_df4 <-drop_na(p_df4)
+p_df4
+
+```
+
+
+
+
+Let's calculate the mean(WIS) improvement relative to the AUTO ARIMA model. We will compare each model with the AUTO ARIMA model for the same states. Later we sum the results of these comparisons. Positive results indicate that there was a general improvement in the mean(WIS) for a given model type among all states. Note that larger values on specific states may override a general trend and make the results less informative. So I do not strongly advice this analysis.
+
+```{r}
+calculate_percentage_of_improvement <- function(data) {
+  return(data.frame(
+    AUTO_AR_NoLg = (data$AUTO_AR_NoLg - data$AUTO_AR_NoLg),
+    ES27_AR_NoLg = ((data$AUTO_AR_NoLg - data$ES27_AR_NoLg) / data$AUTO_AR_NoLg) * 100,
+    ES64_AR_NoLg = ((data$AUTO_AR_NoLg - data$ES64_AR_NoLg) / data$AUTO_AR_NoLg) * 100,
+    AUTO_ADJ_NoLg = ((data$AUTO_AR_NoLg - data$AUTO_ADJ_NoLg) / data$AUTO_AR_NoLg) * 100,
+    ES27_ADJ_NoLg = ((data$AUTO_AR_NoLg - data$ES27_ADJ_NoLg) / data$AUTO_AR_NoLg) * 100,
+    ES64_ADJ_NoLg = ((data$AUTO_AR_NoLg - data$ES64_ADJ_NoLg) / data$AUTO_AR_NoLg) * 100,
+    AUTO_TMP_NoLg = ((data$AUTO_AR_NoLg - data$AUTO_TMP_NoLg) / data$AUTO_AR_NoLg) * 100,
+    ES27_TMP_NoLg = ((data$AUTO_AR_NoLg - data$ES27_TMP_NoLg) / data$AUTO_AR_NoLg) * 100,
+    ES64_TMP_NoLg = ((data$AUTO_AR_NoLg - data$ES64_TMP_NoLg) / data$AUTO_AR_NoLg) * 100,
+    AUTO_EPI_NoLg = ((data$AUTO_AR_NoLg - data$AUTO_EPI_NoLg) / data$AUTO_AR_NoLg) * 100,
+    ES27_EPI_NoLg = ((data$AUTO_AR_NoLg - data$ES27_EPI_NoLg) / data$AUTO_AR_NoLg) * 100,
+    ES64_EPI_NoLg = ((data$AUTO_AR_NoLg - data$ES64_EPI_NoLg) / data$AUTO_AR_NoLg) * 100,
+    
+    AUTO_AR_Lg = ((data$AUTO_AR_NoLg - data$AUTO_AR_Lg) / data$AUTO_AR_NoLg) * 100,
+    ES27_AR_Lg = ((data$AUTO_AR_NoLg - data$ES27_AR_Lg) / data$AUTO_AR_NoLg) * 100,
+    ES64_AR_Lg = ((data$AUTO_AR_NoLg - data$ES64_AR_Lg) / data$AUTO_AR_NoLg) * 100,
+    AUTO_ADJ_Lg = ((data$AUTO_AR_NoLg - data$AUTO_ADJ_Lg) / data$AUTO_AR_NoLg) * 100,
+    ES27_ADJ_Lg = ((data$AUTO_AR_NoLg - data$ES27_ADJ_Lg) / data$AUTO_AR_NoLg) * 100,
+    ES64_ADJ_Lg = ((data$AUTO_AR_NoLg - data$ES64_ADJ_Lg) / data$AUTO_AR_NoLg) * 100,
+    AUTO_TMP_Lg = ((data$AUTO_AR_NoLg - data$AUTO_TMP_Lg) / data$AUTO_AR_NoLg) * 100,
+    ES27_TMP_Lg = ((data$AUTO_AR_NoLg - data$ES27_TMP_Lg) / data$AUTO_AR_NoLg) * 100,
+    ES64_TMP_Lg = ((data$AUTO_AR_NoLg - data$ES64_TMP_Lg) / data$AUTO_AR_NoLg) * 100,
+    AUTO_EPI_Lg = ((data$AUTO_AR_NoLg - data$AUTO_EPI_Lg) / data$AUTO_AR_NoLg) * 100,
+    ES27_EPI_Lg = ((data$AUTO_AR_NoLg - data$ES27_EPI_Lg) / data$AUTO_AR_NoLg) * 100,
+    ES64_EPI_Lg = ((data$AUTO_AR_NoLg - data$ES64_EPI_Lg) / data$AUTO_AR_NoLg) * 100
+  ))
+}
+
+# Calculate percentage of improvemtn 
+W1_percentage_of_improvement <- calculate_percentage_of_improvement(W1)
+W2_percentage_of_improvement <- calculate_percentage_of_improvement(W2)
+W3_percentage_of_improvement <- calculate_percentage_of_improvement(W3)
+W4_percentage_of_improvement <- calculate_percentage_of_improvement(W4)
+
+```
+
+
+
+
+Now let's plot a map of percentage of WIS improvement for each state.
+
+Mean and sd percentage of improvement compared to auto_arima
+
+```{r}
+# List of column names
+#variables <- c("ES27_AR", "ES64_AR", "AUTO_TMP", "ES27_TMP", "ES64_TMP", 
+#               "AUTO_EPI", "ES27_EPI", "ES64_EPI", "AUTO_ADJ", "ES27_ADJ", "ES64_ADJ")
+variables <-c(names(W1_percentage_of_improvement))
+
+# Create an empty dataframe to store results
+summary_impr <- data.frame(WeekAhead = character(), Model = character(), m = numeric(), sd = numeric(), stringsAsFactors = FALSE)
+
+# List of datasets
+datasets <- list("1" = W1_percentage_of_improvement, 
+                 "2" = W2_percentage_of_improvement, 
+                 "3" = W3_percentage_of_improvement, 
+                 "4" = W4_percentage_of_improvement)
+
+# Loop through datasets and variables
+for (dataset_name in names(datasets)) {
+  dataset <- datasets[[dataset_name]]  # Get the dataset
+  
+  for (var in variables) {
+    data <- dataset[[var]]
+    mean_val <- mean(data, na.rm = TRUE)
+    sd_val <- sd(data, na.rm = TRUE)
+
+    # Append results to dataframe
+    summary_impr <- rbind(summary_impr, data.frame(WeekAhead = dataset_name, Model = var, m = mean_val, sd = sd_val))
+
+    # Generate histogram
+    p <- ggplot(dataset, aes(x = .data[[var]])) +
+      geom_histogram(color = "black", fill = "lightblue", bins = 30, alpha = 0.7) +
+      geom_vline(aes(xintercept = mean_val), color = "red", linetype = "dashed", linewidth = 1) +
+      geom_vline(aes(xintercept = mean_val - sd_val), color = "blue", linetype = "dotted", linewidth = 1) +
+      geom_vline(aes(xintercept = mean_val + sd_val), color = "blue", linetype = "dotted", linewidth = 1) +
+      labs(title = paste("Histogram of", var, "in", dataset_name),
+           x = var, 
+           y = "Frequency") +
+      theme_minimal()
+
+    print(p)  # Display the plot
+  }
+}
+
+summary_impr$WeekAhead<-as.numeric(summary_impr$WeekAhead)
+
+summary_impr
+```
+
+Summary of Post Hoc Wilcox test with  p.adjust.method Benjamini-Yekutieli (BY)
+
+```{r}
+
+
+all_p_values<-rbind(p_df1,p_df2,p_df3,p_df4)
+
+#names(all_p_values)[names(all_p_values) == "Models"] <- "Model"
+
+p_values_and_impr <- merge(summary_impr, all_p_values, by = c("WeekAhead", "Model"))
+
+# Create a new column "Model_Type" based on whether "NoLg" is in the Model name
+p_values_and_impr$Model_Type <- ifelse(grepl("NoLg", p_values_and_impr$Model), "NoLog", "Log")
+
+# View the updated dataframe
+head(p_values_and_impr)
+p_values_and_impr
+```
+
+
+
+```{r}
+
+library(ggplot2)
+library(dplyr)
+library(forcats)
+
+# Define significance threshold  
+alpha <- 0.05   
+
+# Get model order based on WeekAhead == 1  
+model_order <- p_values_and_impr %>%
+  filter(WeekAhead == 1) %>%
+  arrange(desc(m)) %>%
+  pull(Model)  # Extract ordered model names
+
+# Prepare data with significance flag and ordering  
+p_df <- p_values_and_impr %>%
+  mutate(Significance = ifelse(p_values < alpha, "Significant", "Not Significant"),
+         Model_Type = ifelse(grepl("NoLg", Model), "Without log-back transformation", "With log-back transformation"),
+         Model = factor(Model, levels = model_order))  # Apply ordered factor
+
+# Heatmap plot with models ordered by WeekAhead == 1  
+plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) +
+  geom_tile(aes(fill = ifelse(Significance == "Significant", m, NA)), color = "black") +  # Fill only significant ones
+  geom_tile(data = p_df %>% filter(Significance == "Not Significant"), 
+            aes(x = factor(WeekAhead), y = Model), fill = "gray80", color = "black") +  # Gray for non-significant
+  geom_text(aes(label = paste0("m:", round(m, 2),", sd:", round(sd, 2))), 
+            color = "black", size = 4) +  # Add text labels
+  scale_fill_gradient(low = "red", high = "cyan", na.value = "gray80", 
+                      name = "Mean Improvement", limits = c(-50, 50)) +  # Fixed color scale from -30 to 30
+  labs(title = "Model improvement (%) comparing each model' WIS with the baseline across 48 states",
+       subtitle = "Gray boxes indicate models not significantly different from the baseline model based on Wilcoxon test with Holm's adjusted p-values",
+       x = "Week Ahead",
+       y = "") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~ Model_Type, scales = "free_y")  # Separate NoLg and other models
+
+
+# Print plot
+print(plot_m_heatmap)
+ggsave("Fig3.jpg", plot_m_heatmap, width = 15, height = 7 )
+
+```
+
+Friedman test for ADJACENT MODELS
+
+```{r}
+
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(tidyr)
+
+# List of datasets
+datasets <- list(W1 = W1, W2 = W2, W3 = W3, W4 = W4)
+
+# Function to compute Wilcoxon test and prepare the data for plotting
+run_pairwise_tests <- function(data, week) {
+  long_data <- data %>%
+    pivot_longer(cols = c(AUTO_ADJ_Lg, ES27_ADJ_Lg, ES64_ADJ_Lg),
+                 names_to = "Type",
+                 values_to = "Value")
+  
+  pairwise_results <- pairwise.wilcox.test(long_data$Value, long_data$Type,
+                                           p.adjust.method = "holm", paired = TRUE)
+  
+  # Convert p-value matrix to long format
+  p_df <- as.data.frame(as.table(pairwise_results$p.value)) %>%
+    rename(Comparison1 = Var1, Comparison2 = Var2, P_value = Freq) %>%
+    mutate(Significance = ifelse(P_value < 0.05, "Significant", "Not Significant"),
+           WeekAhead = week)  # Add a column for dataset identifier
+  
+  return(p_df)
+}
+
+# Apply the function to all datasets and combine results
+p_values_df <- bind_rows(lapply(names(datasets), function(w) run_pairwise_tests(datasets[[w]], w)))
+
+adjacent_variance_test<-ggplot(p_values_df, aes(x = Comparison1, y = Comparison2, fill = Significance)) +
+  geom_tile(color = "black") +  # Add black gridlines
+  geom_text(aes(label = round(P_value, 3)), color = "black", size = 4) +  # Add p-value labels
+  scale_fill_manual(values = c("Significant" = "cyan", "Not Significant" = "gray80"), 
+                    name = "Significance", na.value = "white", drop = TRUE) +  # Remove NA from legend
+  labs(title = "ADJACENT model family pairwise Wilcoxon test",
+       subtitle = "Gray indicates not significant differences (Holm-adjusted p-values)",
+       x = "",
+       y = "") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~ WeekAhead)  # Separate plots for each dataset
+
+adjacent_variance_test
+
+ggsave(adjacent_variance_test,filename="Fig4.jpg", width = 6, height = 5)
+
+```
+
+Now let's plot a map of percentage of WIS improvement for each state.
+
+```{r}
+# MAP 1 week ahead
+
+W1_map <- data.frame(
+  STATE = W1$STATE,
+  percentage_improvement = W1_percentage_of_improvement$AUTO_ADJ_Lg,
+  AUTO_ADJ=W1$AUTO_ADJ_Lg
+)
+
+# Merge the best model data with the states map
+W1_map <- states %>%
+  left_join(W1_map, by = c("STATE")) %>%
+  drop_na()
+
+################################### MAP 2 weeka ahead
+
+W2_map <- data.frame(
+  STATE = W2$STATE,
+  percentage_improvement = W2_percentage_of_improvement$AUTO_ADJ_Lg,
+  AUTO_ADJ=W2$AUTO_ADJ_Lg
+)
+
+# Merge the best model data with the states map
+W2_map <- states %>%
+  left_join(W2_map, by = c("STATE"))%>%
+  drop_na()
+
+##################################### MAP 3 weeka ahead
+
+W3_map <- data.frame(
+  STATE = W3$STATE,
+  percentage_improvement = W3_percentage_of_improvement$AUTO_ADJ_Lg,
+  AUTO_ADJ=W3$AUTO_ADJ_Lg
+)
+
+# Merge the best model data with the states map
+W3_map <- states %>%
+  left_join(W3_map, by = c("STATE"))%>%
+  drop_na() 
+
+############################### MAP 4 weeka ahead
+
+W4_map <- data.frame(
+  STATE = W4$STATE,
+  percentage_improvement = W4_percentage_of_improvement$AUTO_ADJ_Lg,
+  AUTO_ADJ=W4$AUTO_ADJ_Lg
+)
+
+# Merge the best model data with the states map
+W4_map <- states %>%
+  left_join(W4_map, by = c("STATE"))%>%
+  drop_na()
+```
+
+Let's plot some maps with the best models in each state and the percentage of improvement compared to the AUTO ARIMA models for the same state.
+Here I define some colors categories that I will use on the next maps.
+
+1 week ahead percentage of improvement
+
+```{r}
+
+
+
+# Assuming merged_data already includes the necessary columns: model and percentage_improveme
+# Create the map plot for 1 Week Ahead with best models and percentage improvement
+ES_1WEEK <- ggplot(W1_map) +
+  geom_sf(aes(fill = AUTO_ADJ)) +  # Fill based on the best model
+  scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 300)) +  
+  ggtitle("Mean WIS on each state (W1)") +
+  theme_light() +
+  theme(legend.position = "right") +
+  geom_sf_text(data = W1_map, aes(label = round(AUTO_ADJ,1)),  # Round to whole numbers
+               size = 3,
+               color = "black",
+               check_overlap = TRUE) +  # Display percentage improvement in each state
+  labs(
+    fill = "Value",  # Label for the legend
+    subtitle = "Based on 2023 and 2024 influenza seasons"
+    , 
+       x = "",
+       y = ""
+  )  # Adding a subtitle
+
+x_limits <- c(-125, -67)  # Set the desired longitude range
+y_limits <- c(25, 50)    # Set the desired latitude range
+
+
+ES_1WEEK<- ES_1WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
+
+ggsave(ES_1WEEK, height = 4.5, width = 6.5,  filename="Fig4A.jpg")  
+```
+2 weeks ahead
+
+```{r}
+
+# Assuming merged_data already includes the necessary columns: model and percentage_improveme
+# Create the map plot for 1 Week Ahead with best models and percentage improvement
+ES_2WEEK <- ggplot(W2_map) +
+  geom_sf(aes(fill = AUTO_ADJ)) +  # Fill based on the best model
+  scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 300)) +  
+  ggtitle("Mean WIS on each state (W2)") +
+  theme_light() +
+  theme(legend.position = "right") +
+  geom_sf_text(data = W2_map, aes(label = round(AUTO_ADJ,1)),  # Round to whole numbers
+               size = 3,
+               color = "black",
+               check_overlap = TRUE) +  # Display percentage improvement in each state
+  labs(
+    fill = "Value",  # Label for the legend
+    subtitle = "Based on 2023 and 2024 influenza seasons"
+        , 
+       x = "",
+       y = ""
+  )  # Adding a subtitle
+
+x_limits <- c(-125, -67)  # Set the desired longitude range
+y_limits <- c(25, 50)    # Set the desired latitude range
+
+ES_2WEEK <-ES_2WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
+
+ggsave(ES_2WEEK, height = 4.5, width = 6.5,  filename="Fig4B.jpg")  
+```
+3 weeks ahead
+
+```{r}
+
+# Assuming merged_data already includes the necessary columns: model and percentage_improveme
+# Create the map plot for 1 Week Ahead with best models and percentage improvement
+# Create the map plot for 1 Week Ahead with best models and percentage improvement
+ES_3WEEK <- ggplot(W3_map) +
+  geom_sf(aes(fill = AUTO_ADJ)) +  # Fill based on the best model
+  scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 300)) +  
+  ggtitle("Mean WIS on each state (W3)") +
+  theme_light() +
+  theme(legend.position = "right") +
+  geom_sf_text(data = W3_map, aes(label = round(AUTO_ADJ,1)),  # Round to whole numbers
+               size = 3,
+               color = "black",
+               check_overlap = TRUE) +  # Display percentage improvement in each state
+  labs(
+    fill = "Value",  # Label for the legend
+    subtitle = "Based on 2023 and 2024 influenza seasons"
+        , 
+       x = "",
+       y = ""
+  )  # Adding a subtitle
+
+x_limits <- c(-125, -67)  # Set the desired longitude range
+y_limits <- c(25, 50)    # Set the desired latitude range
+
+ES_3WEEK<- ES_3WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
+
+ggsave(ES_3WEEK, height = 4.5, width = 6.5,  filename="Fig4C.jpg")  
+```
+4 weeks ahead
+
+```{r}
+
+ES_4WEEK <- ggplot(W4_map) +
+  geom_sf(aes(fill = AUTO_ADJ)) +
+  scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", 
+                       midpoint = 100, limits = c(0, 300)) +  
+  ggtitle("Mean WIS on each state (W4)") +
+  theme_light() +
+  theme(legend.position = "right") +
+  geom_sf_text(data = W4_map, aes(label = round(AUTO_ADJ,1)),  
+               size = 3,
+               color = "black",
+               check_overlap = TRUE) +
+  labs(
+    fill = "Value",  
+    subtitle = "Based on 2023 and 2024 influenza seasons"
+        , 
+       x = "",
+       y = ""
+  )
+
+x_limits <- c(-125, -67)  
+y_limits <- c(25, 50)    
+
+ES_4WEEK<-ES_4WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
+
+ggsave(ES_4WEEK,height = 4.5, width = 6.5,  filename="Fig4D.jpg")  
+```
+
+Loading datasets for regression analysis
+
+```{r}
+pop_data <- read.csv("NHSH_hospitalizations_seed/regression_features/population_data.csv") # resident population and population density
+sovi_data <- read.csv("NHSH_hospitalizations_seed/regression_features/sovi_2010.2014.csv") # SOVI index
+bric_data<-read.csv("NHSH_hospitalizations_seed/regression_features/bric2015.csv") # BRIC index
+humidity_data<-read.csv("NHSH_hospitalizations_seed/regression_features/humidity_climatology_1990_2020.csv") # ERA5 Specific Humidity
+temperature_data<-read.csv("NHSH_hospitalizations_seed/regression_features/temperature_climatology_1990_2020.csv") # ERA5 Specific Temperature
+
+```
+
+REGRESSION MODELS
+
+We will run the regression for evaluating if the best model log(WIS) which represent its performance is related to given independent variables.
+
+```{r}
+
+# List of data frames
+WIS_dataframes <- list(W1 = W1_map, W2 = W2_map, W3 = W3_map, W4=W4_map)
+regression_models<-data.frame()
+
+```
+
+Percentage of AUTO_ADJ mean WIS
+
+AUTO_ADJ WIS x RESIDENT POPULATION 2020
+
+```{r}
+
+for(i in c(1,2,3,4)){
+
+  # Combining data for the same states
+  WIS_pop_data <- inner_join(WIS_dataframes[[i]], pop_data, by = "STATE")
+  # Fitting the regression model
+  model <- lm((WIS_pop_data$AUTO_ADJ) ~ (WIS_pop_data$Resident_population_2020))
+  # View the model summary
+  model_summary <- summary(model)
+  # Getting the R and p values for the plot
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # Saving the results in a dataframe
+  regression_models2 <- data.frame(
+    independent_variable = "Resident Population (2020)", 
+    Week_Ahead = i, 
+    r_squared = r_squared, 
+    p_value = p_value
+  )
+  # Append to the main results dataframe
+  regression_models <- rbind(regression_models, regression_models2)
+}
+
+regression_models
+```
+
+AUTO_ADJ WIS x POPULATION DENSITY
+
+```{r}
+
+for(i in c(1,2,3,4)){
+
+  WIS_pop_data <- inner_join(WIS_dataframes[[i]], pop_data, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_pop_data$AUTO_ADJ) ~ (WIS_pop_data$Population_density_2020))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="Population Density (2020)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # Append to the main results dataframe
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+Here we will weight the Social Vulnerability Index (SoVI) and Baseline Resilience Indicators for Communities (BRIC) county indexes which for each states based on the population size in each county.
+
+```{r}
+#############################################################
+# SOVI BY STATE
+# weighted by population size in each county
+sovi_by_state <- sovi_data %>%
+  filter(!is.nan(sovi)) %>%  # Exclude rows where 'sovi' is NaN
+  group_by(state.name) %>%
+  summarize(weighted_mean = weighted.mean(sovi, w = population.2020, na.rm = TRUE))
+
+colnames(sovi_by_state)[1] <- "STATE"
+
+#############################################################
+# BRIC BY STATE
+# weighted by population size in each county
+
+bric_by_state <- bric_data %>%
+  group_by(state.name) %>%
+  summarize(across(16:22, ~ weighted.mean(.x, w = population.2020, na.rm = TRUE), .names = "weighted_mean_{col}"))
+colnames(bric_by_state)[1] <- "STATE"
+
+```
+
+AUTO_ADJ WIS x SOVI
+
+```{r}
+
+for(i in c(1,2,3,4)){
+
+  WIS_sovi<-NULL
+  WIS_sovi <- inner_join(WIS_dataframes[[i]], sovi_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_sovi$AUTO_ADJ) ~ (WIS_sovi$weighted_mean))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="Social Vulnerability Index (SoVI)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending the results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC SOCIAL
+
+```{r}
+
+for(i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model  
+  model <- lm((WIS_bric$AUTO_ADJ) ~ (WIS_bric$weighted_mean_z_bric.social))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Social (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending the results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC ECONOMIC
+
+```{r}
+for(i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$AUTO_ADJ) ~ (WIS_bric$weighted_mean_z_bric.economic))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Economic (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC Infrastructure
+
+```{r}
+
+for (i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$AUTO_ADJ) ~ (WIS_bric$weighted_mean_z_bric.infrastructure))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Infrastructure (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+AUTO_ADJ WIS x BRIC institutional
+
+```{r}
+
+for (i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$AUTO_ADJ) ~ (WIS_bric$weighted_mean_z_bric.institutional))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Institutional (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC community
+
+```{r}
+
+for(i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[1]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$AUTO_ADJ) ~ (WIS_bric$weighted_mean_z_bric.community))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Community (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC environment
+
+```{r}
+
+for(i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$AUTO_ADJ) ~ (WIS_bric$weighted_mean_z_bric.environment))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Environment (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+AUTO_ADJ WIS x BRIC total
+
+```{r}
+
+for(i in 1:4){
+  # BRIC INDEX
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$AUTO_ADJ) ~ (WIS_bric$weighted_mean_z_bric.total))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC total (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  regression_models<-rbind(regression_models,regression_models2)
+}
+```
+
+TEMPERATUE - ERA5
+
+Now we will look at regression models that uses mean temperature and specific humidity.
+
+-------------------
+
+AUTO_ADJ WIS x Temperature ERA5 Data
+
+```{r}
+for(i in 1:4){
+  # TEMPERATURE DATA from ERA5
+  WIS_temp <- inner_join(WIS_dataframes[[i]], temperature_data, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_temp$AUTO_ADJ) ~ (WIS_temp$mean))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="Mean Temperature (1990-2020)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+```
+
+AUTO_ADJ WIS x Specific Humidity ERA5 Data
+
+```{r}
+library(ggpubr)
+
+# regression results 
+print(regression_models)
+
+for(i in 1:4){
+  # HUMIDITY DATA from ERA5
+  WIS_humidity <- inner_join(WIS_dataframes[[i]], humidity_data, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_humidity$AUTO_ADJ) ~ (WIS_humidity$mean))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="Mean Specific Humidty (1990-2020)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+# Plot the table
+regression_models
+```
+
+SUMMARY OF RESULTS 
+
+```{r}
+# Define a significance threshold (p < 0.05)
+regression_models <- regression_models %>%
+  mutate(significance = ifelse(p_value < 0.05, "Significant", "Not Significant"))
+
+# Plot
+reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fill = significance)) +  
+  geom_tile(color = "black") +  # Add black borders to squares
+  geom_text(aes(label = round(r_squared, 3)), color = "black", size = 6) +  # Text inside boxes
+  scale_fill_manual(values = c("Significant" = "cyan", "Not Significant" = "gray")) +  
+  labs(title = "Regression models",
+       subtitle = "Mean WIS as dependent variable",
+       x = "Week Ahead",
+       y = "Independent Variables",
+       fill = "Significance") +  
+  theme_minimal() +  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+        axis.text.y = element_text(size = 10))
+
+reg2
+
+ggsave(reg2, height = 8, width = 10, filename="Fig4E.jpg")  
+#ggsave(reg2, filename="reg2.jpg",height = 8, width = 10)
+```
+
+
+Let's plot some maps with the with the mean (%) of difference between the AUTO_ADJ and the AUTO ARIMA models for the same state.
+
+1 week ahead percentage of improvement
+
+```{r}
+# Assuming merged_data already includes the necessary columns: model and percentage_improveme
+# Create the map plot for 1 Week Ahead with best models and percentage improvement
+ES_1WEEK <- ggplot(W1_map) +
+  geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
+  scale_fill_gradient2(high = "darkred", mid = "lightyellow", low = "blue", midpoint = 0, limits = c(-120, 10)) +  
+  ggtitle("Mean WIS improvement in percentage (W1)") +
+  theme_light() +
+  theme(legend.position = "right") +
+  geom_sf_text(data = W1_map, aes(label = round(percentage_improvement,1)),  # Round to whole numbers
+               size = 3,
+               color = "black",
+               check_overlap = TRUE) +  # Display percentage improvement in each state
+  labs(
+    fill = "%",  # Label for the legend
+    subtitle = "(Baseline - AUTO_ADJ_LB) / (Baseline*100)"
+            , 
+       x = "",
+       y = ""
+  )  # Adding a subtitle
+
+x_limits <- c(-125, -67)  # Set the desired longitude range
+y_limits <- c(25, 50)    # Set the desired latitude range
+
+ES_1WEEK<-ES_1WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
+ES_1WEEK
+ggsave(ES_1WEEK,height = 4.5, width = 6.5,  filename="Fig5A.jpg")  
+```
+
+2 weeks ahead
+
+```{r}
+
+# Assuming merged_data already includes the necessary columns: model and percentage_improveme
+# Create the map plot for 1 Week Ahead with best models and percentage improvement
+ES_2WEEK <- ggplot(W2_map) +
+  geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
+  scale_fill_gradient2(high = "darkred", mid = "lightyellow", low = "blue", midpoint = 0, limits = c(-120, 10)) +  
+  ggtitle("Mean WIS improvement in percentage (W2)") +
+  theme_light() +
+  theme(legend.position = "right") +
+  geom_sf_text(data = W2_map, aes(label = round(percentage_improvement,1)),  # Round to whole numbers
+               size = 3,
+               color = "black",
+               check_overlap = TRUE) +  # Display percentage improvement in each state
+  labs(
+    fill = "%",  # Label for the legend
+    subtitle = "(Baseline - AUTO_ADJ_LB) / (Baseline*100)"
+            , 
+       x = "",
+       y = ""
+  )  # Adding a subtitle
+
+
+x_limits <- c(-125, -67)  # Set the desired longitude range
+y_limits <- c(25, 50)    # Set the desired latitude range
+
+ES_2WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
+ES_2WEEK
+ggsave(ES_2WEEK, height = 4.5, width = 6.5, filename="Fig5B.jpg")  
+```
+
+3 weeks ahead
+
+```{r}
+
+# Assuming merged_data already includes the necessary columns: model and percentage_improveme
+# Create the map plot for 1 Week Ahead with best models and percentage improvement
+# Create the map plot for 1 Week Ahead with best models and percentage improvement
+ES_3WEEK <- ggplot(W3_map) +
+  geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
+  scale_fill_gradient2(high = "darkred", mid = "lightyellow", low = "blue", midpoint = 0, limits = c(-120, 10)) +  
+  ggtitle("Mean WIS improvement in percentage (W3)") +
+  theme_light() +
+  theme(legend.position = "right") +
+  geom_sf_text(data = W3_map, aes(label = round(percentage_improvement,1)),  # Round to whole numbers
+               size = 3,
+               color = "black",
+               check_overlap = TRUE) +  # Display percentage improvement in each state
+  labs(
+    fill = "%",  # Label for the legend
+    subtitle = "(Baseline - AUTO_ADJ_LB) / (Baseline*100)"
+            , 
+       x = "",
+       y = ""
+  )  # Adding a subtitle
+
+x_limits <- c(-125, -67)  # Set the desired longitude range
+y_limits <- c(25, 50)    # Set the desired latitude range
+
+ES_3WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
+ES_3WEEK
+ggsave(ES_3WEEK, height = 4.5, width = 6.5, filename="Fig5C.jpg")  
+```
+4 weeks ahead
+
+```{r}
+
+# Assuming merged_data already includes the necessary columns: model and percentage_improveme
+# Create the map plot for 1 Week Ahead with best models and percentage improvement
+ES_4WEEK <- ggplot(W4_map) +
+  geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
+  scale_fill_gradient2(high = "darkred", mid = "lightyellow", low = "blue", midpoint = 0, limits = c(-120, 10)) +  
+  ggtitle("Mean WIS improvement in percentage (W4)") +
+  theme_light() +
+  theme(legend.position = "right") +
+  geom_sf_text(data = W4_map, aes(label = round(percentage_improvement,1)),  # Round to whole numbers
+               size = 3,
+               color = "black",
+               check_overlap = TRUE) +  # Display percentage improvement in each state
+  labs(
+    fill = "%",  # Label for the legend
+    subtitle = "(Baseline - AUTO_ADJ_LB) / (Baseline*100)"
+            , 
+       x = "",
+       y = ""
+  )  # Adding a subtitle
+
+x_limits <- c(-125, -67)  # Set the desired longitude range
+y_limits <- c(25, 50)    # Set the desired latitude range
+
+ES_4WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
+ES_4WEEK
+ggsave(ES_4WEEK, height = 4.5, width = 6.5,  filename="Fig5D.jpg")  
+```
+REGRESSION MODELS
+
+We will run the regression for evaluating if the best model log(WIS) which represent its performance is related to given independent variables.
+
+```{r}
+
+# List of data frames
+WIS_dataframes <- list(W1 = W1_map, W2 = W2_map, W3 = W3_map, W4=W4_map)
+regression_models<-data.frame()
+
+```
+
+Percentage of improvement regression analysis
+
+AUTO_ADJ WIS x RESIDENT POPULATION 2020
+
+```{r}
+
+for(i in c(1,2,3,4)){
+
+  # Combining data for the same states
+  WIS_pop_data <- inner_join(WIS_dataframes[[i]], pop_data, by = "STATE")
+  # Fitting the regression model
+  model <- lm((WIS_pop_data$percentage_improvement) ~ (WIS_pop_data$Resident_population_2020))
+  # View the model summary
+  model_summary <- summary(model)
+  # Getting the R and p values for the plot
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # Saving the results in a dataframe
+  regression_models2 <- data.frame(
+    independent_variable = "Resident Population (2020)", 
+    Week_Ahead = i, 
+    r_squared = r_squared, 
+    p_value = p_value
+  )
+  # Append to the main results dataframe
+  regression_models <- rbind(regression_models, regression_models2)
+}
+
+regression_models
+```
+
+AUTO_ADJ WIS x POPULATION DENSITY
+
+```{r}
+
+for(i in c(1,2,3,4)){
+
+  WIS_pop_data <- inner_join(WIS_dataframes[[i]], pop_data, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_pop_data$percentage_improvement) ~ (WIS_pop_data$Population_density_2020))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="Population Density (2020)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # Append to the main results dataframe
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+Here we will weight the Social Vulnerability Index (SoVI) and Baseline Resilience Indicators for Communities (BRIC) county indexes which for each states based on the population size in each county.
+
+```{r}
+#############################################################
+# SOVI BY STATE
+# weighted by population size in each county
+sovi_by_state <- sovi_data %>%
+  filter(!is.nan(sovi)) %>%  # Exclude rows where 'sovi' is NaN
+  group_by(state.name) %>%
+  summarize(weighted_mean = weighted.mean(sovi, w = population.2020, na.rm = TRUE))
+
+colnames(sovi_by_state)[1] <- "STATE"
+
+#############################################################
+# BRIC BY STATE
+# weighted by population size in each county
+
+bric_by_state <- bric_data %>%
+  group_by(state.name) %>%
+  summarize(across(16:22, ~ weighted.mean(.x, w = population.2020, na.rm = TRUE), .names = "weighted_mean_{col}"))
+colnames(bric_by_state)[1] <- "STATE"
+
+```
+
+AUTO_ADJ WIS x SOVI
+
+```{r}
+
+for(i in c(1,2,3,4)){
+
+  WIS_sovi<-NULL
+  WIS_sovi <- inner_join(WIS_dataframes[[i]], sovi_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_sovi$percentage_improvement) ~ (WIS_sovi$weighted_mean))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="Social Vulnerability Index (SoVI)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending the results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC SOCIAL
+
+```{r}
+
+for(i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model  
+  model <- lm((WIS_bric$percentage_improvement) ~ (WIS_bric$weighted_mean_z_bric.social))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Social (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending the results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC ECONOMIC
+
+```{r}
+for(i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$percentage_improvement) ~ (WIS_bric$weighted_mean_z_bric.economic))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Economic (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC Infrastructure
+
+```{r}
+
+for (i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$percentage_improvement) ~ (WIS_bric$weighted_mean_z_bric.infrastructure))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Infrastructure (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC institutional
+
+```{r}
+
+for (i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$percentage_improvement) ~ (WIS_bric$weighted_mean_z_bric.institutional))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Institutional (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC community
+
+```{r}
+
+for(i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[1]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$percentage_improvement) ~ (WIS_bric$weighted_mean_z_bric.community))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Community (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+
+AUTO_ADJ WIS x BRIC environment
+
+```{r}
+
+for(i in 1:4){
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$percentage_improvement) ~ (WIS_bric$weighted_mean_z_bric.environment))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC Environment (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+```
+AUTO_ADJ WIS x BRIC total
+
+```{r}
+
+for(i in 1:4){
+  # BRIC INDEX
+  WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_bric$percentage_improvement) ~ (WIS_bric$weighted_mean_z_bric.total))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="BRIC total (2015)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  regression_models<-rbind(regression_models,regression_models2)
+}
+```
+
+TEMPERATUE - ERA5
+
+Now we will look at regression models that uses mean temperature and specific humidity.
+
+-------------------
+
+AUTO_ADJ WIS x Temperature ERA5 Data
+
+```{r}
+
+
+for(i in 1:4){
+  # TEMPERATURE DATA from ERA5
+  WIS_temp <- inner_join(WIS_dataframes[[i]], temperature_data, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_temp$percentage_improvement) ~ (WIS_temp$mean))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="Mean Temperature (1990-2020)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+```
+
+AUTO_ADJ WIS x Specific Humidity ERA5 Data
+
+```{r}
+library(ggpubr)
+
+# regression results 
+print(regression_models)
+
+for(i in 1:4){
+  # HUMIDITY DATA from ERA5
+  WIS_humidity <- inner_join(WIS_dataframes[[i]], humidity_data, by = "STATE")
+  # Fit the regression model
+  model <- lm((WIS_humidity$percentage_improvement) ~ (WIS_humidity$mean))
+  # View the model summary
+  model_summary <- summary(model)
+  # Extract R-squared and p-value
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  # saving the results in a dataframe
+  regression_models2<-data.frame("independent_variable"="Mean Specific Humidty (1990-2020)","Week_Ahead"=i, "r_squared"=r_squared,"p_value"= p_value)
+  # appending results
+  regression_models<-rbind(regression_models,regression_models2)
+}
+
+# Plot the table
+regression_models
+```
+
+SUMMARY OF RESULTS 
+
+```{r}
+# Define a significance threshold (p < 0.05)
+regression_models <- regression_models %>%
+  mutate(significance = ifelse(p_value < 0.05, "Significant", "Not Significant"))
+
+# Plot
+reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fill = significance)) +  
+  geom_tile(color = "black") +  # Add black borders to squares
+  geom_text(aes(label = round(r_squared, 3)), color = "black", size = 6) +  # Text inside boxes
+  scale_fill_manual(values = c("Significant" = "cyan", "Not Significant" = "gray")) +  
+  labs(title = "Regression models",
+       subtitle = "Percentage of WIS improvement as dependent variable",
+       x = "Week Ahead",
+       y = "Independent Variables",
+       fill = "Significance") +    
+  theme_minimal() +  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), 
+        axis.text.y = element_text(size = 10))
+
+reg2
+ggsave(reg2, filename="Fig5E.jpg",height = 8, width = 10)
+```
+
+Now let's evaluate which was the mean WIS improvement by epidemiological week
+
+```{r}
+
+# WEEK 1
+W1_AUTO_AR_NoLg_WIS_BY_EPI <- filtered_df_W1_NoLg %>%
+  group_by(epiweek) %>%
+  summarize(AUTO_AR_NoLg = mean(AUTO_AR_NoLg, na.rm = TRUE))
+
+W1_AUTO_ADJ_WIS_BY_EPI <- filtered_df_W1 %>%
+  group_by(epiweek) %>%
+  summarize(AUTO_ADJ = mean(AUTO_ADJ, na.rm = TRUE))
+# WEEK 2
+W2_AUTO_AR_NoLg_WIS_BY_EPI <- filtered_df_W2_NoLg %>%
+  group_by(epiweek) %>%
+  summarize(AUTO_AR_NoLg = mean(AUTO_AR_NoLg, na.rm = TRUE))
+
+W2_AUTO_ADJ_WIS_BY_EPI <- filtered_df_W2 %>%
+  group_by(epiweek) %>%
+  summarize(AUTO_ADJ = mean(AUTO_ADJ, na.rm = TRUE))
+
+
+# WEEK 3
+W3_AUTO_AR_NoLg_WIS_BY_EPI <- filtered_df_W3_NoLg %>%
+  group_by(epiweek) %>%
+  summarize(AUTO_AR_NoLg = mean(AUTO_AR_NoLg, na.rm = TRUE))
+
+W3_AUTO_ADJ_WIS_BY_EPI <- filtered_df_W3 %>%
+  group_by(epiweek) %>%
+  summarize(AUTO_ADJ = mean(AUTO_ADJ, na.rm = TRUE))
+
+# WEEK 4
+W4_AUTO_AR_NoLg_WIS_BY_EPI <- filtered_df_W4_NoLg %>%
+  group_by(epiweek) %>%
+  summarize(AUTO_AR_NoLg = mean(AUTO_AR_NoLg, na.rm = TRUE))
+
+W4_AUTO_ADJ_WIS_BY_EPI <- filtered_df_W4 %>%
+  group_by(epiweek) %>%
+  summarize(AUTO_ADJ = mean(AUTO_ADJ, na.rm = TRUE))
+
+
+filtered_df_W1
+filtered_df_W2
+
+```
+
+Absolute WIS difference by epidemiological week
+
+```{r}
+
+# Define pairs of data frames
+auto_df <- list(W1_AUTO_AR_NoLg_WIS_BY_EPI, W2_AUTO_AR_NoLg_WIS_BY_EPI, W3_AUTO_AR_NoLg_WIS_BY_EPI, W4_AUTO_AR_NoLg_WIS_BY_EPI)
+adj_df <- list(W1_AUTO_ADJ_WIS_BY_EPI, W2_AUTO_ADJ_WIS_BY_EPI, W3_AUTO_ADJ_WIS_BY_EPI, W4_AUTO_ADJ_WIS_BY_EPI)
+week_labels <- c("W1", "W2", "W3", "W4")  # Labels for plots
+
+# Function to process each pair
+for (i in 1:4) {
+  merged_df <- merge(auto_df[[i]], adj_df[[i]], by = "epiweek") %>%
+    mutate(percentage_diff = AUTO_AR_NoLg - AUTO_ADJ) %>%
+    filter((epiweek >= 40 & epiweek <= 53) | (epiweek >= 1 & epiweek <= 20)) %>%
+    mutate(epiweek_order = factor(epiweek, levels = c(40:53, 1:20)))
+
+  mean_value <- mean(merged_df$percentage_diff, na.rm = TRUE)
+
+  plots <- ggplot(merged_df, aes(x = epiweek_order, y = percentage_diff, fill = percentage_diff > 0)) +
+    geom_bar(stat = "identity") +
+    scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "blue"), guide = "none") +  # Blue for positive, Red for negative
+    geom_hline(yintercept = mean_value, linetype = "dashed", color = "black") +
+    labs(x = "Epiweek", y = "Absolute WIS difference",
+         title = paste("Mean absolute WIS improvement by epidemiological week across 48 states (", week_labels[i],")"),
+         subtitle = "Baseline - AUTO_ADJ_LB") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    annotate("text", x = 1, y = mean_value, label = paste("Mean:", round(mean_value, 2)), color = "black", vjust = -1)
+
+  print(plots)  # Print each plot inside the loop
+  
+    # Save the plot with a unique filename
+  ggsave(filename = paste0("Fig6_", week_labels[i], ".png"),
+         plot = plots, width = 8, height = 6, dpi = 300)
+}
+
+```
+
+
+
+Absolute WIS difference by epidemiological week
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Define lists of data frames
+auto_df <- list(filtered_df_W1_NoLg, filtered_df_W2_NoLg, filtered_df_W3_NoLg, filtered_df_W4_NoLg)
+adj_df <- list(filtered_df_W1, filtered_df_W2, filtered_df_W3, filtered_df_W4)
+
+data__<-merge(filtered_df_W1_NoLg,filtered_df_W1)
+
+library(dplyr)
+
+# Summing values by Julian date across all states
+summed_data <- data__ %>%
+  group_by(Julian_date) %>%  # Group only by Julian date
+  summarize(
+    AUTO_AR_NoLg = sum(AUTO_AR_NoLg, na.rm = TRUE),  # Sum AUTO_AR_NoLg across all states
+    AUTO_ADJ = sum(AUTO_ADJ, na.rm = TRUE)           # Sum ES27_EPI across all states
+  )
+
+
+
+```
+
+
+
+
+
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Create a list of data frames for the four weeks
+weeks <- 1:4
+summed_data_list <- list()
+
+for (week in weeks) {
+  # Merge the data frames for the current week
+  data__ <- merge(get(paste0("filtered_df_W", week, "_NoLg")),
+                  get(paste0("filtered_df_W", week)))
+  
+  # Sum values by Julian date across all states
+  summed_data <- data__ %>%
+    group_by(Julian_date) %>%
+    summarize(
+      AUTO_AR_NoLg = sum(AUTO_AR_NoLg, na.rm = TRUE),  # Sum across all states
+      AUTO_ADJ = sum(AUTO_ADJ, na.rm = TRUE)           # Sum across all states
+    ) %>%
+    # Calculate the difference ratio
+    mutate(Difference = 1 - (AUTO_AR_NoLg / AUTO_ADJ),
+           Week = paste0("Week ", week))
+  
+  # Store the summarized data in the list
+  summed_data_list[[week]] <- summed_data
+}
+
+# Combine all weeks into a single data frame
+summed_data_all <- bind_rows(summed_data_list)
+
+# Plot the difference using ggplot2
+ggplot(summed_data_all, aes(x = Julian_date, y = Difference, color = Week)) +
+  geom_line(size = 1) +        # Line plot
+  geom_point(size = 2) +       # Points on the line
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red", size = 1) +  # Reference line at 0
+  theme_minimal() +
+  labs(
+    title = "Difference between AUTO_AR_NoLg and AUTO_ADJ across States for 4 Weeks",
+    x = "Julian Date",
+    y = "Difference (1 - AUTO_AR_NoLg / AUTO_ADJ)"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+

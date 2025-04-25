@@ -1,0 +1,177 @@
+---
+title: "Influenza Hopistalizations dataset with Florida - NHSN"
+author: "Victor Felix"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Loading datasets
+
+```{r}
+library(purrr)
+library(tidyr)
+library(dplyr)
+library(lubridate)
+library(imputeTS)
+library(MMWRweek)
+```
+
+Influenza hospitalizations
+
+```{r}
+influenza_data<-read.csv("Weekly_United_States_Hospitalization_Metrics_by_Jurisdiction__During_Mandatory_Reporting_Period_from_August_1__2020_to_April_30__2024__and_for_Data_Reported_Voluntarily_Beginning_May_1__2024__National_Healthcare_Safety_Network__NHSN__20241001.csv")
+
+state_codes<-read.csv("State_Codes.csv")
+
+```
+
+Choosing U.S. states
+
+```{r}
+states=state_codes$abbreviation[1:48] # removing Florida
+```
+
+Creating a list with multiple dataframes
+
+```{r}
+
+influenza_data$Week.Ending.Date<-as.Date(influenza_data$Week.Ending.Date)
+influenza_data$epiweek<-MMWRweek(influenza_data$Week.Ending.Date)$MMWRweek
+
+
+# Initialize an empty list to store the results
+influenza_hosp_by_state <- list()
+
+# Loop through each state in the 'states' vector
+for (i in 1:48) {
+  st <- states[i]  # Get the current state
+  # Filter and arrange the data for the current state
+  influenza_hosp_by_state[[i]] <- influenza_data %>%
+    arrange(Week.Ending.Date) %>%  # Order by date
+    filter(Geographic.aggregation == st)  # Filter for the current state
+}
+
+```
+
+Finding the datasets that have NAs
+
+We need to start from week 12 of all datasets till we remove all initial NAs.
+In addition to the initial week 3 states had more NAs on three states, which we replace with zeros.
+
+WV(state code=45): 3 NAs
+MN(state code=20): 18 NAs
+MA(state code=18): 32 NAs
+
+```{r}
+#INITIAL NAs
+# Loop through each element in state_data_list
+for (i in 1:length(influenza_hosp_by_state)) {
+  
+  # Extract the unique state name from the 'state' column
+  states_names <- unique(influenza_hosp_by_state[[i]]$Geographic.aggregation)
+  # Plot epi_week, setting the title to the state name
+  print(sum(is.na(influenza_hosp_by_state[[i]]$Weekly.Total.Influenza.Admissions[12:18])))
+}
+
+
+#MORE NAs
+# Loop through each element in state_data_list
+for (i in 1:48) {
+  
+  state_name <- unique(influenza_hosp_by_state[[i]]$Geographic.aggregation)
+  missing_values_count <- sum(is.na(influenza_hosp_by_state[[i]]$Weekly.Total.Influenza.Admissions[12:length(influenza_hosp_by_state[[i]]$Week.Ending.Date)]))
+
+  print(paste("State:", state_name,"State code:", i, "- Missing values:", missing_values_count))
+}
+
+#FINAL NAs
+# Loop through each element in state_data_list
+for (i in 1:length(influenza_hosp_by_state)) {
+  
+  # Extract the unique state name from the 'state' column
+  states_names <- unique(influenza_hosp_by_state[[i]]$Geographic.aggregation)
+  # Plot epi_week, setting the title to the state name
+  print(sum(is.na(influenza_hosp_by_state[[i]]$Weekly.Total.Influenza.Admissions[190:198])))
+}
+
+```
+
+3 states with NAs that will be replaced with zeros.
+
+```{r}
+
+# Loop through each element in state_data_list
+for (i in c(18,20,45)) {
+  
+  # Extract the unique state name from the 'state' column
+  states_names <- unique(influenza_hosp_by_state[[i]]$Geographic.aggregation)
+  # Plot epi_week, setting the title to the state name
+  plot(influenza_hosp_by_state[[i]]$Week.Ending.Date[12:198],influenza_hosp_by_state[[i]]$Weekly.Total.Influenza.Admissions[12:198], main = states_names, ylab="Cases", xlab="Dates")
+}
+```
+Noting that the weeks that have NAs are at the end of the last season and in a location with low influenza activity we will replace these values with zero.
+
+```{r}
+for (i in c(18, 20, 45)) {
+  # Extract the unique state name from the 'Geographic.aggregation' column
+  state_name <- unique(influenza_hosp_by_state[[i]]$Geographic.aggregation)
+  
+  # Extract the 'Weekly.Total.Influenza.Admissions' column from 12 to 198
+  admissions <- influenza_hosp_by_state[[i]]$Weekly.Total.Influenza.Admissions[12:198]
+  
+  # Replace only the NA values with zero
+  admissions[is.na(admissions)] <- 0
+  
+  # Update the original data with the new values
+  influenza_hosp_by_state[[i]]$Weekly.Total.Influenza.Admissions[12:198] <- admissions
+  
+  # Plot the time series and set the title to the state name
+  plot(admissions, 
+       type = "l",   # Line plot
+       main = state_name, 
+       xlab = "Week", 
+       ylab = "Influenza Admissions")
+}
+
+```
+The clean final dataset for all states
+
+```{r}
+# Loop through each element in state_data_list
+for (i in 1:48) {
+  
+  # Extract the unique state name from the 'state' column
+  states_names <- unique(influenza_hosp_by_state[[i]]$Geographic.aggregation)
+  # Plot epi_week, setting the title to the state name
+  plot(influenza_hosp_by_state[[i]]$Week.Ending.Date[12:198],influenza_hosp_by_state[[i]]$Weekly.Total.Influenza.Admissions[12:198], main = states_names)
+}
+
+# Combine the list of data frames into a single data frame with names as a column
+influenza_hosp_dataframe <- bind_rows(lapply(influenza_hosp_by_state, function(df) df[12:198, ]))
+```
+
+Final dataset similar in format that can be read by the ensembles
+
+```{r}
+colnames(state_codes)[3] <- "state_name"
+
+final_dataset <- influenza_hosp_dataframe %>%
+  select("target_end_date"=Week.Ending.Date, "abbreviation"=Geographic.aggregation,"cases"= Weekly.Total.Influenza.Admissions)
+
+final_dataset <- left_join(final_dataset, state_codes, by = "abbreviation")
+final_dataset
+
+# write the dataset to use in the models
+write.csv(final_dataset, file = "ES_ADJACENT/treated_influenza_hosp_dataframe_v2.csv")
+write.csv(final_dataset, file = "ES_ARIMA/treated_influenza_hosp_dataframe_v2.csv")
+write.csv(final_dataset, file = "ES_EPIWEEK/treated_influenza_hosp_dataframe_v2.csv")
+write.csv(final_dataset, file = "ES_TEMPERATURE/treated_influenza_hosp_dataframe_v2.csv")
+
+
+```
+  

@@ -1,0 +1,281 @@
+---
+title: "ARIMA ENSEMBLE MODELS - Influenza hospitalization data"
+author: "Victor Felix"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+This function utilizes ensembles and single automatic ARIMA models. The function fits a rolling window of 104 weeks to generate forecasts. It returns some metrics that evaluate the performance of the models: target_end_date, abs_error, cases, forecast, number of models, weighted interval score (WIS) and predictive quantiles (%). The user defines if it will use an AUTO ARIMA (auto=TRUE), or ensembles of 27 (ES27=TRUE) or ensembles of 64 models (ES64=TRUE). It can also choose the number of weeks ahead for each forecast, and the size of the rolling window which is set as 104 (2 years).
+
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+!!!!!!!!!!!!!!!!!!!!
+LOADING THE PACKAGES
+!!!!!!!!!!!!!!!!!!!!
+```{r}
+library("tidyr")
+library("MMWRweek")
+library("data.table")
+library("caret")
+library("purrr")
+library("dplyr")
+library("tseries")
+library("gtools")
+library("forecast")
+library("scoringutils")
+library("covidHubUtils")
+library("parallel")
+library("future")#https://cran.r-project.org/web/packages/future/vignettes/future-4-issues.html
+library("listenv")
+library("epitools")
+```
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+LOADING DATASET AND FUNCTIONS 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+```{r}
+###########################################
+#       LOADING AND CLEANING THE DATASET  #        
+###########################################
+
+# Loads the ADJACENT states models
+source("ES_ARIMA_nolog.R", local = TRUE, chdir = TRUE)
+
+# Loads the ILI dataset
+my_data = read.csv("treated_influenza_hosp_dataframe_v2.csv")
+my_data$target_end_date<-as.Date(my_data$target_end_date) # set the dates as dates
+
+list_of_states <- split(my_data, my_data$state_name)
+
+```
+
+AUTO ARIMA WEEK1
+
+```{r}
+start_time <- Sys.time()
+
+AUTO_ARIMA_WEEK1_list <- mclapply(list_of_states, ES_ARIMA, auto=TRUE, n_weeks_ahead=1, mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+AUTO_ARIMA_WEEK1 <- bind_rows(AUTO_ARIMA_WEEK1_list, .id = "State")
+```
+
+AUTO ARIMA WEEK2
+
+```{r}
+start_time <- Sys.time()
+
+AUTO_ARIMA_WEEK2_list <- mclapply(list_of_states , ES_ARIMA, auto=TRUE, n_weeks_ahead=2, mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+AUTO_ARIMA_WEEK2 <- bind_rows(AUTO_ARIMA_WEEK2_list, .id = "State")
+
+```
+
+AUTO ARIMA WEEK3
+
+```{r}
+start_time <- Sys.time()
+
+AUTO_ARIMA_WEEK3_list <- mclapply(list_of_states , ES_ARIMA, auto=TRUE, n_weeks_ahead=3, mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+AUTO_ARIMA_WEEK3 <- bind_rows(AUTO_ARIMA_WEEK3_list, .id = "State")
+
+```
+
+AUTO ARIMA WEEK4
+
+```{r}
+start_time <- Sys.time()
+
+AUTO_ARIMA_WEEK4_list <- mclapply(list_of_states, ES_ARIMA, auto=TRUE, n_weeks_ahead=4 ,mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+AUTO_ARIMA_WEEK4 <- bind_rows(AUTO_ARIMA_WEEK4_list, .id = "State")
+
+```
+
+```{r}
+save.image("ARIMA_MODELS_influenza_hospitalization_nolog.Rdata")
+```
+
+ES27 ARIMA WEEK1
+
+```{r}
+start_time <- Sys.time()
+
+ES27_ARIMA_WEEK1_list <- mclapply(list_of_states, ES_ARIMA, ES27=TRUE, n_weeks_ahead=1, mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+ES27_ARIMA_WEEK1 <- bind_rows(ES27_ARIMA_WEEK1_list, .id = "State")
+
+```
+
+ES27 ARIMA WEEK2
+
+```{r}
+start_time <- Sys.time()
+
+ES27_ARIMA_WEEK2_list <- mclapply(list_of_states, ES_ARIMA, ES27=TRUE, n_weeks_ahead=2, mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+ES27_ARIMA_WEEK2 <- bind_rows(ES27_ARIMA_WEEK2_list, .id = "State")
+
+```
+
+ES27 ARIMA WEEK3
+
+```{r}
+start_time <- Sys.time()
+
+ES27_ARIMA_WEEK3_list <- mclapply(list_of_states, ES_ARIMA, ES27=TRUE, n_weeks_ahead=3, mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+ES27_ARIMA_WEEK3 <- bind_rows(ES27_ARIMA_WEEK3_list, .id = "State")
+
+```
+
+ES27 ARIMA WEEK4
+
+```{r}
+start_time <- Sys.time()
+
+ES27_ARIMA_WEEK4_list <- mclapply(list_of_states, ES_ARIMA, ES27=TRUE, n_weeks_ahead=4 ,mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+ES27_ARIMA_WEEK4 <- bind_rows(ES27_ARIMA_WEEK4_list, .id = "State")
+
+```
+
+```{r}
+save.image("ARIMA_MODELS_influenza_hospitalization_nolog.Rdata")
+```
+
+ES64 ARIMA WEEK1
+
+```{r}
+start_time <- Sys.time()
+
+ES64_ARIMA_WEEK1_list <- mclapply(list_of_states, ES_ARIMA, ES64=TRUE, n_weeks_ahead=1, mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+ES64_ARIMA_WEEK1 <- bind_rows(ES64_ARIMA_WEEK1_list, .id = "State")
+
+```
+
+ES64 ARIMA WEEK2
+
+```{r}
+start_time <- Sys.time()
+
+ES64_ARIMA_WEEK2_list <- mclapply(list_of_states, ES_ARIMA, ES64=TRUE, n_weeks_ahead=2, mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+ES64_ARIMA_WEEK2 <- bind_rows(ES64_ARIMA_WEEK2_list, .id = "State")
+
+```
+
+ES64 ARIMA WEEK3
+
+```{r}
+start_time <- Sys.time()
+
+ES64_ARIMA_WEEK3_list <- mclapply(list_of_states, ES_ARIMA, ES64=TRUE, n_weeks_ahead=3, mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+ES64_ARIMA_WEEK3 <- bind_rows(ES64_ARIMA_WEEK3_list, .id = "State")
+
+```
+
+ES64 ARIMA WEEK4
+
+```{r}
+start_time <- Sys.time()
+
+ES64_ARIMA_WEEK4_list <- mclapply(list_of_states, ES_ARIMA, ES64=TRUE, n_weeks_ahead=4 ,mc.cores=2)%>%
+  setNames(names(list_of_states))
+
+end_time <- Sys.time()
+run_time <- end_time - start_time
+
+print(run_time)
+
+# Combine the list of data frames into a single data frame with names as a column
+ES64_ARIMA_WEEK4 <- bind_rows(ES64_ARIMA_WEEK4_list, .id = "State")
+
+```
+
+```{r}
+save.image("ARIMA_MODELS_influenza_hospitalization_nolog.Rdata")
+```

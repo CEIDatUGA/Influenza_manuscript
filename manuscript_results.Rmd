@@ -2405,14 +2405,28 @@ summed_data_all <- bind_rows(summed_data_list)
 
 # Plot the difference using ggplot2
 ggplot(summed_data_all, aes(x = Julian_date, y = (Difference)*100, color = Week)) +
-#  geom_line(size = 1) +        # Line plot
-  geom_point(size = 2) +       # Points on the line
-#  geom_hline(yintercept = 0, linetype = "dashed", color = "red", size = 1) +  # Reference line at 0
+  geom_point(size = 2) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
   theme_minimal() +
   labs(
-    title = "Percentage of WIS difference across all states AUTO_AVG_LB compared to baseline",
+    title = "Mean percentage of WIS difference across all states",
+    subtitle =  "AUTO_AVG_LB compared to baseline",
     x = "Julian Date",
-    y = "Difference (1 - AUTO_AR_NoLg / AUTO_AVG)"
+    y = "Difference (%)"
   ) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  scale_y_continuous(
+    limits = c(-100, 100),  # adjust if necessary
+    breaks = seq(-100, 100, by = 20)
+  ) +
+  scale_x_date(
+    date_breaks = "1 month",
+    date_labels = "%b %y"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_color_manual(
+    values = c("Week 1" = "#ffcccc",
+               "Week 2" = "#ff6666",
+               "Week 3" = "#cc0000",
+               "Week 4" = "#990000")
+  )
 ```

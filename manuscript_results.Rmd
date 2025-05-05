@@ -1893,7 +1893,7 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
        subtitle = "Mean WIS as dependent variable",
        x = "Week Ahead",
        y = "Independent Variables",
-       fill = "Significance") +  
+       fill = "Significance (p < 0.05)") +  
   theme_minimal() +  
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         axis.text.y = element_text(size = 10))
@@ -2361,7 +2361,7 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
        subtitle = "Percentage of WIS improvement as dependent variable",
        x = "Week Ahead",
        y = "Independent Variables",
-       fill = "Significance") +    
+       fill = "Significance (p < 0.05)") +    
   theme_minimal() +  
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
         axis.text.y = element_text(size = 10))
@@ -2405,13 +2405,13 @@ summed_data_all <- bind_rows(summed_data_list)
 
 # Plot the difference using ggplot2
 ggplot(summed_data_all, aes(x = Julian_date, y = (Difference)*100, color = Week)) +
-  geom_point(size = 2) +
+  geom_point(size = 3) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
   theme_minimal() +
   labs(
-    title = "Mean percentage of WIS difference across all states",
+    title = "Mean percentage of WIS differences across all states",
     subtitle =  "AUTO_AVG_LB compared to baseline",
-    x = "Julian Date",
+    x = "",
     y = "Difference (%)"
   ) +
   scale_y_continuous(

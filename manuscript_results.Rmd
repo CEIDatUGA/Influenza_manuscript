@@ -89,23 +89,23 @@ df_W1_NoLg <- data.frame(
   STATE = AUTO_ARIMA_WEEK1$State,
   Julian_date = AUTO_ARIMA_WEEK1$target_end_date,
   epiweek = AUTO_ARIMA_WEEK1$epiweek,
-  AUTO_AR_NoLg=AUTO_ARIMA_WEEK1$WIS, 
-  AUTO_ADJ_NoLg=AUTO_ADJACENT_WEEK1$WIS, 
-  AUTO_EPI_NoLg=AUTO_EPIWEEK_WEEK1$WIS,
-  AUTO_TEMP_NoLg=AUTO_TEMPERATURE_WEEK1$WIS,
-  AUTO_AVG_NoLg=AUTO_AVERAGE_WEEK1$WIS,
+  AUTO_AR=AUTO_ARIMA_WEEK1$WIS, 
+  AUTO_ADJ=AUTO_ADJACENT_WEEK1$WIS, 
+  AUTO_EPI=AUTO_EPIWEEK_WEEK1$WIS,
+  AUTO_TEMP=AUTO_TEMPERATURE_WEEK1$WIS,
+  AUTO_AVG=AUTO_AVERAGE_WEEK1$WIS,
   
-  ES27_AR_NoLg=ES27_ARIMA_WEEK1$WIS, 
-  ES27_ADJ_NoLg=ES27_ADJACENT_WEEK1$WIS, 
-  ES27_EPI_NoLg=ES27_EPIWEEK_WEEK1$WIS,
-  ES27_TEMP_NoLg=ES27_TEMPERATURE_WEEK1$WIS,
-  ES27_AVG_NoLg=ES27_AVERAGE_WEEK1$WIS,
+  ES27_AR=ES27_ARIMA_WEEK1$WIS, 
+  ES27_ADJ=ES27_ADJACENT_WEEK1$WIS, 
+  ES27_EPI=ES27_EPIWEEK_WEEK1$WIS,
+  ES27_TEMP=ES27_TEMPERATURE_WEEK1$WIS,
+  ES27_AVG=ES27_AVERAGE_WEEK1$WIS,
   
-  ES64_AR_NoLg=ES64_ARIMA_WEEK1$WIS, 
-  ES64_ADJ_NoLg=ES64_ADJACENT_WEEK1$WIS, 
-  ES64_EPI_NoLg=ES64_EPIWEEK_WEEK1$WIS,
-  ES64_TEMP_NoLg=ES64_TEMPERATURE_WEEK1$WIS,
-  ES64_AVG_NoLg=ES64_AVERAGE_WEEK1$WIS
+  ES64_AR=ES64_ARIMA_WEEK1$WIS, 
+  ES64_ADJ=ES64_ADJACENT_WEEK1$WIS, 
+  ES64_EPI=ES64_EPIWEEK_WEEK1$WIS,
+  ES64_TEMP=ES64_TEMPERATURE_WEEK1$WIS,
+  ES64_AVG=ES64_AVERAGE_WEEK1$WIS
 )
 
 head(df_W1_NoLg)
@@ -139,23 +139,23 @@ df_W2_NoLg <- data.frame(
   STATE = AUTO_ARIMA_WEEK2$State,
   Julian_date = AUTO_ARIMA_WEEK2$target_end_date,
   epiweek = AUTO_ARIMA_WEEK2$epiweek,
-  AUTO_AR_NoLg=AUTO_ARIMA_WEEK2$WIS, 
-  AUTO_ADJ_NoLg=AUTO_ADJACENT_WEEK2$WIS, 
-  AUTO_EPI_NoLg=AUTO_EPIWEEK_WEEK2$WIS,
-  AUTO_TEMP_NoLg=AUTO_TEMPERATURE_WEEK2$WIS,
-  AUTO_AVG_NoLg=AUTO_AVERAGE_WEEK2$WIS,
+  AUTO_AR=AUTO_ARIMA_WEEK2$WIS, 
+  AUTO_ADJ=AUTO_ADJACENT_WEEK2$WIS, 
+  AUTO_EPI=AUTO_EPIWEEK_WEEK2$WIS,
+  AUTO_TEMP=AUTO_TEMPERATURE_WEEK2$WIS,
+  AUTO_AVG=AUTO_AVERAGE_WEEK2$WIS,
   
-  ES27_AR_NoLg=ES27_ARIMA_WEEK2$WIS, 
-  ES27_ADJ_NoLg=ES27_ADJACENT_WEEK2$WIS, 
-  ES27_EPI_NoLg=ES27_EPIWEEK_WEEK2$WIS,
-  ES27_TEMP_NoLg=ES27_TEMPERATURE_WEEK2$WIS,
-  ES27_AVG_NoLg=ES27_AVERAGE_WEEK2$WIS,
+  ES27_AR=ES27_ARIMA_WEEK2$WIS, 
+  ES27_ADJ=ES27_ADJACENT_WEEK2$WIS, 
+  ES27_EPI=ES27_EPIWEEK_WEEK2$WIS,
+  ES27_TEMP=ES27_TEMPERATURE_WEEK2$WIS,
+  ES27_AVG=ES27_AVERAGE_WEEK2$WIS,
   
-  ES64_AR_NoLg=ES64_ARIMA_WEEK2$WIS, 
-  ES64_ADJ_NoLg=ES64_ADJACENT_WEEK2$WIS, 
-  ES64_EPI_NoLg=ES64_EPIWEEK_WEEK2$WIS,
-  ES64_TEMP_NoLg=ES64_TEMPERATURE_WEEK2$WIS,
-  ES64_AVG_NoLg=ES64_AVERAGE_WEEK2$WIS
+  ES64_AR=ES64_ARIMA_WEEK2$WIS, 
+  ES64_ADJ=ES64_ADJACENT_WEEK2$WIS, 
+  ES64_EPI=ES64_EPIWEEK_WEEK2$WIS,
+  ES64_TEMP=ES64_TEMPERATURE_WEEK2$WIS,
+  ES64_AVG=ES64_AVERAGE_WEEK2$WIS
   
 )
 
@@ -191,23 +191,23 @@ df_W3_NoLg <- data.frame(
   STATE = AUTO_ARIMA_WEEK3$State,
   Julian_date = AUTO_ARIMA_WEEK3$target_end_date,
   epiweek = AUTO_ARIMA_WEEK3$epiweek,
-  AUTO_AR_NoLg=AUTO_ARIMA_WEEK3$WIS, 
-  AUTO_ADJ_NoLg=AUTO_ADJACENT_WEEK3$WIS, 
-  AUTO_EPI_NoLg=AUTO_EPIWEEK_WEEK3$WIS,
-  AUTO_TEMP_NoLg=AUTO_TEMPERATURE_WEEK3$WIS,
-  AUTO_AVG_NoLg=AUTO_AVERAGE_WEEK3$WIS,
+  AUTO_AR=AUTO_ARIMA_WEEK3$WIS, 
+  AUTO_ADJ=AUTO_ADJACENT_WEEK3$WIS, 
+  AUTO_EPI=AUTO_EPIWEEK_WEEK3$WIS,
+  AUTO_TEMP=AUTO_TEMPERATURE_WEEK3$WIS,
+  AUTO_AVG=AUTO_AVERAGE_WEEK3$WIS,
     
-  ES27_AR_NoLg=ES27_ARIMA_WEEK3$WIS, 
-  ES27_ADJ_NoLg=ES27_ADJACENT_WEEK3$WIS, 
-  ES27_EPI_NoLg=ES27_EPIWEEK_WEEK3$WIS,
-  ES27_TEMP_NoLg=ES27_TEMPERATURE_WEEK3$WIS,
-  ES27_AVG_NoLg=ES27_AVERAGE_WEEK3$WIS,
+  ES27_AR=ES27_ARIMA_WEEK3$WIS, 
+  ES27_ADJ=ES27_ADJACENT_WEEK3$WIS, 
+  ES27_EPI=ES27_EPIWEEK_WEEK3$WIS,
+  ES27_TEMP=ES27_TEMPERATURE_WEEK3$WIS,
+  ES27_AVG=ES27_AVERAGE_WEEK3$WIS,
     
-  ES64_AR_NoLg=ES64_ARIMA_WEEK3$WIS, 
-  ES64_ADJ_NoLg=ES64_ADJACENT_WEEK3$WIS, 
-  ES64_EPI_NoLg=ES64_EPIWEEK_WEEK3$WIS,
-  ES64_TEMP_NoLg=ES64_TEMPERATURE_WEEK3$WIS,
-  ES64_AVG_NoLg=ES64_AVERAGE_WEEK3$WIS
+  ES64_AR=ES64_ARIMA_WEEK3$WIS, 
+  ES64_ADJ=ES64_ADJACENT_WEEK3$WIS, 
+  ES64_EPI=ES64_EPIWEEK_WEEK3$WIS,
+  ES64_TEMP=ES64_TEMPERATURE_WEEK3$WIS,
+  ES64_AVG=ES64_AVERAGE_WEEK3$WIS
 )
 
 head(df_W3_NoLg)
@@ -241,23 +241,23 @@ df_W4_NoLg <- data.frame(
   STATE = AUTO_ARIMA_WEEK4$State,
   Julian_date = AUTO_ARIMA_WEEK4$target_end_date,
   epiweek = AUTO_ARIMA_WEEK4$epiweek,
-  AUTO_AR_NoLg=AUTO_ARIMA_WEEK4$WIS, 
-  AUTO_ADJ_NoLg=AUTO_ADJACENT_WEEK4$WIS, 
-  AUTO_EPI_NoLg=AUTO_EPIWEEK_WEEK4$WIS,
-  AUTO_TEMP_NoLg=AUTO_TEMPERATURE_WEEK4$WIS,
-  AUTO_AVG_NoLg=AUTO_AVERAGE_WEEK4$WIS, 
+  AUTO_AR=AUTO_ARIMA_WEEK4$WIS, 
+  AUTO_ADJ=AUTO_ADJACENT_WEEK4$WIS, 
+  AUTO_EPI=AUTO_EPIWEEK_WEEK4$WIS,
+  AUTO_TEMP=AUTO_TEMPERATURE_WEEK4$WIS,
+  AUTO_AVG=AUTO_AVERAGE_WEEK4$WIS, 
   
-  ES27_AR_NoLg=ES27_ARIMA_WEEK4$WIS, 
-  ES27_ADJ_NoLg=ES27_ADJACENT_WEEK4$WIS, 
-  ES27_EPI_NoLg=ES27_EPIWEEK_WEEK4$WIS,
-  ES27_TEMP_NoLg=ES27_TEMPERATURE_WEEK4$WIS,
-  ES27_AVG_NoLg=ES27_AVERAGE_WEEK4$WIS,  
+  ES27_AR=ES27_ARIMA_WEEK4$WIS, 
+  ES27_ADJ=ES27_ADJACENT_WEEK4$WIS, 
+  ES27_EPI=ES27_EPIWEEK_WEEK4$WIS,
+  ES27_TEMP=ES27_TEMPERATURE_WEEK4$WIS,
+  ES27_AVG=ES27_AVERAGE_WEEK4$WIS,  
   
-  ES64_AR_NoLg=ES64_ARIMA_WEEK4$WIS, 
-  ES64_ADJ_NoLg=ES64_ADJACENT_WEEK4$WIS, 
-  ES64_EPI_NoLg=ES64_EPIWEEK_WEEK4$WIS,
-  ES64_TEMP_NoLg=ES64_TEMPERATURE_WEEK4$WIS,
-  ES64_AVG_NoLg=ES64_AVERAGE_WEEK4$WIS  
+  ES64_AR=ES64_ARIMA_WEEK4$WIS, 
+  ES64_ADJ=ES64_ADJACENT_WEEK4$WIS, 
+  ES64_EPI=ES64_EPIWEEK_WEEK4$WIS,
+  ES64_TEMP=ES64_TEMPERATURE_WEEK4$WIS,
+  ES64_AVG=ES64_AVERAGE_WEEK4$WIS  
 )
 
 head(df_W4_NoLg)
@@ -348,8 +348,8 @@ df_combined_ <- bind_rows(
   df_W3_NoLg %>% mutate(Dataset = "3 weeks ahead"),
   df_W4_NoLg %>% mutate(Dataset = "4 weeks ahead")
 ) %>%
-  select(STATE, epiweek, AUTO_AR_NoLg, Dataset, Julian_date) %>%
-  rename(WIS = AUTO_AR_NoLg)  # Rename for consistency
+  select(STATE, epiweek, AUTO_AR, Dataset, Julian_date) %>%
+  rename(WIS = AUTO_AR)  # Rename for consistency
 
 # Define the epiweek values to highlight
 highlight_weeks <- c(21, 41)
@@ -389,23 +389,23 @@ calculate_mean_wis <- function(data) {
   data %>%
     group_by(STATE) %>%
     summarize(
-      AUTO_AR_NoLg = mean(AUTO_AR_NoLg, na.rm = TRUE),
-      AUTO_ADJ_NoLg = mean(AUTO_ADJ_NoLg, na.rm = TRUE),
-      AUTO_EPI_NoLg = mean(AUTO_EPI_NoLg, na.rm = TRUE),
-      AUTO_TMP_NoLg = mean(AUTO_TEMP_NoLg, na.rm = TRUE),
-      AUTO_AVG_NoLg = mean(AUTO_AVG_NoLg, na.rm = TRUE),
+      AUTO_AR = mean(AUTO_AR, na.rm = TRUE),
+      AUTO_ADJ = mean(AUTO_ADJ, na.rm = TRUE),
+      AUTO_EPI = mean(AUTO_EPI, na.rm = TRUE),
+      AUTO_TMP = mean(AUTO_TEMP, na.rm = TRUE),
+      AUTO_AVG = mean(AUTO_AVG, na.rm = TRUE),
       
-      ES27_AR_NoLg = mean(ES27_AR_NoLg, na.rm = TRUE),
-      ES27_ADJ_NoLg = mean(ES27_ADJ_NoLg, na.rm = TRUE),
-      ES27_EPI_NoLg = mean(ES27_EPI_NoLg, na.rm = TRUE),
-      ES27_TMP_NoLg = mean(ES27_TEMP_NoLg, na.rm = TRUE),
-      ES27_AVG_NoLg = mean(ES27_AVG_NoLg, na.rm = TRUE),
+      ES27_AR = mean(ES27_AR, na.rm = TRUE),
+      ES27_ADJ = mean(ES27_ADJ, na.rm = TRUE),
+      ES27_EPI = mean(ES27_EPI, na.rm = TRUE),
+      ES27_TMP = mean(ES27_TEMP, na.rm = TRUE),
+      ES27_AVG = mean(ES27_AVG, na.rm = TRUE),
       
-      ES64_AR_NoLg = mean(ES64_AR_NoLg, na.rm = TRUE),
-      ES64_ADJ_NoLg = mean(ES64_ADJ_NoLg, na.rm = TRUE),
-      ES64_EPI_NoLg = mean(ES64_EPI_NoLg, na.rm = TRUE),
-      ES64_TMP_NoLg = mean(ES64_TEMP_NoLg, na.rm = TRUE),
-      ES64_AVG_NoLg = mean(ES64_AVG_NoLg, na.rm = TRUE)
+      ES64_AR = mean(ES64_AR, na.rm = TRUE),
+      ES64_ADJ = mean(ES64_ADJ, na.rm = TRUE),
+      ES64_EPI = mean(ES64_EPI, na.rm = TRUE),
+      ES64_TMP = mean(ES64_TEMP, na.rm = TRUE),
+      ES64_AVG = mean(ES64_AVG, na.rm = TRUE)
     )
 }
 
@@ -432,29 +432,29 @@ combined_data <- data.frame(
   
   Models = rep(c("AUTO_AR", "ES27_AR", "ES64_AR", "AUTO_ADJ", "ES27_ADJ", "ES64_ADJ", "AUTO_TMP", "ES27_TMP", "ES64_TMP", "AUTO_EPI", "ES27_EPI", "ES64_EPI","AUTO_AVG", "ES27_AVG", "ES64_AVG"), each=48, times = 4),
   
-  value = c(W1_NoLg$AUTO_AR_NoLg, W1_NoLg$ES27_AR_NoLg, W1_NoLg$ES64_AR_NoLg, 
-            W1_NoLg$AUTO_ADJ_NoLg, W1_NoLg$ES27_ADJ_NoLg, W1_NoLg$ES64_ADJ_NoLg, 
-            W1_NoLg$AUTO_TMP_NoLg, W1_NoLg$ES27_TMP_NoLg, W1_NoLg$ES64_TMP_NoLg, 
-            W1_NoLg$AUTO_EPI_NoLg, W1_NoLg$ES27_EPI_NoLg, W1_NoLg$ES64_EPI_NoLg,
-            W1_NoLg$AUTO_AVG_NoLg, W1_NoLg$ES27_AVG_NoLg, W1_NoLg$ES64_AVG_NoLg,
+  value = c(W1_NoLg$AUTO_AR, W1_NoLg$ES27_AR, W1_NoLg$ES64_AR, 
+            W1_NoLg$AUTO_ADJ, W1_NoLg$ES27_ADJ, W1_NoLg$ES64_ADJ, 
+            W1_NoLg$AUTO_TMP, W1_NoLg$ES27_TMP, W1_NoLg$ES64_TMP, 
+            W1_NoLg$AUTO_EPI, W1_NoLg$ES27_EPI, W1_NoLg$ES64_EPI,
+            W1_NoLg$AUTO_AVG, W1_NoLg$ES27_AVG, W1_NoLg$ES64_AVG,
               
-            W2_NoLg$AUTO_AR_NoLg, W2_NoLg$ES27_AR_NoLg, W2_NoLg$ES64_AR_NoLg, 
-            W2_NoLg$AUTO_ADJ_NoLg, W2_NoLg$ES27_ADJ_NoLg, W2_NoLg$ES64_ADJ_NoLg, 
-            W2_NoLg$AUTO_TMP_NoLg, W2_NoLg$ES27_TMP_NoLg, W2_NoLg$ES64_TMP_NoLg, 
-            W2_NoLg$AUTO_EPI_NoLg, W2_NoLg$ES27_EPI_NoLg, W2_NoLg$ES64_EPI_NoLg,
-            W2_NoLg$AUTO_AVG_NoLg, W2_NoLg$ES27_AVG_NoLg, W2_NoLg$ES64_AVG_NoLg,
+            W2_NoLg$AUTO_AR, W2_NoLg$ES27_AR, W2_NoLg$ES64_AR, 
+            W2_NoLg$AUTO_ADJ, W2_NoLg$ES27_ADJ, W2_NoLg$ES64_ADJ, 
+            W2_NoLg$AUTO_TMP, W2_NoLg$ES27_TMP, W2_NoLg$ES64_TMP, 
+            W2_NoLg$AUTO_EPI, W2_NoLg$ES27_EPI, W2_NoLg$ES64_EPI,
+            W2_NoLg$AUTO_AVG, W2_NoLg$ES27_AVG, W2_NoLg$ES64_AVG,
             
-            W3_NoLg$AUTO_AR_NoLg, W3_NoLg$ES27_AR_NoLg, W3_NoLg$ES64_AR_NoLg,
-            W3_NoLg$AUTO_ADJ_NoLg, W3_NoLg$ES27_ADJ_NoLg, W3_NoLg$ES64_ADJ_NoLg, 
-            W3_NoLg$AUTO_TMP_NoLg, W3_NoLg$ES27_TMP_NoLg, W3_NoLg$ES64_TMP_NoLg, 
-            W3_NoLg$AUTO_EPI_NoLg, W3_NoLg$ES27_EPI_NoLg, W3_NoLg$ES64_EPI_NoLg,
-            W3_NoLg$AUTO_AVG_NoLg, W3_NoLg$ES27_AVG_NoLg, W3_NoLg$ES64_AVG_NoLg,
+            W3_NoLg$AUTO_AR, W3_NoLg$ES27_AR, W3_NoLg$ES64_AR,
+            W3_NoLg$AUTO_ADJ, W3_NoLg$ES27_ADJ, W3_NoLg$ES64_ADJ, 
+            W3_NoLg$AUTO_TMP, W3_NoLg$ES27_TMP, W3_NoLg$ES64_TMP, 
+            W3_NoLg$AUTO_EPI, W3_NoLg$ES27_EPI, W3_NoLg$ES64_EPI,
+            W3_NoLg$AUTO_AVG, W3_NoLg$ES27_AVG, W3_NoLg$ES64_AVG,
             
-            W4_NoLg$AUTO_AR_NoLg, W4_NoLg$ES27_AR_NoLg, W4_NoLg$ES64_AR_NoLg,
-            W4_NoLg$AUTO_ADJ_NoLg, W4_NoLg$ES27_ADJ_NoLg, W4_NoLg$ES64_ADJ_NoLg, 
-            W4_NoLg$AUTO_TMP_NoLg, W4_NoLg$ES27_TMP_NoLg, W4_NoLg$ES64_TMP_NoLg, 
-            W4_NoLg$AUTO_EPI_NoLg, W4_NoLg$ES27_EPI_NoLg, W4_NoLg$ES64_EPI_NoLg,
-            W4_NoLg$AUTO_AVG_NoLg, W4_NoLg$ES27_AVG_NoLg, W4_NoLg$ES64_AVG_NoLg
+            W4_NoLg$AUTO_AR, W4_NoLg$ES27_AR, W4_NoLg$ES64_AR,
+            W4_NoLg$AUTO_ADJ, W4_NoLg$ES27_ADJ, W4_NoLg$ES64_ADJ, 
+            W4_NoLg$AUTO_TMP, W4_NoLg$ES27_TMP, W4_NoLg$ES64_TMP, 
+            W4_NoLg$AUTO_EPI, W4_NoLg$ES27_EPI, W4_NoLg$ES64_EPI,
+            W4_NoLg$AUTO_AVG, W4_NoLg$ES27_AVG, W4_NoLg$ES64_AVG
             )
 )
 
@@ -538,23 +538,23 @@ df_W1 <- data.frame(
   STATE = AUTO_ARIMA_WEEK1$State,
   Julian_date = AUTO_ARIMA_WEEK1$target_end_date,
   epiweek = AUTO_ARIMA_WEEK1$epiweek,
-  AUTO_AR=AUTO_ARIMA_WEEK1$WIS, 
-  AUTO_ADJ=AUTO_ADJACENT_WEEK1$WIS, 
-  AUTO_EPI=AUTO_EPIWEEK_WEEK1$WIS,
-  AUTO_TEMP=AUTO_TEMPERATURE_WEEK1$WIS,
-  AUTO_AVG=AUTO_AVERAGE_WEEK1$WIS,
+  AUTO_AR_LB=AUTO_ARIMA_WEEK1$WIS, 
+  AUTO_ADJ_LB=AUTO_ADJACENT_WEEK1$WIS, 
+  AUTO_EPI_LB=AUTO_EPIWEEK_WEEK1$WIS,
+  AUTO_TEMP_LB=AUTO_TEMPERATURE_WEEK1$WIS,
+  AUTO_AVG_LB=AUTO_AVERAGE_WEEK1$WIS,
   
-  ES27_AR=ES27_ARIMA_WEEK1$WIS, 
-  ES27_ADJ=ES27_ADJACENT_WEEK1$WIS, 
-  ES27_EPI=ES27_EPIWEEK_WEEK1$WIS,
-  ES27_TEMP=ES27_TEMPERATURE_WEEK1$WIS,
-  ES27_AVG=ES27_AVERAGE_WEEK1$WIS,  
+  ES27_AR_LB=ES27_ARIMA_WEEK1$WIS, 
+  ES27_ADJ_LB=ES27_ADJACENT_WEEK1$WIS, 
+  ES27_EPI_LB=ES27_EPIWEEK_WEEK1$WIS,
+  ES27_TEMP_LB=ES27_TEMPERATURE_WEEK1$WIS,
+  ES27_AVG_LB=ES27_AVERAGE_WEEK1$WIS,  
   
-  ES64_AR=ES64_ARIMA_WEEK1$WIS, 
-  ES64_ADJ=ES64_ADJACENT_WEEK1$WIS, 
-  ES64_EPI=ES64_EPIWEEK_WEEK1$WIS,
-  ES64_TEMP=ES64_TEMPERATURE_WEEK1$WIS,
-  ES64_AVG=ES64_AVERAGE_WEEK1$WIS  
+  ES64_AR_LB=ES64_ARIMA_WEEK1$WIS, 
+  ES64_ADJ_LB=ES64_ADJACENT_WEEK1$WIS, 
+  ES64_EPI_LB=ES64_EPIWEEK_WEEK1$WIS,
+  ES64_TEMP_LB=ES64_TEMPERATURE_WEEK1$WIS,
+  ES64_AVG_LB=ES64_AVERAGE_WEEK1$WIS  
 )
 
 head(df_W1)
@@ -588,23 +588,23 @@ df_W2 <- data.frame(
   STATE = AUTO_ARIMA_WEEK2$State,
   Julian_date = AUTO_ARIMA_WEEK2$target_end_date,
   epiweek = AUTO_ARIMA_WEEK2$epiweek,
-  AUTO_AR=AUTO_ARIMA_WEEK2$WIS, 
-  AUTO_ADJ=AUTO_ADJACENT_WEEK2$WIS, 
-  AUTO_EPI=AUTO_EPIWEEK_WEEK2$WIS,
-  AUTO_TEMP=AUTO_TEMPERATURE_WEEK2$WIS,
-  AUTO_AVG=AUTO_AVERAGE_WEEK2$WIS,
+  AUTO_AR_LB=AUTO_ARIMA_WEEK2$WIS, 
+  AUTO_ADJ_LB=AUTO_ADJACENT_WEEK2$WIS, 
+  AUTO_EPI_LB=AUTO_EPIWEEK_WEEK2$WIS,
+  AUTO_TEMP_LB=AUTO_TEMPERATURE_WEEK2$WIS,
+  AUTO_AVG_LB=AUTO_AVERAGE_WEEK2$WIS,
   
-  ES27_AR=ES27_ARIMA_WEEK2$WIS, 
-  ES27_ADJ=ES27_ADJACENT_WEEK2$WIS, 
-  ES27_EPI=ES27_EPIWEEK_WEEK2$WIS,
-  ES27_TEMP=ES27_TEMPERATURE_WEEK2$WIS,
-  ES27_AVG=ES27_AVERAGE_WEEK2$WIS,  
+  ES27_AR_LB=ES27_ARIMA_WEEK2$WIS, 
+  ES27_ADJ_LB=ES27_ADJACENT_WEEK2$WIS, 
+  ES27_EPI_LB=ES27_EPIWEEK_WEEK2$WIS,
+  ES27_TEMP_LB=ES27_TEMPERATURE_WEEK2$WIS,
+  ES27_AVG_LB=ES27_AVERAGE_WEEK2$WIS,  
   
-  ES64_AR=ES64_ARIMA_WEEK2$WIS, 
-  ES64_ADJ=ES64_ADJACENT_WEEK2$WIS, 
-  ES64_EPI=ES64_EPIWEEK_WEEK2$WIS,
-  ES64_TEMP=ES64_TEMPERATURE_WEEK2$WIS,
-  ES64_AVG=ES64_AVERAGE_WEEK2$WIS  
+  ES64_AR_LB=ES64_ARIMA_WEEK2$WIS, 
+  ES64_ADJ_LB=ES64_ADJACENT_WEEK2$WIS, 
+  ES64_EPI_LB=ES64_EPIWEEK_WEEK2$WIS,
+  ES64_TEMP_LB=ES64_TEMPERATURE_WEEK2$WIS,
+  ES64_AVG_LB=ES64_AVERAGE_WEEK2$WIS  
 )
 
 head(df_W2)
@@ -638,23 +638,23 @@ df_W3 <- data.frame(
   STATE = AUTO_ARIMA_WEEK3$State,
   Julian_date = AUTO_ARIMA_WEEK3$target_end_date,
   epiweek = AUTO_ARIMA_WEEK3$epiweek,
-  AUTO_AR=AUTO_ARIMA_WEEK3$WIS, 
-  AUTO_ADJ=AUTO_ADJACENT_WEEK3$WIS, 
-  AUTO_EPI=AUTO_EPIWEEK_WEEK3$WIS,
-  AUTO_TEMP=AUTO_TEMPERATURE_WEEK3$WIS,
-  AUTO_AVG=AUTO_AVERAGE_WEEK3$WIS,
+  AUTO_AR_LB=AUTO_ARIMA_WEEK3$WIS, 
+  AUTO_ADJ_LB=AUTO_ADJACENT_WEEK3$WIS, 
+  AUTO_EPI_LB=AUTO_EPIWEEK_WEEK3$WIS,
+  AUTO_TEMP_LB=AUTO_TEMPERATURE_WEEK3$WIS,
+  AUTO_AVG_LB=AUTO_AVERAGE_WEEK3$WIS,
   
-  ES27_AR=ES27_ARIMA_WEEK3$WIS, 
-  ES27_ADJ=ES27_ADJACENT_WEEK3$WIS, 
-  ES27_EPI=ES27_EPIWEEK_WEEK3$WIS,
-  ES27_TEMP=ES27_TEMPERATURE_WEEK3$WIS,
-  ES27_AVG=ES27_AVERAGE_WEEK3$WIS,  
+  ES27_AR_LB=ES27_ARIMA_WEEK3$WIS, 
+  ES27_ADJ_LB=ES27_ADJACENT_WEEK3$WIS, 
+  ES27_EPI_LB=ES27_EPIWEEK_WEEK3$WIS,
+  ES27_TEMP_LB=ES27_TEMPERATURE_WEEK3$WIS,
+  ES27_AVG_LB=ES27_AVERAGE_WEEK3$WIS,  
   
-  ES64_AR=ES64_ARIMA_WEEK3$WIS, 
-  ES64_ADJ=ES64_ADJACENT_WEEK3$WIS, 
-  ES64_EPI=ES64_EPIWEEK_WEEK3$WIS,
-  ES64_TEMP=ES64_TEMPERATURE_WEEK3$WIS,
-  ES64_AVG=ES64_AVERAGE_WEEK3$WIS  
+  ES64_AR_LB=ES64_ARIMA_WEEK3$WIS, 
+  ES64_ADJ_LB=ES64_ADJACENT_WEEK3$WIS, 
+  ES64_EPI_LB=ES64_EPIWEEK_WEEK3$WIS,
+  ES64_TEMP_LB=ES64_TEMPERATURE_WEEK3$WIS,
+  ES64_AVG_LB=ES64_AVERAGE_WEEK3$WIS  
 )
 
 head(df_W3)
@@ -689,23 +689,23 @@ df_W4 <- data.frame(
   STATE = AUTO_ARIMA_WEEK4$State,
   Julian_date = AUTO_ARIMA_WEEK4$target_end_date,
   epiweek = AUTO_ARIMA_WEEK4$epiweek,
-  AUTO_AR=AUTO_ARIMA_WEEK4$WIS, 
-  AUTO_ADJ=AUTO_ADJACENT_WEEK4$WIS, 
-  AUTO_EPI=AUTO_EPIWEEK_WEEK4$WIS,
-  AUTO_TEMP=AUTO_TEMPERATURE_WEEK4$WIS,
-  AUTO_AVG=AUTO_AVERAGE_WEEK4$WIS,
+  AUTO_AR_LB=AUTO_ARIMA_WEEK4$WIS, 
+  AUTO_ADJ_LB=AUTO_ADJACENT_WEEK4$WIS, 
+  AUTO_EPI_LB=AUTO_EPIWEEK_WEEK4$WIS,
+  AUTO_TEMP_LB=AUTO_TEMPERATURE_WEEK4$WIS,
+  AUTO_AVG_LB=AUTO_AVERAGE_WEEK4$WIS,
   
-  ES27_AR=ES27_ARIMA_WEEK4$WIS, 
-  ES27_ADJ=ES27_ADJACENT_WEEK4$WIS, 
-  ES27_EPI=ES27_EPIWEEK_WEEK4$WIS,
-  ES27_TEMP=ES27_TEMPERATURE_WEEK4$WIS,
-  ES27_AVG=ES27_AVERAGE_WEEK4$WIS,  
+  ES27_AR_LB=ES27_ARIMA_WEEK4$WIS, 
+  ES27_ADJ_LB=ES27_ADJACENT_WEEK4$WIS, 
+  ES27_EPI_LB=ES27_EPIWEEK_WEEK4$WIS,
+  ES27_TEMP_LB=ES27_TEMPERATURE_WEEK4$WIS,
+  ES27_AVG_LB=ES27_AVERAGE_WEEK4$WIS,  
   
-  ES64_AR=ES64_ARIMA_WEEK4$WIS, 
-  ES64_ADJ=ES64_ADJACENT_WEEK4$WIS, 
-  ES64_EPI=ES64_EPIWEEK_WEEK4$WIS,
-  ES64_TEMP=ES64_TEMPERATURE_WEEK4$WIS,
-  ES64_AVG=ES64_AVERAGE_WEEK4$WIS  
+  ES64_AR_LB=ES64_ARIMA_WEEK4$WIS, 
+  ES64_ADJ_LB=ES64_ADJACENT_WEEK4$WIS, 
+  ES64_EPI_LB=ES64_EPIWEEK_WEEK4$WIS,
+  ES64_TEMP_LB=ES64_TEMPERATURE_WEEK4$WIS,
+  ES64_AVG_LB=ES64_AVERAGE_WEEK4$WIS  
 )
 
 head(df_W4)
@@ -754,23 +754,23 @@ calculate_mean_wis <- function(data) {
   data %>%
     group_by(STATE) %>%
     summarize(
-      AUTO_AR_Lg = mean(AUTO_AR, na.rm = TRUE),
-      AUTO_ADJ_Lg = mean(AUTO_ADJ, na.rm = TRUE),
-      AUTO_EPI_Lg = mean(AUTO_EPI, na.rm = TRUE),
-      AUTO_TMP_Lg = mean(AUTO_TEMP, na.rm = TRUE),
-      AUTO_AVG_Lg = mean(AUTO_AVG, na.rm = TRUE),
+      AUTO_AR_LB = mean(AUTO_AR_LB, na.rm = TRUE),
+      AUTO_ADJ_LB = mean(AUTO_ADJ_LB, na.rm = TRUE),
+      AUTO_EPI_LB = mean(AUTO_EPI_LB, na.rm = TRUE),
+      AUTO_TMP_LB = mean(AUTO_TEMP_LB, na.rm = TRUE),
+      AUTO_AVG_LB = mean(AUTO_AVG_LB, na.rm = TRUE),
       
-      ES27_AR_Lg = mean(ES27_AR, na.rm = TRUE),
-      ES27_ADJ_Lg = mean(ES27_ADJ, na.rm = TRUE),
-      ES27_EPI_Lg = mean(ES27_EPI, na.rm = TRUE),
-      ES27_TMP_Lg = mean(ES27_TEMP, na.rm = TRUE),
-      ES27_AVG_Lg = mean(ES27_AVG, na.rm = TRUE),
+      ES27_AR_LB = mean(ES27_AR_LB, na.rm = TRUE),
+      ES27_ADJ_LB = mean(ES27_ADJ_LB, na.rm = TRUE),
+      ES27_EPI_LB = mean(ES27_EPI_LB, na.rm = TRUE),
+      ES27_TMP_LB = mean(ES27_TEMP_LB, na.rm = TRUE),
+      ES27_AVG_LB = mean(ES27_AVG_LB, na.rm = TRUE),
       
-      ES64_AR_Lg = mean(ES64_AR, na.rm = TRUE),
-      ES64_ADJ_Lg = mean(ES64_ADJ, na.rm = TRUE),
-      ES64_EPI_Lg = mean(ES64_EPI, na.rm = TRUE),
-      ES64_TMP_Lg = mean(ES64_TEMP, na.rm = TRUE),
-      ES64_AVG_Lg = mean(ES64_AVG, na.rm = TRUE),
+      ES64_AR_LB = mean(ES64_AR_LB, na.rm = TRUE),
+      ES64_ADJ_LB = mean(ES64_ADJ_LB, na.rm = TRUE),
+      ES64_EPI_LB = mean(ES64_EPI_LB, na.rm = TRUE),
+      ES64_TMP_LB = mean(ES64_TEMP_LB, na.rm = TRUE),
+      ES64_AVG_LB = mean(ES64_AVG_LB, na.rm = TRUE),
       
     )
 }
@@ -797,29 +797,31 @@ combined_data <- data.frame(
   
   Models = rep(c("AUTO_AR_LB", "ES27_AR_LB", "ES64_AR_LB", "AUTO_ADJ_LB", "ES27_ADJ_LB", "ES64_ADJ_LB", "AUTO_TMP_LB", "ES27_TMP_LB", "ES64_TMP_LB", "AUTO_EPI_LB", "ES27_EPI_LB", "ES64_EPI_LB", "AUTO_AVG_LB", "ES27_AVG_LB", "ES64_AVG_LB"), each=48, times = 4),
   
-  value = c(W1_Lg$AUTO_AR_Lg, W1_Lg$ES27_AR_Lg, W1_Lg$ES64_AR_Lg, 
-            W1_Lg$AUTO_ADJ_Lg, W1_Lg$ES27_ADJ_Lg, W1_Lg$ES64_ADJ_Lg, 
-            W1_Lg$AUTO_TMP_Lg, W1_Lg$ES27_TMP_Lg, W1_Lg$ES64_TMP_Lg, 
-            W1_Lg$AUTO_EPI_Lg, W1_Lg$ES27_EPI_Lg, W1_Lg$ES64_EPI_Lg,
-            W1_Lg$AUTO_AVG_Lg, W1_Lg$ES27_AVG_Lg, W1_Lg$ES64_AVG_Lg,
+  value = c(W1_Lg$AUTO_AR_LB, W1_Lg$ES27_AR_LB, W1_Lg$ES64_AR_LB, 
+            W1_Lg$AUTO_ADJ_LB, W1_Lg$ES27_ADJ_LB, W1_Lg$ES64_ADJ_LB, 
+            W1_Lg$AUTO_TMP_LB, W1_Lg$ES27_TMP_LB, W1_Lg$ES64_TMP_LB, 
+            W1_Lg$AUTO_EPI_LB, W1_Lg$ES27_EPI_LB, W1_Lg$ES64_EPI_LB,
+            W1_Lg$AUTO_AVG_LB, W1_Lg$ES27_AVG_LB, W1_Lg$ES64_AVG_LB,
             
-            W2_Lg$AUTO_AR_Lg, W2_Lg$ES27_AR_Lg, W2_Lg$ES64_AR_Lg, 
-            W2_Lg$AUTO_ADJ_Lg, W2_Lg$ES27_ADJ_Lg, W2_Lg$ES64_ADJ_Lg, 
-            W2_Lg$AUTO_TMP_Lg, W2_Lg$ES27_TMP_Lg, W2_Lg$ES64_TMP_Lg, 
-            W2_Lg$AUTO_EPI_Lg, W2_Lg$ES27_EPI_Lg, W2_Lg$ES64_EPI_Lg,
-            W2_Lg$AUTO_AVG_Lg, W2_Lg$ES27_AVG_Lg, W2_Lg$ES64_AVG_Lg,            
+            W2_Lg$AUTO_AR_LB, W2_Lg$ES27_AR_LB, W2_Lg$ES64_AR_LB, 
+            W2_Lg$AUTO_ADJ_LB, W2_Lg$ES27_ADJ_LB, W2_Lg$ES64_ADJ_LB, 
+            W2_Lg$AUTO_TMP_LB, W2_Lg$ES27_TMP_LB, W2_Lg$ES64_TMP_LB, 
+            W2_Lg$AUTO_EPI_LB, W2_Lg$ES27_EPI_LB, W2_Lg$ES64_EPI_LB,
+            W2_Lg$AUTO_AVG_LB, W2_Lg$ES27_AVG_LB, W2_Lg$ES64_AVG_LB,            
             
-            W3_Lg$AUTO_AR_Lg, W3_Lg$ES27_AR_Lg, W3_Lg$ES64_AR_Lg, 
-            W3_Lg$AUTO_ADJ_Lg, W3_Lg$ES27_ADJ_Lg, W3_Lg$ES64_ADJ_Lg, 
-            W3_Lg$AUTO_TMP_Lg, W3_Lg$ES27_TMP_Lg, W3_Lg$ES64_TMP_Lg, 
-            W3_Lg$AUTO_EPI_Lg, W3_Lg$ES27_EPI_Lg, W3_Lg$ES64_EPI_Lg,
-            W3_Lg$AUTO_AVG_Lg, W3_Lg$ES27_AVG_Lg, W3_Lg$ES64_AVG_Lg,
+            W3_Lg$AUTO_AR_LB, W3_Lg$ES27_AR_LB, W3_Lg$ES64_AR_LB, 
+            W3_Lg$AUTO_ADJ_LB, W3_Lg$ES27_ADJ_LB, W3_Lg$ES64_ADJ_LB, 
+            W3_Lg$AUTO_TMP_LB, W3_Lg$ES27_TMP_LB, W3_Lg$ES64_TMP_LB, 
+            W3_Lg$AUTO_EPI_LB, W3_Lg$ES27_EPI_LB, W3_Lg$ES64_EPI_LB,
+            W3_Lg$AUTO_AVG_LB, W3_Lg$ES27_AVG_LB, W3_Lg$ES64_AVG_LB,
             
-            W4_Lg$AUTO_AR_Lg, W4_Lg$ES27_AR_Lg, W4_Lg$ES64_AR_Lg, 
-            W4_Lg$AUTO_ADJ_Lg, W4_Lg$ES27_ADJ_Lg, W4_Lg$ES64_ADJ_Lg, 
-            W4_Lg$AUTO_TMP_Lg, W4_Lg$ES27_TMP_Lg, W4_Lg$ES64_TMP_Lg, 
-            W4_Lg$AUTO_EPI_Lg, W4_Lg$ES27_EPI_Lg, W4_Lg$ES64_EPI_Lg,
-            W4_Lg$AUTO_AVG_Lg, W4_Lg$ES27_AVG_Lg, W4_Lg$ES64_AVG_Lg)
+            
+            W4_Lg$AUTO_AR_LB, W4_Lg$ES27_AR_LB, W4_Lg$ES64_AR_LB, 
+            W4_Lg$AUTO_ADJ_LB, W4_Lg$ES27_ADJ_LB, W4_Lg$ES64_ADJ_LB, 
+            W4_Lg$AUTO_TMP_LB, W4_Lg$ES27_TMP_LB, W4_Lg$ES64_TMP_LB, 
+            W4_Lg$AUTO_EPI_LB, W4_Lg$ES27_EPI_LB, W4_Lg$ES64_EPI_LB,
+            W4_Lg$AUTO_AVG_LB, W4_Lg$ES27_AVG_LB, W4_Lg$ES64_AVG_LB)
+
 )
 
 # Create a new column for categories
@@ -892,7 +894,7 @@ for (i in 1:nrow(W1)) {
 # REORDER BY FREQUENCY
 W1$Best_Result <- fct_infreq(W1$Best_Result)
 # Create a new column to classify the model type
-W1$Model_Type <- ifelse(grepl("_NoLg$", W1$Best_Result), "Without log-back transformation", "With log-back transformation")
+W1$Model_Type <- ifelse(grepl("_LB$", W1$Best_Result), "With log-back transformation", "Without log-back transformation")
 
 # Print the first rows
 head(W1)
@@ -913,7 +915,7 @@ for (i in 1:nrow(W2)) {
 # REORDER BY FREQUENCY
 W2$Best_Result <- fct_infreq(W2$Best_Result)
 # Create a new column to classify the model type
-W2$Model_Type <- ifelse(grepl("_NoLg$", W2$Best_Result), "Without log-back transformation", "With log-back transformation")
+W2$Model_Type <- ifelse(grepl("_LB$", W2$Best_Result),  "With log-back transformation","Without log-back transformation")
 
 # Print merged results
 head(W2)
@@ -934,7 +936,7 @@ for (i in 1:nrow(W3)) {
 # REORDER BY FREQUENCY
 W3$Best_Result <- fct_infreq(W3$Best_Result)
 # Create a new column to classify the model type
-W3$Model_Type <- ifelse(grepl("_NoLg$", W3$Best_Result), "Without log-back transformation", "With log-back transformation")
+W3$Model_Type <- ifelse(grepl("_LB$", W3$Best_Result),  "With log-back transformation","Without log-back transformation")
 
 # Print merged results
 head(W3)
@@ -952,7 +954,7 @@ for (i in 1:nrow(W4)) {
 }
 W4$Best_Result <- fct_infreq(W4$Best_Result)
 # Create a new column to classify the model type
-W4$Model_Type <- ifelse(grepl("_NoLg$", W4$Best_Result), "Without log-back transformation", "With log-back transformation")
+W4$Model_Type <- ifelse(grepl("_LB$", W4$Best_Result),  "With log-back transformation","Without log-back transformation")
 # Print merged results
 head(W4)
 
@@ -964,18 +966,18 @@ Now, let's plot the best models by each state for each forecast horizon (1-4 wee
 
 # Create a custom color mapping for each variable
 custom_colors <- c(
-  "AUTO_AR_Lg" = colors_ar[1], "ES27_AR_Lg" = colors_ar[2], "ES64_AR_Lg" = colors_ar[3],
-  "AUTO_EPI_Lg" = colors_epi[1], "ES27_EPI_Lg" = colors_epi[2], "ES64_EPI_Lg" = colors_epi[3],
-  "AUTO_TMP_Lg" = colors_tmp[1], "ES27_TMP_Lg" = colors_tmp[2], "ES64_TMP_Lg" = colors_tmp[3],
-  "AUTO_ADJ_Lg" = colors_adj[1], "ES27_ADJ_Lg" = colors_adj[2], "ES64_ADJ_Lg" = colors_adj[3],
-  "AUTO_AVG_Lg" = colors_avg[1], "ES27_AVG_Lg" = colors_avg[2], "ES64_AVG_Lg" = colors_avg[3],
+  "AUTO_AR_LB" = colors_ar[1], "ES27_AR_LB" = colors_ar[2], "ES64_AR_LB" = colors_ar[3],
+  "AUTO_EPI_LB" = colors_epi[1], "ES27_EPI_LB" = colors_epi[2], "ES64_EPI_LB" = colors_epi[3],
+  "AUTO_TMP_LB" = colors_tmp[1], "ES27_TMP_LB" = colors_tmp[2], "ES64_TMP_LB" = colors_tmp[3],
+  "AUTO_ADJ_LB" = colors_adj[1], "ES27_ADJ_LB" = colors_adj[2], "ES64_ADJ_LB" = colors_adj[3],
+  "AUTO_AVG_LB" = colors_avg[1], "ES27_AVG_LB" = colors_avg[2], "ES64_AVG_LB" = colors_avg[3],
   
   
-  "AUTO_AR_NoLg" = colors_ar[1], "ES27_AR_NoLg" = colors_ar[2], "ES64_AR_NoLg" = colors_ar[3],
-  "AUTO_EPI_NoLg" = colors_epi[1], "ES27_EPI_NoLg" = colors_epi[2], "ES64_EPI_NoLg" = colors_epi[3],
-  "AUTO_TMP_NoLg" = colors_tmp[1], "ES27_TMP_NoLg" = colors_tmp[2], "ES64_TMP_NoLg" = colors_tmp[3],
-  "AUTO_ADJ_NoLg" = colors_adj[1], "ES27_ADJ_NoLg" = colors_adj[2], "ES64_ADJ_NoLg" = colors_adj[3],
-  "AUTO_AVG_NoLg" = colors_avg[1], "ES27_AVG_NoLg" = colors_avg[2], "ES64_AVG_NoLg" = colors_avg[3]
+  "AUTO_AR" = colors_ar[1], "ES27_AR" = colors_ar[2], "ES64_AR" = colors_ar[3],
+  "AUTO_EPI" = colors_epi[1], "ES27_EPI" = colors_epi[2], "ES64_EPI" = colors_epi[3],
+  "AUTO_TMP" = colors_tmp[1], "ES27_TMP" = colors_tmp[2], "ES64_TMP" = colors_tmp[3],
+  "AUTO_ADJ" = colors_adj[1], "ES27_ADJ" = colors_adj[2], "ES64_ADJ" = colors_adj[3],
+  "AUTO_AVG" = colors_avg[1], "ES27_AVG" = colors_avg[2], "ES64_AVG" = colors_avg[3]
 )
 
 # --------- WEEK1 MODELS ------------- #
@@ -1076,11 +1078,11 @@ wide_data <- long_data %>%
   pivot_wider(names_from = Type, values_from = Value)
 
 # Get all model types except "AUTO_AAR"
-model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR_NoLg","Best_Result","Model_Type","Week_Ahead"))
+model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR","Best_Result","Model_Type","Week_Ahead"))
 
 # Perform Wilcoxon test for each model type against AUTO_AAR
 wilcox_results <- map_df(model_types, function(model) {
-  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR_NoLg, paired = TRUE)
+  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR, paired = TRUE)
   data.frame(Model = model, p_value = test$p.value, W = test$statistic)
 })
 
@@ -1108,11 +1110,11 @@ wide_data <- long_data %>%
   pivot_wider(names_from = Type, values_from = Value)
 
 # Get all model types except "AUTO_AAR"
-model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR_NoLg","Best_Result","Model_Type","Week_Ahead"))
+model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR","Best_Result","Model_Type","Week_Ahead"))
 
 # Perform Wilcoxon test for each model type against AUTO_AAR
 wilcox_results <- map_df(model_types, function(model) {
-  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR_NoLg, paired = TRUE)
+  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR, paired = TRUE)
   data.frame(Model = model, p_value = test$p.value, W = test$statistic)
 })
 
@@ -1142,11 +1144,11 @@ wide_data <- long_data %>%
   pivot_wider(names_from = Type, values_from = Value)
 
 # Get all model types except "AUTO_AAR"
-model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR_NoLg","Best_Result","Model_Type","Week_Ahead"))
+model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR","Best_Result","Model_Type","Week_Ahead"))
 
 # Perform Wilcoxon test for each model type against AUTO_AAR
 wilcox_results <- map_df(model_types, function(model) {
-  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR_NoLg, paired = TRUE)
+  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR, paired = TRUE)
   data.frame(Model = model, p_value = test$p.value, W = test$statistic)
 })
 
@@ -1176,11 +1178,11 @@ wide_data <- long_data %>%
   pivot_wider(names_from = Type, values_from = Value)
 
 # Get all model types except "AUTO_AAR"
-model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR_NoLg","Best_Result","Model_Type","Week_Ahead"))
+model_types <- setdiff(names(wide_data), c("STATE", "AUTO_AR","Best_Result","Model_Type","Week_Ahead"))
 
 # Perform Wilcoxon test for each model type against AUTO_AAR
 wilcox_results <- map_df(model_types, function(model) {
-  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR_NoLg, paired = TRUE)
+  test <- wilcox.test(wide_data[[model]], wide_data$AUTO_AR, paired = TRUE)
   data.frame(Model = model, p_value = test$p.value, W = test$statistic)
 })
 
@@ -1201,46 +1203,46 @@ Let's calculate the mean(WIS) improvement relative to the AUTO ARIMA model. We w
 ```{r}
 calculate_percentage_of_improvement <- function(data) {
   return(data.frame(
-    AUTO_AR_NoLg = (data$AUTO_AR_NoLg / data$AUTO_AR_NoLg),
+    AUTO_AR = (data$AUTO_AR / data$AUTO_AR),
     
-    ES27_AR_NoLg = ((1 - (data$ES27_AR_NoLg/data$AUTO_AR_NoLg)) * 100),
-    ES64_AR_NoLg = ((1 - (data$ES64_AR_NoLg/data$AUTO_AR_NoLg )) * 100),
+    ES27_AR = ((1 - (data$ES27_AR/data$AUTO_AR)) * 100),
+    ES64_AR = ((1 - (data$ES64_AR/data$AUTO_AR )) * 100),
    
-    AUTO_ADJ_NoLg = ((1 - (data$AUTO_ADJ_NoLg/data$AUTO_AR_NoLg)) * 100),
-    ES27_ADJ_NoLg = ((1 - (data$ES27_ADJ_NoLg/data$AUTO_AR_NoLg)) * 100),
-    ES64_ADJ_NoLg = ((1 - (data$ES64_ADJ_NoLg/data$AUTO_AR_NoLg)) * 100),
+    AUTO_ADJ = ((1 - (data$AUTO_ADJ/data$AUTO_AR)) * 100),
+    ES27_ADJ = ((1 - (data$ES27_ADJ/data$AUTO_AR)) * 100),
+    ES64_ADJ = ((1 - (data$ES64_ADJ/data$AUTO_AR)) * 100),
     
-    AUTO_TMP_NoLg = ((1 - (data$AUTO_TMP_NoLg/data$AUTO_AR_NoLg)) * 100),
-    ES27_TMP_NoLg = ((1 - (data$ES27_TMP_NoLg/data$AUTO_AR_NoLg)) * 100),
-    ES64_TMP_NoLg = ((1 - (data$ES64_TMP_NoLg/data$AUTO_AR_NoLg)) * 100),
+    AUTO_TMP = ((1 - (data$AUTO_TMP/data$AUTO_AR)) * 100),
+    ES27_TMP = ((1 - (data$ES27_TMP/data$AUTO_AR)) * 100),
+    ES64_TMP = ((1 - (data$ES64_TMP/data$AUTO_AR)) * 100),
     
-    AUTO_EPI_NoLg = ((1 - (data$AUTO_EPI_NoLg/data$AUTO_AR_NoLg)) * 100),
-    ES27_EPI_NoLg = ((1 - (data$ES27_EPI_NoLg/data$AUTO_AR_NoLg)) * 100),
-    ES64_EPI_NoLg = ((1 - (data$ES64_EPI_NoLg/data$AUTO_AR_NoLg)) * 100),
+    AUTO_EPI = ((1 - (data$AUTO_EPI/data$AUTO_AR)) * 100),
+    ES27_EPI = ((1 - (data$ES27_EPI/data$AUTO_AR)) * 100),
+    ES64_EPI = ((1 - (data$ES64_EPI/data$AUTO_AR)) * 100),
     
-    AUTO_AVG_NoLg = ((1 - (data$AUTO_AVG_NoLg/data$AUTO_AR_NoLg)) * 100),
-    ES27_AVG_NoLg = ((1 - (data$ES27_AVG_NoLg/data$AUTO_AR_NoLg)) * 100),
-    ES64_AVG_NoLg = ((1 - (data$ES64_AVG_NoLg/data$AUTO_AR_NoLg)) * 100),
+    AUTO_AVG = ((1 - (data$AUTO_AVG/data$AUTO_AR)) * 100),
+    ES27_AVG = ((1 - (data$ES27_AVG/data$AUTO_AR)) * 100),
+    ES64_AVG = ((1 - (data$ES64_AVG/data$AUTO_AR)) * 100),
     
-    AUTO_AR_Lg = ((1 - (data$AUTO_AR_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES27_AR_Lg = ((1 - (data$ES27_AR_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES64_AR_Lg = ((1 - (data$ES64_AR_Lg/data$AUTO_AR_NoLg)) * 100),
+    AUTO_AR_LB = ((1 - (data$AUTO_AR_LB/data$AUTO_AR)) * 100),
+    ES27_AR_LB = ((1 - (data$ES27_AR_LB/data$AUTO_AR)) * 100),
+    ES64_AR_LB = ((1 - (data$ES64_AR_LB/data$AUTO_AR)) * 100),
     
-    AUTO_ADJ_Lg = ((1 - (data$AUTO_ADJ_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES27_ADJ_Lg = ((1 - (data$ES27_ADJ_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES64_ADJ_Lg = ((1 - (data$ES64_ADJ_Lg/data$AUTO_AR_NoLg)) * 100),
+    AUTO_ADJ_LB = ((1 - (data$AUTO_ADJ_LB/data$AUTO_AR)) * 100),
+    ES27_ADJ_LB = ((1 - (data$ES27_ADJ_LB/data$AUTO_AR)) * 100),
+    ES64_ADJ_LB = ((1 - (data$ES64_ADJ_LB/data$AUTO_AR)) * 100),
     
-    AUTO_TMP_Lg = ((1 - (data$AUTO_TMP_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES27_TMP_Lg = ((1 - (data$ES27_TMP_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES64_TMP_Lg = ((1 - (data$ES64_TMP_Lg/data$AUTO_AR_NoLg)) * 100),
+    AUTO_TMP_LB = ((1 - (data$AUTO_TMP_LB/data$AUTO_AR)) * 100),
+    ES27_TMP_LB = ((1 - (data$ES27_TMP_LB/data$AUTO_AR)) * 100),
+    ES64_TMP_LB = ((1 - (data$ES64_TMP_LB/data$AUTO_AR)) * 100),
     
-    AUTO_EPI_Lg = ((1 - (data$AUTO_EPI_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES27_EPI_Lg = ((1 - (data$ES27_EPI_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES64_EPI_Lg = ((1 - (data$ES64_EPI_Lg/data$AUTO_AR_NoLg)) * 100),
+    AUTO_EPI_LB = ((1 - (data$AUTO_EPI_LB/data$AUTO_AR)) * 100),
+    ES27_EPI_LB = ((1 - (data$ES27_EPI_LB/data$AUTO_AR)) * 100),
+    ES64_EPI_LB = ((1 - (data$ES64_EPI_LB/data$AUTO_AR)) * 100),
     
-    AUTO_AVG_Lg = ((1 - (data$AUTO_AVG_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES27_AVG_Lg = ((1 - (data$ES27_AVG_Lg/data$AUTO_AR_NoLg)) * 100),
-    ES64_AVG_Lg = ((1 - (data$ES64_AVG_Lg/data$AUTO_AR_NoLg)) * 100)    
+    AUTO_AVG_LB = ((1 - (data$AUTO_AVG_LB/data$AUTO_AR)) * 100),
+    ES27_AVG_LB = ((1 - (data$ES27_AVG_LB/data$AUTO_AR)) * 100),
+    ES64_AVG_LB = ((1 - (data$ES64_AVG_LB/data$AUTO_AR)) * 100)    
   ))
 }
 
@@ -1312,7 +1314,7 @@ all_p_values<-rbind(p_values_wk1,p_values_wk2,p_values_wk3,p_values_wk4)
 p_values_and_impr <- merge(summary_impr, all_p_values, by = c("WeekAhead", "Model"))
 
 # Create a new column "Model_Type" based on whether "NoLg" is in the Model name
-p_values_and_impr$Model_Type <- ifelse(grepl("NoLg", p_values_and_impr$Model), "NoLog", "Log")
+p_values_and_impr$Model_Type <- ifelse(grepl("_LB$", p_values_and_impr$Model), "LB", "no_LB")
 
 # View the updated dataframe
 head(p_values_and_impr)
@@ -1339,7 +1341,7 @@ model_order <- p_values_and_impr %>%
 # Prepare data with significance flag and ordering  
 p_df <- p_values_and_impr %>%
   mutate(Significance = ifelse(p_values < alpha, "Significant", "Not Significant"),
-         Model_Type = ifelse(grepl("NoLg", Model), "Without log-back transformation", "With log-back transformation"),
+         Model_Type = ifelse(grepl("_LB$", Model), "With log-back transformation", "Without log-back transformation"),
          Model = factor(Model, levels = model_order))  # Apply ordered factor
 
 # Heatmap plot with models ordered by WeekAhead == 1  
@@ -1351,7 +1353,7 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
             color = "black", size = 4) +  # Add text labels
   scale_fill_gradient(low = "red", high = "cyan", na.value = "gray80", 
                       name = "Percentage (%)", limits = c(-35, 35)) +  # Fixed color scale from -30 to 30
-  labs(title = "Figure X: Mean differences between models' WIS and the baseline across 48 states",
+  labs(title = "Figure X:Mean differences between models' WIS and the baseline across 48 states",
        subtitle = "Gray boxes indicate models that are not significantly different from the baseline (p>0.05)",
          caption = "m = mean difference, sd = standard deviation",
        x = "Week Ahead",
@@ -1377,8 +1379,8 @@ Now let's plot a map of percentage of WIS improvement for each state.
 
 W1_map <- data.frame(
   STATE = W1$STATE,
-  percentage_improvement = W1_percentage_of_improvement$AUTO_AVG_Lg,
-  AUTO_AVG=W1$AUTO_AVG_Lg
+  percentage_improvement = W1_percentage_of_improvement$AUTO_AVG_LB,
+  AUTO_AVG=W1$AUTO_AVG_LB
 )
 
 # Merge the best model data with the states map
@@ -1390,8 +1392,8 @@ W1_map <- states %>%
 
 W2_map <- data.frame(
   STATE = W2$STATE,
-  percentage_improvement = W2_percentage_of_improvement$AUTO_AVG_Lg,
-  AUTO_AVG=W2$AUTO_AVG_Lg
+  percentage_improvement = W2_percentage_of_improvement$AUTO_AVG_LB,
+  AUTO_AVG=W2$AUTO_AVG_LB
 )
 
 # Merge the best model data with the states map
@@ -1403,8 +1405,8 @@ W2_map <- states %>%
 
 W3_map <- data.frame(
   STATE = W3$STATE,
-  percentage_improvement = W3_percentage_of_improvement$AUTO_AVG_Lg,
-  AUTO_AVG=W3$AUTO_AVG_Lg
+  percentage_improvement = W3_percentage_of_improvement$AUTO_AVG_LB,
+  AUTO_AVG=W3$AUTO_AVG_LB
 )
 
 # Merge the best model data with the states map
@@ -1416,8 +1418,8 @@ W3_map <- states %>%
 
 W4_map <- data.frame(
   STATE = W4$STATE,
-  percentage_improvement = W4_percentage_of_improvement$AUTO_AVG_Lg,
-  AUTO_AVG=W4$AUTO_AVG_Lg
+  percentage_improvement = W4_percentage_of_improvement$AUTO_AVG_LB,
+  AUTO_AVG=W4$AUTO_AVG_LB
 )
 
 # Merge the best model data with the states map
@@ -2391,11 +2393,11 @@ for (week in weeks) {
   summed_data <- data__ %>%
     group_by(Julian_date) %>%
     summarize(
-      AUTO_AR_NoLg = sum(AUTO_AR_NoLg, na.rm = TRUE),  # Sum across all states
-      AUTO_AVG = sum(AUTO_AVG, na.rm = TRUE)           # Sum across all states
+      AUTO_AR = sum(AUTO_AR, na.rm = TRUE),  # Sum across all states
+      AUTO_AVG_LB = sum(AUTO_AVG_LB, na.rm = TRUE)           # Sum across all states
     ) %>%
     # Calculate the difference ratio
-    mutate(Difference = 1 - (AUTO_AVG / AUTO_AR_NoLg),
+    mutate(Difference = 1 - (AUTO_AVG_LB / AUTO_AR),
            Week = paste0("Week ", week))
   
   # Store the summarized data in the list

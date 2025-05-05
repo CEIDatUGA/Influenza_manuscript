@@ -795,7 +795,7 @@ Here we have boxplots of the mean(WIS) by each state.
 combined_data <- data.frame(
   week = rep(c("W1", "W2", "W3", "W4"), each = 48 * 15),
   
-  Models = rep(c("AUTO_AR_Lg", "ES27_AR_Lg", "ES64_AR_Lg", "AUTO_ADJ_Lg", "ES27_ADJ_Lg", "ES64_ADJ_Lg", "AUTO_TMP_Lg", "ES27_TMP_Lg", "ES64_TMP_Lg", "AUTO_EPI_Lg", "ES27_EPI_Lg", "ES64_EPI_Lg", "AUTO_AVG_Lg", "ES27_AVG_Lg", "ES64_AVG_Lg"), each=48, times = 4),
+  Models = rep(c("AUTO_AR_LB", "ES27_AR_LB", "ES64_AR_LB", "AUTO_ADJ_LB", "ES27_ADJ_LB", "ES64_ADJ_LB", "AUTO_TMP_LB", "ES27_TMP_LB", "ES64_TMP_LB", "AUTO_EPI_LB", "ES27_EPI_LB", "ES64_EPI_LB", "AUTO_AVG_LB", "ES27_AVG_LB", "ES64_AVG_LB"), each=48, times = 4),
   
   value = c(W1_Lg$AUTO_AR_Lg, W1_Lg$ES27_AR_Lg, W1_Lg$ES64_AR_Lg, 
             W1_Lg$AUTO_ADJ_Lg, W1_Lg$ES27_ADJ_Lg, W1_Lg$ES64_ADJ_Lg, 
@@ -815,13 +815,11 @@ combined_data <- data.frame(
             W3_Lg$AUTO_EPI_Lg, W3_Lg$ES27_EPI_Lg, W3_Lg$ES64_EPI_Lg,
             W3_Lg$AUTO_AVG_Lg, W3_Lg$ES27_AVG_Lg, W3_Lg$ES64_AVG_Lg,
             
-            
             W4_Lg$AUTO_AR_Lg, W4_Lg$ES27_AR_Lg, W4_Lg$ES64_AR_Lg, 
             W4_Lg$AUTO_ADJ_Lg, W4_Lg$ES27_ADJ_Lg, W4_Lg$ES64_ADJ_Lg, 
             W4_Lg$AUTO_TMP_Lg, W4_Lg$ES27_TMP_Lg, W4_Lg$ES64_TMP_Lg, 
             W4_Lg$AUTO_EPI_Lg, W4_Lg$ES27_EPI_Lg, W4_Lg$ES64_EPI_Lg,
             W4_Lg$AUTO_AVG_Lg, W4_Lg$ES27_AVG_Lg, W4_Lg$ES64_AVG_Lg)
-
 )
 
 # Create a new column for categories
@@ -843,11 +841,11 @@ colors_avg <- c("orange","orange2", "orange3")
 
 # Create a custom color mapping for each variable
 custom_colors <- c(
-  "AUTO_AR_Lg" = colors_ar[1], "ES27_AR_Lg" = colors_ar[2], "ES64_AR_Lg" = colors_ar[3],
-  "AUTO_EPI_Lg" = colors_epi[1], "ES27_EPI_Lg" = colors_epi[2], "ES64_EPI_Lg" = colors_epi[3],
-  "AUTO_TMP_Lg" = colors_tmp[1], "ES27_TMP_Lg" = colors_tmp[2], "ES64_TMP_Lg" = colors_tmp[3],
-  "AUTO_ADJ_Lg" = colors_adj[1], "ES27_ADJ_Lg" = colors_adj[2], "ES64_ADJ_Lg" = colors_adj[3],
-  "AUTO_AVG_Lg" = colors_avg[1], "ES27_AVG_Lg" = colors_avg[2], "ES64_AVG_Lg" = colors_avg[3]
+  "AUTO_AR_LB" = colors_ar[1], "ES27_AR_LB" = colors_ar[2], "ES64_AR_LB" = colors_ar[3],
+  "AUTO_EPI_LB" = colors_epi[1], "ES27_EPI_LB" = colors_epi[2], "ES64_EPI_LB" = colors_epi[3],
+  "AUTO_TMP_LB" = colors_tmp[1], "ES27_TMP_LB" = colors_tmp[2], "ES64_TMP_LB" = colors_tmp[3],
+  "AUTO_ADJ_LB" = colors_adj[1], "ES27_ADJ_LB" = colors_adj[2], "ES64_ADJ_LB" = colors_adj[3],
+  "AUTO_AVG_LB" = colors_avg[1], "ES27_AVG_LB" = colors_avg[2], "ES64_AVG_LB" = colors_avg[3]
 )
 
   # Create the box plot with additional facet for categories

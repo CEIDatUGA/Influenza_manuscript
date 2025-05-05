@@ -1353,12 +1353,16 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
             color = "black", size = 4) +  # Add text labels
   scale_fill_gradient(low = "red", high = "cyan", na.value = "gray80", 
                       name = "Percentage (%)", limits = c(-35, 35)) +  # Fixed color scale from -30 to 30
-  labs(title = "Mean model improvement and standard deviation comparing each model' WIS with the baseline across 48 states",
-       subtitle = "Gray boxes indicate models not significantly different from the baseline model based on Wilcoxon test with Holm's adjusted p-values",
+  labs(title = "Figure X: Mean differences between models' WIS and the baseline across 48 states",
+       subtitle = "Gray boxes indicate models that are not significantly different from the baseline (p>0.05)",
+         caption = "m = mean difference, sd = standard deviation",
        x = "Week Ahead",
        y = "") + 
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+  plot.caption = element_text(size = 12),
+    plot.title = element_text(size = 18, face = "bold"),
+    plot.subtitle = element_text(size = 14),) +
   facet_wrap(~ Model_Type, scales = "free_y")  # Separate NoLg and other models
 
 
@@ -2404,29 +2408,37 @@ for (week in weeks) {
 summed_data_all <- bind_rows(summed_data_list)
 
 # Plot the difference using ggplot2
-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference)*100, color = Week)) +
+model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference)*100, color = Week)) +
   geom_point(size = 3) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
   theme_minimal() +
   labs(
-    title = "Mean percentage of WIS differences across all states",
-    subtitle =  "AUTO_AVG_LB compared to baseline",
+    title = "Figure X: Mean percentage of WIS differences across all states",
+    subtitle = "AUTO_AVG_LB compared to baseline",
     x = "",
     y = "Difference (%)"
   ) +
   scale_y_continuous(
-    limits = c(-100, 100),  # adjust if necessary
+    limits = c(-100, 100),
     breaks = seq(-100, 100, by = 20)
   ) +
   scale_x_date(
     date_breaks = "1 month",
     date_labels = "%b %y"
   ) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   scale_color_manual(
     values = c("Week 1" = "#ffcccc",
                "Week 2" = "#ff6666",
                "Week 3" = "#cc0000",
                "Week 4" = "#990000")
+  ) +
+  theme(
+    plot.title = element_text(size = 18, face = "bold"),
+    plot.subtitle = element_text(size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
+
+model_improv
+
+ggsave(model_improv, height = 4.5, width = 9,  filename="Fig6.jpg")  
 ```

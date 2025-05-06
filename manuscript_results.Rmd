@@ -1930,8 +1930,7 @@ Let's plot some maps with the with the mean (%) of difference between the AUTO_A
 1 week ahead percentage of improvement
 
 ```{r}
-# Assuming merged_data already includes the necessary columns: model and percentage_improveme
-# Create the map plot for 1 Week Ahead with best models and percentage improvement
+
 ES_1WEEK <- ggplot(W1_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
@@ -1940,7 +1939,7 @@ ES_1WEEK <- ggplot(W1_map) +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
   geom_sf_text(data = W1_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
-               size = 2.5,
+               size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
@@ -1960,8 +1959,6 @@ ES_1WEEK<-ES_1WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 
 ```{r}
 
-# Assuming merged_data already includes the necessary columns: model and percentage_improveme
-# Create the map plot for 1 Week Ahead with best models and percentage improvement
 ES_2WEEK <- ggplot(W2_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
@@ -1970,7 +1967,7 @@ ES_2WEEK <- ggplot(W2_map) +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
   geom_sf_text(data = W2_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
-               size = 2.5,
+               size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
@@ -1992,8 +1989,6 @@ ES_2WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 
 ```{r}
 
-# Assuming merged_data already includes the necessary columns: model and percentage_improveme
-
 ES_3WEEK <- ggplot(W3_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
@@ -2002,7 +1997,7 @@ ES_3WEEK <- ggplot(W3_map) +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
   geom_sf_text(data = W3_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
-               size = 2.5,
+               size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
@@ -2021,9 +2016,6 @@ ES_3WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 4 weeks ahead
 
 ```{r}
-
-# Assuming merged_data already includes the necessary columns: model and percentage_improveme
-
 ES_4WEEK <- ggplot(W4_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
@@ -2032,7 +2024,7 @@ ES_4WEEK <- ggplot(W4_map) +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
   geom_sf_text(data = W4_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
-               size = 2.5,
+               size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(

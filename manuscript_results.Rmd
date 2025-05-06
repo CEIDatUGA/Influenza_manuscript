@@ -41,6 +41,8 @@ library("ggplot2")
 library("broom")
 library("fields")
 library("ggpubr")
+library("patchwork")
+
 ```
 
 Loading the results of each model and the shapefiles of the maps.
@@ -1212,44 +1214,44 @@ calculate_percentage_of_improvement <- function(data) {
   return(data.frame(
     AUTO_AR = (data$AUTO_AR / data$AUTO_AR),
     
-    ES27_AR = (-(1 - (data$ES27_AR/data$AUTO_AR)) * 100),
-    ES64_AR = (-(1 - (data$ES64_AR/data$AUTO_AR )) * 100),
+    ES27_AR = (((data$ES27_AR/data$AUTO_AR)-1) * 100),
+    ES64_AR = (((data$ES64_AR/data$AUTO_AR )-1) * 100),
    
-    AUTO_ADJ = (-(1 - (data$AUTO_ADJ/data$AUTO_AR)) * 100),
-    ES27_ADJ = (-(1 - (data$ES27_ADJ/data$AUTO_AR)) * 100),
-    ES64_ADJ = (-(1 - (data$ES64_ADJ/data$AUTO_AR)) * 100),
+    AUTO_ADJ = (((data$AUTO_ADJ/data$AUTO_AR)-1) * 100),
+    ES27_ADJ = (((data$ES27_ADJ/data$AUTO_AR)-1) * 100),
+    ES64_ADJ = (((data$ES64_ADJ/data$AUTO_AR)-1) * 100),
     
-    AUTO_TMP = (-(1 - (data$AUTO_TMP/data$AUTO_AR)) * 100),
-    ES27_TMP = (-(1 - (data$ES27_TMP/data$AUTO_AR)) * 100),
-    ES64_TMP = (-(1 - (data$ES64_TMP/data$AUTO_AR)) * 100),
+    AUTO_TMP = (((data$AUTO_TMP/data$AUTO_AR)-1) * 100),
+    ES27_TMP = (((data$ES27_TMP/data$AUTO_AR)-1) * 100),
+    ES64_TMP = (((data$ES64_TMP/data$AUTO_AR)-1) * 100),
     
-    AUTO_EPI = (-(1 - (data$AUTO_EPI/data$AUTO_AR)) * 100),
-    ES27_EPI = (-(1 - (data$ES27_EPI/data$AUTO_AR)) * 100),
-    ES64_EPI = (-(1 - (data$ES64_EPI/data$AUTO_AR)) * 100),
+    AUTO_EPI = (((data$AUTO_EPI/data$AUTO_AR)-1) * 100),
+    ES27_EPI = (((data$ES27_EPI/data$AUTO_AR)-1) * 100),
+    ES64_EPI = (((data$ES64_EPI/data$AUTO_AR)-1) * 100),
     
-    AUTO_AVG = (-(1 - (data$AUTO_AVG/data$AUTO_AR)) * 100),
-    ES27_AVG = (-(1 - (data$ES27_AVG/data$AUTO_AR)) * 100),
-    ES64_AVG = (-(1 - (data$ES64_AVG/data$AUTO_AR)) * 100),
+    AUTO_AVG = (((data$AUTO_AVG/data$AUTO_AR)-1) * 100),
+    ES27_AVG = (((data$ES27_AVG/data$AUTO_AR)-1) * 100),
+    ES64_AVG = (((data$ES64_AVG/data$AUTO_AR)-1) * 100),
     
-    AUTO_AR_LB = (-(1 - (data$AUTO_AR_LB/data$AUTO_AR)) * 100),
-    ES27_AR_LB = (-(1 - (data$ES27_AR_LB/data$AUTO_AR)) * 100),
-    ES64_AR_LB = (-(1 - (data$ES64_AR_LB/data$AUTO_AR)) * 100),
+    AUTO_AR_LB = (((data$AUTO_AR_LB/data$AUTO_AR)-1) * 100),
+    ES27_AR_LB = (((data$ES27_AR_LB/data$AUTO_AR)-1) * 100),
+    ES64_AR_LB = (((data$ES64_AR_LB/data$AUTO_AR)-1) * 100),
     
-    AUTO_ADJ_LB = (-(1 - (data$AUTO_ADJ_LB/data$AUTO_AR)) * 100),
-    ES27_ADJ_LB = (-(1 - (data$ES27_ADJ_LB/data$AUTO_AR)) * 100),
-    ES64_ADJ_LB = (-(1 - (data$ES64_ADJ_LB/data$AUTO_AR)) * 100),
+    AUTO_ADJ_LB = (((data$AUTO_ADJ_LB/data$AUTO_AR)-1) * 100),
+    ES27_ADJ_LB = (((data$ES27_ADJ_LB/data$AUTO_AR)-1) * 100),
+    ES64_ADJ_LB = (((data$ES64_ADJ_LB/data$AUTO_AR)-1) * 100),
     
-    AUTO_TMP_LB = (-(1 - (data$AUTO_TMP_LB/data$AUTO_AR)) * 100),
-    ES27_TMP_LB = (-(1 - (data$ES27_TMP_LB/data$AUTO_AR)) * 100),
-    ES64_TMP_LB = (-(1 - (data$ES64_TMP_LB/data$AUTO_AR)) * 100),
+    AUTO_TMP_LB = (((data$AUTO_TMP_LB/data$AUTO_AR)-1) * 100),
+    ES27_TMP_LB = (((data$ES27_TMP_LB/data$AUTO_AR)-1) * 100),
+    ES64_TMP_LB = (((data$ES64_TMP_LB/data$AUTO_AR)-1) * 100),
     
-    AUTO_EPI_LB = (-(1 - (data$AUTO_EPI_LB/data$AUTO_AR)) * 100),
-    ES27_EPI_LB = (-(1 - (data$ES27_EPI_LB/data$AUTO_AR)) * 100),
-    ES64_EPI_LB = (-(1 - (data$ES64_EPI_LB/data$AUTO_AR)) * 100),
+    AUTO_EPI_LB = (((data$AUTO_EPI_LB/data$AUTO_AR)-1) * 100),
+    ES27_EPI_LB = (((data$ES27_EPI_LB/data$AUTO_AR)-1) * 100),
+    ES64_EPI_LB = (((data$ES64_EPI_LB/data$AUTO_AR)-1) * 100),
     
-    AUTO_AVG_LB = (-(1 - (data$AUTO_AVG_LB/data$AUTO_AR)) * 100),
-    ES27_AVG_LB = (-(1 - (data$ES27_AVG_LB/data$AUTO_AR)) * 100),
-    ES64_AVG_LB = (-(1 - (data$ES64_AVG_LB/data$AUTO_AR)) * 100)    
+    AUTO_AVG_LB = (((data$AUTO_AVG_LB/data$AUTO_AR)-1) * 100),
+    ES27_AVG_LB = (((data$ES27_AVG_LB/data$AUTO_AR)-1) * 100),
+    ES64_AVG_LB = (((data$ES64_AVG_LB/data$AUTO_AR)-1) * 100)    
   ))
 }
 
@@ -1356,7 +1358,7 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
   geom_tile(aes(fill = ifelse(Significance == "Significant", m, NA)), color = "black") +  # Fill only significant ones
   geom_tile(data = p_df %>% filter(Significance == "Not Significant"), 
             aes(x = factor(WeekAhead), y = Model), fill = "gray80", color = "black") +  # Gray for non-significant
-  geom_text(aes(label = paste0("m:", round(m, 2),", sd:", round(sd, 2))), 
+  geom_text(aes(label = paste0("m:", round(m, 1),", sd:", round(sd, 1))), 
             color = "black", size = 4) +  # Add text labels
   scale_fill_gradient(low = "cyan", high = "red", na.value = "gray80", 
                       name = "Percentage (%)", limits = c(-35, 35)) +  # Fixed color scale from -30 to 30
@@ -1367,7 +1369,7 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
        y = "") + 
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-  plot.caption = element_text(size = 12),
+  plot.caption = element_text(size = 16),
     plot.title = element_text(size = 18, face = "bold"),
     plot.subtitle = element_text(size = 14),) +
   facet_wrap(~ Model_Type, scales = "free_y")  # Separate NoLg and other models
@@ -1375,7 +1377,7 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
 
 # Print plot
 print(plot_m_heatmap)
-ggsave("Fig3.jpg", plot_m_heatmap, width = 15, height = 7 )
+ggsave("Fig3.jpg", plot_m_heatmap, width = 14, height = 7 )
 
 ```
 
@@ -1926,17 +1928,16 @@ Let's plot some maps with the with the mean (%) of difference between the AUTO_A
 ES_1WEEK <- ggplot(W1_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
-  ggtitle("Mean WIS improvement in percentage (W1)") +
+  ggtitle("1 Week Ahead") +
   theme_light() +
-  theme(legend.position = "right") +
+  theme(legend.position = "right",
+    plot.title = element_text(hjust = 0.5)) +
   geom_sf_text(data = W1_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
-               size = 3,
+               size = 2.5,
                color = "black",
-               check_overlap = TRUE) +  # Display percentage improvement in each state
+               check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
     fill = "%",  # Label for the legend
-    subtitle = "(1-(Baseline/AUTO_AVG_LB))*100"
-            , 
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -1945,7 +1946,6 @@ x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
 
 ES_1WEEK<-ES_1WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
-ES_1WEEK
 
 #ggsave(ES_1WEEK,height = 4.5, width = 6.5,  filename="Fig5A.jpg")  
 ```
@@ -1958,17 +1958,16 @@ ES_1WEEK
 ES_2WEEK <- ggplot(W2_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
-  ggtitle("Mean WIS improvement in percentage (W2)") +
+  ggtitle("2 Weeks Ahead") +
   theme_light() +
-  theme(legend.position = "right") +
+  theme(legend.position = "right",
+    plot.title = element_text(hjust = 0.5)) +
   geom_sf_text(data = W2_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
-               size = 3,
+               size = 2.5,
                color = "black",
-               check_overlap = TRUE) +  # Display percentage improvement in each state
+               check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
     fill = "%",  # Label for the legend
-    subtitle = "(1-(Baseline/AUTO_AVG_LB))*100"
-            , 
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -1978,7 +1977,6 @@ x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
 
 ES_2WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
-ES_2WEEK
 
 #ggsave(ES_2WEEK, height = 4.5, width = 6.5, filename="Fig5B.jpg")  
 ```
@@ -1992,17 +1990,16 @@ ES_2WEEK
 ES_3WEEK <- ggplot(W3_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
-  ggtitle("Mean WIS improvement in percentage (W3)") +
+  ggtitle("3 Weeks Ahead") +
   theme_light() +
-  theme(legend.position = "right") +
+  theme(legend.position = "right",
+    plot.title = element_text(hjust = 0.5)) +
   geom_sf_text(data = W3_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
-               size = 3,
+               size = 2.5,
                color = "black",
-               check_overlap = TRUE) +  # Display percentage improvement in each state
+               check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
     fill = "%",  # Label for the legend
-    subtitle = "(1-(Baseline/AUTO_AVG_LB))*100"
-            , 
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -2011,7 +2008,6 @@ x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
 
 ES_3WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
-ES_3WEEK
 
 #ggsave(ES_3WEEK, height = 4.5, width = 6.5, filename="Fig5C.jpg")  
 ```
@@ -2024,17 +2020,16 @@ ES_3WEEK
 ES_4WEEK <- ggplot(W4_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
-  ggtitle("Mean WIS improvement in percentage (W4)") +
+  ggtitle("4 Weeks Ahead") +
   theme_light() +
-  theme(legend.position = "right") +
+  theme(legend.position = "right",
+    plot.title = element_text(hjust = 0.5)) +
   geom_sf_text(data = W4_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
-               size = 3,
+               size = 2.5,
                color = "black",
-               check_overlap = TRUE) +  # Display percentage improvement in each state
+               check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
     fill = "%",  # Label for the legend
-    subtitle = "(1-(Baseline/AUTO_AVG_LB))*100"
-            , 
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -2043,15 +2038,11 @@ x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
 
 ES_4WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
-ES_4WEEK
 
 #ggsave(ES_4WEEK, height = 4.5, width = 6.5,  filename="Fig5D.jpg")  
 ```
 
 ```{r}
-
-library(patchwork)
-
 # Ensure each plot has coord_sf applied
 ES_1WEEK <- ES_1WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 ES_2WEEK <- ES_2WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
@@ -2060,13 +2051,18 @@ ES_4WEEK <- ES_4WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 
 # Combine in a 2x2 grid
 combined_plot <- (ES_1WEEK | ES_2WEEK) /
-                 (ES_3WEEK | ES_4WEEK)
-
+                 (ES_3WEEK | ES_4WEEK) + 
+  plot_annotation(
+    title = "Figure X: Mean WIS differences (%) compared to the baseline",
+    subtitle = "Results by forecast horizon",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"),
+                  plot.subtitle = element_text(size = 14))
+  )
 # Print
-print(combined_plot)
+print(combined_plot) 
 
 # Save to file
-ggsave("Fig5_2x2_combined.jpg", combined_plot, width = 15, height = 8)
+ggsave("Fig5.jpg", combined_plot, width =12, height =7)
 ```
 
 REGRESSION MODELS

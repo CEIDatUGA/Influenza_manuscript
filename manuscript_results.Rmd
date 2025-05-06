@@ -326,7 +326,7 @@ plt00 <- ggplot(forecast_df, aes(x = Week, y = Value, group = 1)) +
   geom_point(color = "black", size = 3) +         # Points for each forecast value
   geom_ribbon(aes(ymin = Lower, ymax = Upper),   # Ribbon for confidence intervals
               fill = "gray", alpha = 0.25) +
-  labs(title = "Figure X: Example of influenza hospitalizaions forecasts",
+  labs(title = "Figure 1: Example of probabilistic forecasts",
        subtitle = "The gray ribbon indicates the 95% confidence interval",
        x = "Target Weeks",
        y = "Forecast Values") +
@@ -336,7 +336,7 @@ plt00 <- ggplot(forecast_df, aes(x = Week, y = Value, group = 1)) +
 
 plt00
 
-ggsave(plt00, height = 5, width = 10, filename="fig00.jpg") 
+ggsave(plt00, height = 4, width =7, filename="Fig1.jpg") 
 ```
 
 Weighted interval scores for each state and each target week.
@@ -367,22 +367,25 @@ highlight_dates <- df_combined_ %>%
 # Plot
 plt0 <- ggplot(df_combined_, aes(x = Julian_date, y = WIS, group = STATE)) + 
   geom_vline(data = highlight_dates, aes(xintercept = Julian_date), color = "red", linetype = "dashed", size = 1) +  
-  geom_line(color = "black", size = 0.2) +  
+  geom_line(color = "black", size = 0.1) +  
   facet_wrap(~ Dataset, ncol = 2, scales = "free_y") +  
   theme_minimal() +  
-  labs(title = "Figure X: Baseline model WIS for 48 states on the contiguous U.S.",#,
-#       subtitle = "Dashed red lines indicates epidemiological weeks outsise of the influenza season",
-       x = "Month", 
+  labs(title = "Figure 2: Baseline model WIS for 48 states on the contiguous U.S.",#,
+       subtitle = "Weeks between the dashed red lines are outside of the influenza season",
+       x = "", 
        y = "WIS") +  
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         plot.title = element_text(size = 16, face = "bold"),
-        legend.position = "none") + 
-  scale_x_date(labels = scales::date_format("%b"), breaks = "2 month")  # Format x-axis to show months and set monthly breaks
+        legend.position = "none") +
+  scale_x_date(
+    date_breaks = "1 month",
+    date_labels = "%b %y"
+  ) # Format x-axis to show months and set monthly breaks
 
 # Print the plot
 plt0
 
-ggsave(plt0, height = 5, width = 8, filename="fig0.jpg")  
+ggsave(plt0, height = 5, width = 8, filename="Fig2.jpg")  
 ```
 
 Computing mean weighted interval score for all target week for each model.
@@ -878,8 +881,8 @@ plt2
 # Combine in a 2x2 grid
 combined_plot <- (plt1 | plt2) + 
   plot_annotation(
-    title = "Figure X: Mean WIS for our 24 models",
-    subtitle = "Results by forecast horizon",
+    title = "Figure 3: Mean WIS for our 24 models",
+    subtitle = "Results by target week",
     theme = theme(plot.title = element_text(size = 16, face = "bold"),
                   plot.subtitle = element_text(size = 14))
   )
@@ -887,7 +890,7 @@ combined_plot <- (plt1 | plt2) +
 print(combined_plot) 
 
 # Save to file
-ggsave("Fig1.jpg", combined_plot, width =13, height =7)
+ggsave("Fig3.jpg", combined_plot, width =13, height =7)
 ```
 
 
@@ -1076,8 +1079,8 @@ all_weeks <- bind_rows(W1, W2, W3, W4)
 combined_plot <- ggplot(all_weeks, aes(x = Best_Result, fill = Best_Result)) +
   geom_bar() +
   scale_fill_manual(values = custom_colors) +
-  labs(title = "Figure X: Best model based on the lowest mean WIS",
-       subtitle = "Across the 48 states on the contiguous U.S.",
+  labs(title = "Figure 4: Best model based on the lowest mean WIS",
+       subtitle = "Results for the 48 states on the contiguous U.S. by target week",
        x = "", y = "Number of states",
        fill = "Best model" ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
@@ -1085,7 +1088,7 @@ combined_plot <- ggplot(all_weeks, aes(x = Best_Result, fill = Best_Result)) +
   facet_grid(Week_Ahead ~ Model_Type, scales = "free_x")
 
 # Save and display the plot
-ggsave("Fig2.jpg", combined_plot, width =8, height =5)
+ggsave("Fig4.jpg", combined_plot, width =8, height =5)
 print(combined_plot)
 
 ```
@@ -1381,10 +1384,10 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
             color = "black", size = 4) +  # Add text labels
   scale_fill_gradient(low = "cyan", high = "red", na.value = "gray80", 
                       name = "Percentage (%)", limits = c(-35, 35)) +  # Fixed color scale from -30 to 30
-  labs(title = "Figure X: Mean differences between models' WIS and the baseline across 48 states",
+  labs(title = "Figure 5: Mean differences between models' WIS and the baseline across 48 states",
        subtitle = "Gray boxes indicate models that are not significantly different from the baseline (p>0.05)",
          caption = "m = mean difference (%), sd = standard deviation",
-       x = "Week Ahead",
+       x = "Target Ahead",
        y = "") + 
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
@@ -1396,7 +1399,7 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
 
 # Print plot
 print(plot_m_heatmap)
-ggsave("Fig3.jpg", plot_m_heatmap, width = 14, height = 7 )
+ggsave("Fig5.jpg", plot_m_heatmap, width = 14, height = 7 )
 
 ```
 
@@ -1466,7 +1469,7 @@ Here I define some colors categories that I will use on the next maps.
 ES_1WEEK <- ggplot(W1_map) +
   geom_sf(aes(fill = AUTO_AVG)) +  # Fill based on the best model
   scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 352)) +  
-  ggtitle("1 Week Ahead") +
+  ggtitle("1 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
@@ -1496,7 +1499,7 @@ ES_1WEEK
 ES_2WEEK <- ggplot(W2_map) +
   geom_sf(aes(fill = AUTO_AVG)) +  # Fill based on the best model
   scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 352)) +  
-  ggtitle("2 Weeks Ahead") +
+  ggtitle("2 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
@@ -1525,7 +1528,7 @@ ES_2WEEK
 ES_3WEEK <- ggplot(W3_map) +
   geom_sf(aes(fill = AUTO_AVG)) +  # Fill based on the best model
   scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 352)) +  
-  ggtitle("3 Weeks Ahead") +
+  ggtitle("3 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
@@ -1554,7 +1557,7 @@ ES_4WEEK <- ggplot(W4_map) +
   geom_sf(aes(fill = AUTO_AVG)) +
   scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", 
                        midpoint = 100, limits = c(0, 352)) +  
-  ggtitle("4 Weeks Ahead") +
+  ggtitle("4 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
@@ -1583,7 +1586,7 @@ Combine in a 2x2 grid
 combined_plot <- (ES_1WEEK | ES_2WEEK) /
                  (ES_3WEEK | ES_4WEEK) + 
   plot_annotation(
-    title = "Figure X: Mean WIS for the 48 states in the contiguous U.S.",
+    title = "Figure 6: Mean WIS for the 48 states in the contiguous U.S.",
     subtitle = "Results for the the 2022/2023 and 2023/2024 influenza seasons",
     theme = theme(plot.title = element_text(size = 16, face = "bold"),
                   plot.subtitle = element_text(size = 14))
@@ -1592,7 +1595,7 @@ combined_plot <- (ES_1WEEK | ES_2WEEK) /
 print(combined_plot) 
 
 # Save to file
-ggsave("Fig4.jpg", combined_plot, width =12, height =7)
+ggsave("Fig6.jpg", combined_plot, width =12, height =7)
 
 ```
 
@@ -1928,18 +1931,20 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
   geom_tile(color = "black") +  # Add black borders to squares
   geom_text(aes(label = round(r_squared, 3)), color = "black", size = 6) +  # Text inside boxes
   scale_fill_manual(values = c("Significant" = "cyan", "Not Significant" = "gray")) +  
-  labs(title = "Regression models",
+  labs(title = "Figure 7: Regression models",
        subtitle = "Mean WIS as dependent variable",
        x = "Week Ahead",
        y = "Independent Variables",
        fill = "Significance (p < 0.05)") +  
   theme_minimal() +  
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
-        axis.text.y = element_text(size = 10))
+        axis.text.y = element_text(size = 10),
+        plot.title = element_text(size = 16, face = "bold"),
+                  plot.subtitle = element_text(size = 14))
 
 reg2
 
-ggsave(reg2, height = 8, width = 10, filename="Fig4E.jpg")  
+ggsave(reg2, height = 6, width = 8, filename="Fig7.jpg")  
 #ggsave(reg2, filename="reg2.jpg",height = 8, width = 10)
 ```
 
@@ -1953,7 +1958,7 @@ Let's plot some maps with the with the mean (%) of difference between the AUTO_A
 ES_1WEEK <- ggplot(W1_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
-  ggtitle("1 Week Ahead") +
+  ggtitle("1 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
@@ -1981,7 +1986,7 @@ ES_1WEEK<-ES_1WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 ES_2WEEK <- ggplot(W2_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
-  ggtitle("2 Weeks Ahead") +
+  ggtitle("2 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
@@ -2011,7 +2016,7 @@ ES_2WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 ES_3WEEK <- ggplot(W3_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
-  ggtitle("3 Weeks Ahead") +
+  ggtitle("3 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
@@ -2038,7 +2043,7 @@ ES_3WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 ES_4WEEK <- ggplot(W4_map) +
   geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
-  ggtitle("4 Weeks Ahead") +
+  ggtitle("4 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
@@ -2071,7 +2076,7 @@ ES_4WEEK <- ES_4WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 combined_plot <- (ES_1WEEK | ES_2WEEK) /
                  (ES_3WEEK | ES_4WEEK) + 
   plot_annotation(
-    title = "Figure X: Mean WIS differences (%) compared to the baseline",
+    title = "Figure 8: Mean WIS differences (%) compared to the baseline",
     subtitle = "Results by forecast horizon",
     theme = theme(plot.title = element_text(size = 16, face = "bold"),
                   plot.subtitle = element_text(size = 14))
@@ -2080,7 +2085,7 @@ combined_plot <- (ES_1WEEK | ES_2WEEK) /
 print(combined_plot) 
 
 # Save to file
-ggsave("Fig5.jpg", combined_plot, width =12, height =7)
+ggsave("Fig8.jpg", combined_plot, width =12, height =7)
 ```
 
 REGRESSION MODELS
@@ -2404,25 +2409,24 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
   geom_tile(color = "black") +  # Add black borders to squares
   geom_text(aes(label = round(r_squared, 3)), color = "black", size = 6) +  # Text inside boxes
   scale_fill_manual(values = c("Significant" = "cyan", "Not Significant" = "gray")) +  
-  labs(title = "Regression models",
-       subtitle = "Percentage of WIS improvement as dependent variable",
-       x = "Week Ahead",
+  labs(title = "Figure 9: Regression models",
+       subtitle = "Mean WIS differences (%) as dependent variable",
+       x = "Target Ahead",
        y = "Independent Variables",
        fill = "Significance (p < 0.05)") +    
   theme_minimal() +  
   theme(axis.text.x = element_text(angle = 45, hjust = 1), 
-        axis.text.y = element_text(size = 10))
+        axis.text.y = element_text(size = 10),
+        plot.title = element_text(size = 16, face = "bold"),
+                  plot.subtitle = element_text(size = 14))
 
 reg2
-ggsave(reg2, filename="Fig5E.jpg",height = 8, width = 10)
+ggsave(reg2, filename="Fig9.jpg",height = 6, width = 8)
 ```
 
 Now let's evaluate which was the mean WIS improvement by epidemiological week
 
 ```{r}
-library(dplyr)
-library(ggplot2)
-
 # Create a list of data frames for the four weeks
 weeks <- 1:4
 summed_data_list <- list()
@@ -2456,7 +2460,7 @@ model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), col
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
   theme_minimal() +
   labs(
-    title = "Figure X: Mean percentage of WIS differences across all states",
+    title = "Figure 10: Mean percentage of WIS differences across all states",
     subtitle = "AUTO_AVG_LB compared to baseline",
     x = "",
     y = "Difference (%)"
@@ -2483,5 +2487,77 @@ model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), col
 
 model_improv
 
-ggsave(model_improv, height = 4.5, width = 9,  filename="Fig6.jpg")  
+ggsave(model_improv, height = 4.5, width = 9,  filename="Fig10.jpg")  
+```
+Talvez incluir standar deviation das diferenceas
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Create a list of data frames for the four weeks
+weeks <- 1:4
+summed_data_list <- list()
+
+for (week in weeks) {
+  # Merge the data frames for the current week
+  data__ <- merge(get(paste0("filtered_df_W", week, "_NoLg")),
+                  get(paste0("filtered_df_W", week)))
+  
+  # Calculate the percentage difference at the row level (i.e., per state-date)
+  data__ <- data__ %>%
+    mutate(Difference = ((AUTO_AVG_LB / AUTO_AR) - 1) * 100)
+
+  # Group by Julian date and calculate mean and standard deviation of Difference
+  summarized <- data__ %>%
+    group_by(Julian_date) %>%
+    summarize(
+      Mean_Diff = Difference,
+      SD_Diff = sd(Difference, na.rm = TRUE)
+    ) %>%
+    mutate(Week = paste0("Week ", week))
+
+  # Store the summarized data
+  summed_data_list[[week]] <- summarized
+}
+
+# Combine all weeks into a single data frame
+summed_data_all <- bind_rows(summed_data_list)
+
+# Plot the mean difference with error bars for standard deviation
+model_improv <- ggplot(summed_data_all, aes(x = Julian_date, y = Mean_Diff, color = Week)) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = Mean_Diff - SD_Diff, ymax = Mean_Diff + SD_Diff), width = 0.5) +
+  geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
+  theme_minimal() +
+  labs(
+    title = "Figure 10: Mean percentage of WIS differences across all states",
+    subtitle = "AUTO_AVG_LB compared to baseline",
+    x = "",
+    y = "Difference (%)"
+  ) +
+  scale_y_continuous(
+    limits = c(-100, 100),
+    breaks = seq(-100, 100, by = 20)
+  ) +
+  scale_x_date(
+    date_breaks = "1 month",
+    date_labels = "%b %y"
+  ) +
+  scale_color_manual(
+    values = c("Week 1" = "#ffcccc",
+               "Week 2" = "#ff6666",
+               "Week 3" = "#cc0000",
+               "Week 4" = "#990000")
+  ) +
+  theme(
+    plot.title = element_text(size = 18, face = "bold"),
+    plot.subtitle = element_text(size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+model_improv
+
+#ggsave(model_improv, height = 4.5, width = 9, filename = "Fig11.jpg")
+
 ```

@@ -265,7 +265,6 @@ df_W4_NoLg <- data.frame(
 head(df_W4_NoLg)
 ```
 
-
 Filter only the flu season
 
 ```{r}
@@ -503,7 +502,7 @@ plt1<-  ggplot(combined_data, aes(x = week, y = value, fill = Models)) +
   scale_y_continuous(limits = c(0, 650)) +  # Set y-axis range
     theme_minimal()
 plt1
-ggsave(plt1, height = 8, width = 10, filename="fig1A.jpg")  
+#ggsave(plt1, height = 8, width = 10, filename="fig1A.jpg")  
 ```
 
 Loading model with log-back transformations.
@@ -869,8 +868,28 @@ plt2<-  ggplot(combined_data, aes(x = week, y = value, fill = Models)) +
   scale_y_continuous(limits = c(0, 650)) +  # Set y-axis range
     theme_minimal()
 plt2
-ggsave(plt2, height = 8, width = 10, filename="Fig1B.jpg")  
+#ggsave(plt2, height = 8, width = 10, filename="Fig1B.jpg")  
 ```
+
+
+
+```{r}
+
+# Combine in a 2x2 grid
+combined_plot <- (plt1 | plt2) + 
+  plot_annotation(
+    title = "Figure X: Mean WIS for our 24 models",
+    subtitle = "Results by forecast horizon",
+    theme = theme(plot.title = element_text(size = 16, face = "bold"),
+                  plot.subtitle = element_text(size = 14))
+  )
+# Print
+print(combined_plot) 
+
+# Save to file
+ggsave("Fig1.jpg", combined_plot, width =13, height =7)
+```
+
 
 COMBINING THE RESULTS WITH LOG AND NO LOG TRASNFORMATION
 
@@ -1943,7 +1962,7 @@ ES_1WEEK <- ggplot(W1_map) +
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
-    fill = "%",  # Label for the legend
+    fill = "Percentage (%)",  # Label for the legend
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -1971,7 +1990,7 @@ ES_2WEEK <- ggplot(W2_map) +
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
-    fill = "%",  # Label for the legend
+    fill = "Percentage (%)",  # Label for the legend
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -2001,7 +2020,7 @@ ES_3WEEK <- ggplot(W3_map) +
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
-    fill = "%",  # Label for the legend
+    fill =  "Percentage (%)",  # Label for the legend
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -2028,7 +2047,7 @@ ES_4WEEK <- ggplot(W4_map) +
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
-    fill = "%",  # Label for the legend
+    fill = "Percentage (%)",  # Label for the legend
        x = "",
        y = ""
   )  # Adding a subtitle

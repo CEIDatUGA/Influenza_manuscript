@@ -2492,42 +2492,40 @@ ggsave(model_improv, height = 4.5, width = 9,  filename="Fig10.jpg")
 Talvez incluir standar deviation das diferenceas
 
 ```{r}
-library(dplyr)
-library(ggplot2)
-
-# Create a list of data frames for the four weeks
 weeks <- 1:4
 summed_data_list <- list()
 
 for (week in weeks) {
-  # Merge the data frames for the current week
+  # Merge the data frames
   data__ <- merge(get(paste0("filtered_df_W", week, "_NoLg")),
                   get(paste0("filtered_df_W", week)))
-  
-  # Calculate the percentage difference at the row level (i.e., per state-date)
-  data__ <- data__ %>%
-    mutate(Difference = ((AUTO_AVG_LB / AUTO_AR) - 1) * 100)
 
-  # Group by Julian date and calculate mean and standard deviation of Difference
-  summarized <- data__ %>%
+  # Step 1: Calculate % difference at state level
+  data__ <- data__ %>%
+    mutate(Diff_state = ((AUTO_AVG_LB / AUTO_AR) - 1) * 100)
+
+  # Step 2: Aggregate sum of components across states for mean difference
+  summed_data <- data__ %>%
     group_by(Julian_date) %>%
     summarize(
-      Mean_Diff = Difference,
-      SD_Diff = sd(Difference, na.rm = TRUE)
+      AUTO_AR = sum(AUTO_AR, na.rm = TRUE),
+      AUTO_AVG_LB = sum(AUTO_AVG_LB, na.rm = TRUE),
+      SD_Diff = sd(Diff_state, na.rm = TRUE)  # SD of raw state-level % differences
     ) %>%
-    mutate(Week = paste0("Week ", week))
+    mutate(
+      Difference = ((AUTO_AVG_LB / AUTO_AR) - 1) * 100,  # Mean from totals
+      Week = paste0("Week ", week)
+    )
 
-  # Store the summarized data
-  summed_data_list[[week]] <- summarized
+  summed_data_list[[week]] <- summed_data
 }
 
 # Combine all weeks into a single data frame
 summed_data_all <- bind_rows(summed_data_list)
 
-# Plot the mean difference with error bars for standard deviation
-model_improv <- ggplot(summed_data_all, aes(x = Julian_date, y = Mean_Diff, color = Week)) +
+model_improv <- ggplot(summed_data_all, aes(x = Julian_date, y = Difference, color = Week)) +
   geom_point(size = 3) +
-  geom_errorbar(aes(ymin = Mean_Diff - SD_Diff, ymax = Mean_Diff + SD_Diff), width = 0.5) +
+  geom_errorbar(aes(ymin = Difference - SD_Diff, ymax = Difference + SD_Diff), width = 0.5) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
   theme_minimal() +
   labs(
@@ -2537,7 +2535,7 @@ model_improv <- ggplot(summed_data_all, aes(x = Julian_date, y = Mean_Diff, colo
     y = "Difference (%)"
   ) +
   scale_y_continuous(
-    limits = c(-100, 100),
+    limits = c(-400, 400),
     breaks = seq(-100, 100, by = 20)
   ) +
   scale_x_date(
@@ -2557,7 +2555,4 @@ model_improv <- ggplot(summed_data_all, aes(x = Julian_date, y = Mean_Diff, colo
   )
 
 model_improv
-
-#ggsave(model_improv, height = 4.5, width = 9, filename = "Fig11.jpg")
-
 ```

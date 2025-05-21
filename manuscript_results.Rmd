@@ -370,7 +370,7 @@ plt0 <- ggplot(df_combined_, aes(x = Julian_date, y = WIS, group = STATE)) +
   geom_line(color = "black", size = 0.1) +  
   facet_wrap(~ Dataset, ncol = 2, scales = "free_y") +  
   theme_minimal() +  
-  labs(title = "Figure 2: Baseline model WIS for 48 states on the contiguous U.S.",#,
+  labs(title = "Baseline model WIS for 48 states on the contiguous U.S.",#,
        subtitle = "Weeks between the dashed red lines are outside of the influenza season",
        x = "", 
        y = "WIS") +  
@@ -496,16 +496,17 @@ custom_colors <- c(
 plt1<-  ggplot(combined_data, aes(x = week, y = value, fill = Models)) +
     geom_boxplot(color = "black") +
     scale_fill_manual(values = custom_colors) +
-    facet_wrap(category ~ Models , nrow = 3) +
+    facet_wrap(category ~ Models , nrow = 5) +
     labs(
       title = "A) Models without log-back transformations",
-      x = "Target Week",
+      x = "",
       y = "Mean Weighted Interval Score (WIS)"
     ) +
   scale_y_continuous(limits = c(0, 650)) +  # Set y-axis range
-    theme_minimal()
+    theme_minimal()+
+  theme(legend.position = "none")
 plt1
-#ggsave(plt1, height = 8, width = 10, filename="fig1A.jpg")  
+#ggsave(plt1, height = 12, width = 8, filename="fig1A.jpg")  
 ```
 
 Loading model with log-back transformations.
@@ -862,14 +863,15 @@ custom_colors <- c(
 plt2<-  ggplot(combined_data, aes(x = week, y = value, fill = Models)) +
     geom_boxplot(color = "black") +
     scale_fill_manual(values = custom_colors) +
-    facet_wrap(category ~ Models , nrow = 3) +
+    facet_wrap(category ~ Models , nrow = 5) +
     labs(
       title = "B) Models with log-back transformations",
       x = "",
       y = "Weighted Interval Score (WIS)"
     ) +
   scale_y_continuous(limits = c(0, 650)) +  # Set y-axis range
-    theme_minimal()
+    theme_minimal()+
+  theme(legend.position = "none")
 plt2
 #ggsave(plt2, height = 8, width = 10, filename="Fig1B.jpg")  
 ```
@@ -881,7 +883,7 @@ plt2
 # Combine in a 2x2 grid
 combined_plot <- (plt1 | plt2) + 
   plot_annotation(
-    title = "Figure 3: Mean WIS for our 24 models",
+    title = "Mean WIS for the 24 models",
     subtitle = "Results by target week",
     theme = theme(plot.title = element_text(size = 16, face = "bold"),
                   plot.subtitle = element_text(size = 14))
@@ -890,7 +892,7 @@ combined_plot <- (plt1 | plt2) +
 print(combined_plot) 
 
 # Save to file
-ggsave("Fig3.jpg", combined_plot, width =13, height =7)
+ggsave("Fig3.jpg", combined_plot, width =9, height =10)
 ```
 
 
@@ -1079,7 +1081,7 @@ all_weeks <- bind_rows(W1, W2, W3, W4)
 combined_plot <- ggplot(all_weeks, aes(x = Best_Result, fill = Best_Result)) +
   geom_bar() +
   scale_fill_manual(values = custom_colors) +
-  labs(title = "Figure 4: Best model based on the lowest mean WIS",
+  labs(title = "Best model based on the lowest mean WIS",
        subtitle = "Results for the 48 states on the contiguous U.S. by target week",
        x = "", y = "Number of states",
        fill = "Best model" ) +
@@ -1384,7 +1386,7 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
             color = "black", size = 4) +  # Add text labels
   scale_fill_gradient(low = "cyan", high = "red", na.value = "gray80", 
                       name = "Percentage (%)", limits = c(-35, 35)) +  # Fixed color scale from -30 to 30
-  labs(title = "Figure 5: Mean differences between models' WIS and the baseline across 48 states",
+  labs(title = "Mean differences between models' WIS and the baseline across 48 states",
        subtitle = "Gray boxes indicate models that are not significantly different from the baseline (p>0.05)",
          caption = "m = mean difference (%), sd = standard deviation",
        x = "Target Ahead",
@@ -1586,7 +1588,7 @@ Combine in a 2x2 grid
 combined_plot <- (ES_1WEEK | ES_2WEEK) /
                  (ES_3WEEK | ES_4WEEK) + 
   plot_annotation(
-    title = "Figure 6: Mean WIS for the 48 states in the contiguous U.S.",
+    title = "Mean WIS for the 48 states in the contiguous U.S.",
     subtitle = "Results for the the 2022/2023 and 2023/2024 influenza seasons",
     theme = theme(plot.title = element_text(size = 16, face = "bold"),
                   plot.subtitle = element_text(size = 14))
@@ -1931,9 +1933,9 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
   geom_tile(color = "black") +  # Add black borders to squares
   geom_text(aes(label = round(r_squared, 3)), color = "black", size = 6) +  # Text inside boxes
   scale_fill_manual(values = c("Significant" = "cyan", "Not Significant" = "gray")) +  
-  labs(title = "Figure 7: Regression models",
+  labs(title = "Regression models R²",
        subtitle = "Mean WIS as dependent variable",
-       x = "Week Ahead",
+       x = "Target Week",
        y = "Independent Variables",
        fill = "Significance (p < 0.05)") +  
   theme_minimal() +  
@@ -2076,7 +2078,7 @@ ES_4WEEK <- ES_4WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 combined_plot <- (ES_1WEEK | ES_2WEEK) /
                  (ES_3WEEK | ES_4WEEK) + 
   plot_annotation(
-    title = "Figure 8: Mean WIS differences (%) compared to the baseline",
+    title = "Mean WIS differences compared to the baseline",
     subtitle = "Results by forecast horizon",
     theme = theme(plot.title = element_text(size = 16, face = "bold"),
                   plot.subtitle = element_text(size = 14))
@@ -2409,9 +2411,9 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
   geom_tile(color = "black") +  # Add black borders to squares
   geom_text(aes(label = round(r_squared, 3)), color = "black", size = 6) +  # Text inside boxes
   scale_fill_manual(values = c("Significant" = "cyan", "Not Significant" = "gray")) +  
-  labs(title = "Figure 9: Regression models",
+  labs(title = "Regression models R²",
        subtitle = "Mean WIS differences (%) as dependent variable",
-       x = "Target Ahead",
+       x = "Target Week",
        y = "Independent Variables",
        fill = "Significance (p < 0.05)") +    
   theme_minimal() +  
@@ -2423,8 +2425,6 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
 reg2
 ggsave(reg2, filename="Fig9.jpg",height = 6, width = 8)
 ```
-
-Now let's evaluate which was the mean WIS improvement by epidemiological week
 
 ```{r}
 # Create a list of data frames for the four weeks
@@ -2440,8 +2440,8 @@ for (week in weeks) {
   summed_data <- data__ %>%
     group_by(Julian_date) %>%
     summarize(
-      AUTO_AR = sum(AUTO_AR, na.rm = TRUE),  # Sum across all states
-      AUTO_AVG_LB = sum(AUTO_AVG_LB, na.rm = TRUE)           # Sum across all states
+      AUTO_AR = mean(AUTO_AR, na.rm = TRUE),  # Sum across all states
+      AUTO_AVG_LB = mean(AUTO_AVG_LB, na.rm = TRUE)           # Sum across all states
     ) %>%
     # Calculate the difference ratio
     mutate(Difference =  ((AUTO_AVG_LB / AUTO_AR)-1)*100,
@@ -2460,7 +2460,7 @@ model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), col
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
   theme_minimal() +
   labs(
-    title = "Figure 10: Mean percentage of WIS differences across all states",
+    title = "Mean percentage of WIS differences across all states",
     subtitle = "AUTO_AVG_LB compared to baseline",
     x = "",
     y = "Difference (%)"
@@ -2488,71 +2488,4 @@ model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), col
 model_improv
 
 ggsave(model_improv, height = 4.5, width = 9,  filename="Fig10.jpg")  
-```
-Talvez incluir standar deviation das diferenceas
-
-```{r}
-weeks <- 1:4
-summed_data_list <- list()
-
-for (week in weeks) {
-  # Merge the data frames
-  data__ <- merge(get(paste0("filtered_df_W", week, "_NoLg")),
-                  get(paste0("filtered_df_W", week)))
-
-  # Step 1: Calculate % difference at state level
-  data__ <- data__ %>%
-    mutate(Diff_state = ((AUTO_AVG_LB / AUTO_AR) - 1) * 100)
-
-  # Step 2: Aggregate sum of components across states for mean difference
-  summed_data <- data__ %>%
-    group_by(Julian_date) %>%
-    summarize(
-      AUTO_AR = sum(AUTO_AR, na.rm = TRUE),
-      AUTO_AVG_LB = sum(AUTO_AVG_LB, na.rm = TRUE),
-      SD_Diff = sd(Diff_state, na.rm = TRUE)  # SD of raw state-level % differences
-    ) %>%
-    mutate(
-      Difference = ((AUTO_AVG_LB / AUTO_AR) - 1) * 100,  # Mean from totals
-      Week = paste0("Week ", week)
-    )
-
-  summed_data_list[[week]] <- summed_data
-}
-
-# Combine all weeks into a single data frame
-summed_data_all <- bind_rows(summed_data_list)
-
-model_improv <- ggplot(summed_data_all, aes(x = Julian_date, y = Difference, color = Week)) +
-  geom_point(size = 3) +
-  geom_errorbar(aes(ymin = Difference - SD_Diff, ymax = Difference + SD_Diff), width = 0.5) +
-  geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
-  theme_minimal() +
-  labs(
-    title = "Figure 10: Mean percentage of WIS differences across all states",
-    subtitle = "AUTO_AVG_LB compared to baseline",
-    x = "",
-    y = "Difference (%)"
-  ) +
-  scale_y_continuous(
-    limits = c(-400, 400),
-    breaks = seq(-100, 100, by = 20)
-  ) +
-  scale_x_date(
-    date_breaks = "1 month",
-    date_labels = "%b %y"
-  ) +
-  scale_color_manual(
-    values = c("Week 1" = "#ffcccc",
-               "Week 2" = "#ff6666",
-               "Week 3" = "#cc0000",
-               "Week 4" = "#990000")
-  ) +
-  theme(
-    plot.title = element_text(size = 18, face = "bold"),
-    plot.subtitle = element_text(size = 14),
-    axis.text.x = element_text(angle = 45, hjust = 1)
-  )
-
-model_improv
 ```

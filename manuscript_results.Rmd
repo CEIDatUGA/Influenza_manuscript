@@ -929,7 +929,6 @@ W1$Model_Type <- ifelse(grepl("_LB$", W1$Best_Result), "With log-back transforma
 # Print the first rows
 head(W1)
 
-
 ################################################
 
 # Extract the columns of interest 
@@ -1384,11 +1383,19 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
             aes(x = factor(WeekAhead), y = Model), fill = "gray80", color = "black") +  # Gray for non-significant
   geom_text(aes(label = paste0("m:", round(m, 1),", sd:", round(sd, 1))), 
             color = "black", size = 4) +  # Add text labels
-  scale_fill_gradient(low = "cyan", high = "red", na.value = "gray80", 
-                      name = "Percentage (%)", limits = c(-35, 35)) +  # Fixed color scale from -30 to 30
+  scale_fill_gradient2(
+  low = "cyan", 
+  mid = "white", 
+  high = "red", 
+  midpoint = 0,     # <-- Sets 0 as the midpoint
+  na.value = "gray80", 
+  name = "Mean difference", 
+  limits = c(-35, 35)       
+)+
+  
   labs(title = "Mean differences between models' WIS and the baseline across 48 states",
        subtitle = "Gray boxes indicate models that are not significantly different from the baseline (p>0.05)",
-         caption = "m = mean difference (%), sd = standard deviation",
+         caption = "m = mean difference, sd = standard deviation",
        x = "Target Ahead",
        y = "") + 
   theme_minimal() +
@@ -1653,6 +1660,53 @@ for(i in c(1,2,3,4)){
 }
 
 regression_models
+
+
+```
+
+best regression plot
+
+```{r}
+plot_list <- list()  # store plots
+
+for(i in 1:4) {
+  
+  # Combine WIS data and population
+  WIS_pop_data <- inner_join(WIS_dataframes[[i]], pop_data, by = "STATE")
+  
+  # Fit linear model
+  model <- lm(AUTO_AVG ~ Resident_population_2020, data = WIS_pop_data)
+  model_summary <- summary(model)
+  
+  # Save R² and p-values
+  r_squared <- round(model_summary$r.squared, 3)
+  p_value <- signif(model_summary$coefficients[2, 4], 3)
+  
+  # Create plot
+  p <- ggplot(WIS_pop_data, aes(x = Resident_population_2020, y = AUTO_AVG)) +
+    geom_point(color = "steelblue", size = 2) +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred", linetype = "dashed") +
+    labs(
+      title = paste("Regression","Target Week", i),
+      subtitle = paste("R² =", r_squared, "| p =", p_value),
+      x = "Resident Population (2020)",
+      y = "AUTO_AVG"
+    ) +
+    theme_minimal()
+  
+  # Store the plot
+  plot_list[[i]] <- p
+}
+
+
+# Combine the plots vertically
+combined_regressions <- wrap_plots(plot_list, ncol = 1)
+
+# Display (optional)
+combined_regressions
+
+# Save the combined plot
+#ggsave("Figx.png", combined_plot, width = 3, height = 5, dpi = 600)
 ```
 
 AUTO_ADJ WIS x POPULATION DENSITY
@@ -1946,7 +2000,10 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
 
 reg2
 
-ggsave(reg2, height = 6, width = 8, filename="Fig7.jpg")  
+# Combine the plots vertically
+reg2_scatter <- reg2 | combined_regressions 
+reg2_scatter
+ggsave(reg2_scatter, height = 6, width = 12, filename="Fig7.jpg")  
 #ggsave(reg2, filename="reg2.jpg",height = 8, width = 10)
 ```
 
@@ -1969,7 +2026,7 @@ ES_1WEEK <- ggplot(W1_map) +
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
-    fill = "Percentage (%)",  # Label for the legend
+    fill = "Mean difference",  # Label for the legend
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -1997,7 +2054,7 @@ ES_2WEEK <- ggplot(W2_map) +
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
-    fill = "Percentage (%)",  # Label for the legend
+    fill = "Mean difference",  # Label for the legend
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -2027,7 +2084,7 @@ ES_3WEEK <- ggplot(W3_map) +
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
-    fill =  "Percentage (%)",  # Label for the legend
+    fill =  "Mean difference",  # Label for the legend
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -2054,7 +2111,7 @@ ES_4WEEK <- ggplot(W4_map) +
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
   labs(
-    fill = "Percentage (%)",  # Label for the legend
+    fill = "Mean difference",  # Label for the legend
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -2263,6 +2320,59 @@ for (i in 1:4){
 
 ```
 
+
+best regression plot
+
+```{r}
+
+# Prepare a list to hold your plots
+bric_plots <- list()
+
+for (i in 1:4) {
+  # 1) Join the WIS and BRIC data
+  WIS_bric <- inner_join(
+    WIS_dataframes[[i]],
+    bric_by_state,
+    by = "STATE"
+  )
+  
+  # 2) Fit the linear model
+  model <- lm(
+    percentage_improvement ~ weighted_mean_z_bric.infrastructure,
+    data = WIS_bric
+  )
+  ms <- summary(model)
+  
+  # 3) Extract R² and p‐value
+  r2 <- round(ms$r.squared, 3)
+  p  <- signif(ms$coefficients[2, 4], 3)
+  
+  # 4) Build the ggplot
+  p <- ggplot(WIS_bric,
+              aes(x = weighted_mean_z_bric.infrastructure,
+                  y = percentage_improvement)) +
+    geom_point(color = "steelblue", size = 2) +
+    geom_smooth(method = "lm", se = FALSE, color = "darkred") +
+    labs(
+      title    = paste("Regression","Target Week", i),
+      subtitle = paste0("R² = ", r2, "   p = ", p),
+      x        = "BRIC infrastructure (2015)",
+      y        = "Difference"
+    ) +
+    theme_minimal()
+  
+  # 5) Store it
+  bric_plots[[i]] <- p
+}
+
+# Combine the plots vertically
+combined_regressions <- wrap_plots(bric_plots, ncol = 1)
+
+# Display 
+combined_regressions
+
+```
+
 AUTO_AVG WIS x BRIC institutional
 
 ```{r}
@@ -2423,7 +2533,11 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
                   plot.subtitle = element_text(size = 14))
 
 reg2
-ggsave(reg2, filename="Fig9.jpg",height = 6, width = 8)
+
+reg2_scatter <- reg2 | combined_regressions 
+reg2_scatter
+ggsave(reg2_scatter, height = 6, width = 12, filename="Fig9.jpg")  
+#ggsave(reg2, filename="Fig9.jpg",height = 6, width = 8)
 ```
 
 ```{r}
@@ -2456,14 +2570,14 @@ summed_data_all <- bind_rows(summed_data_list)
 
 # Plot the difference using ggplot2
 model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), color = Week)) +
-  geom_point(size = 3) +
+  geom_point(size = 2.5) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
   theme_minimal() +
   labs(
-    title = "Mean percentage of WIS differences across all states",
+    title = "Weekly mean WIS differences across all states",
     subtitle = "AUTO_AVG_LB compared to baseline",
     x = "",
-    y = "Difference (%)"
+    y = "Mean difference"
   ) +
   scale_y_continuous(
     limits = c(-100, 100),
@@ -2474,10 +2588,12 @@ model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), col
     date_labels = "%b %y"
   ) +
   scale_color_manual(
-    values = c("Week 1" = "#ffcccc",
-               "Week 2" = "#ff6666",
-               "Week 3" = "#cc0000",
-               "Week 4" = "#990000")
+    values = c(
+    "Week 1" = "#00BFC4",  # Bright cyan
+    "Week 2" = "#F8766D",  # Bright coral red
+    "Week 3" = "#7CAE00",  # Lime green
+    "Week 4" = "#C77CFF"   # Bright purple
+  )
   ) +
   theme(
     plot.title = element_text(size = 18, face = "bold"),
@@ -2488,4 +2604,44 @@ model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), col
 model_improv
 
 ggsave(model_improv, height = 4.5, width = 9,  filename="Fig10.jpg")  
+```
+hospitalizations
+
+```{r}
+
+total_hospitalizations_by_week <- AUTO_ADJACENT_WEEK1 %>%
+  filter(epiweek >= 40 | epiweek <= 20) %>%  # Apply filter AFTER epiweek exists
+  group_by(target_end_date) %>%
+  summarise(mean_cases = sum(cases, na.rm = TRUE))
+
+hospital_plot <-ggplot(total_hospitalizations_by_week, aes(x = target_end_date, y = mean_cases)) +
+  geom_bar(stat = "identity",fill = "steelblue") +
+  labs(title = "Total influenza hospitalizations on the 48 states",
+       x = "",
+       y = "Influenza hospitalizations") +
+  scale_x_date(
+    date_breaks = "1 month",
+    date_labels = "%b %y"
+  ) +
+  theme_minimal()+
+  theme(plot.title = element_text(size = 18, face = "bold"),
+    plot.subtitle = element_text(size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+
+hospital_plot
+
+```
+
+
+```{r}
+
+# Combine the plots vertically
+combined_plot <- hospital_plot / model_improv
+
+# Display (optional)
+combined_plot
+
+# Save the combined plot
+ggsave("Fig10.png", combined_plot, width = 7, height = 7, dpi = 600)
+
 ```

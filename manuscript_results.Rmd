@@ -2603,7 +2603,7 @@ model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), col
 
 model_improv
 
-ggsave(model_improv, height = 4.5, width = 9,  filename="Fig10.jpg")  
+#ggsave(model_improv, height = 4.5, width = 9,  filename="Fig10.jpg")  
 ```
 hospitalizations
 
@@ -2642,6 +2642,6 @@ combined_plot <- hospital_plot / model_improv
 combined_plot
 
 # Save the combined plot
-ggsave("Fig10.png", combined_plot, width = 7, height = 7, dpi = 600)
+ggsave("Fig10.jpg", combined_plot, width = 7, height = 7, dpi = 600)
 
 ```

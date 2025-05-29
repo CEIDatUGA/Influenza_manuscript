@@ -298,47 +298,6 @@ filtered_df_W4_NoLg <- df_W4_NoLg %>%
 head(filtered_df_W4_NoLg)
 ```
 
-Example of influenza hospitalizations forecasts and 95% confidence interval.
-
-```{r}
-
-# Create a data frame with forecasts for plotting
-forecast_df <- data.frame(
-  Week = factor(1:4, labels = paste0("Week ", 1:4)),  # Label weeks
-  Value = c(AUTO_ARIMA_WEEK1_list[[1]]$forecasts[5], 
-            AUTO_ARIMA_WEEK2_list[[1]]$forecasts[5], 
-            AUTO_ARIMA_WEEK3_list[[1]]$forecasts[5], 
-            AUTO_ARIMA_WEEK4_list[[1]]$forecasts[5]),
-  Lower = c(AUTO_ARIMA_WEEK1_list[[1]][["0.025"]][5], 
-            AUTO_ARIMA_WEEK2_list[[1]][["0.025"]][5], 
-            AUTO_ARIMA_WEEK3_list[[1]][["0.025"]][5], 
-            AUTO_ARIMA_WEEK4_list[[1]][["0.025"]][5]),
-  Upper = c(AUTO_ARIMA_WEEK1_list[[1]][["0.975"]][5], 
-            AUTO_ARIMA_WEEK2_list[[1]][["0.975"]][5], 
-            AUTO_ARIMA_WEEK3_list[[1]][["0.975"]][5], 
-            AUTO_ARIMA_WEEK4_list[[1]][["0.975"]][5])
-)
-
-
-# Plotting forecasts and ribbon
-plt00 <- ggplot(forecast_df, aes(x = Week, y = Value, group = 1)) +
-  geom_line(color = "black", size = 1) +          # Line connecting forecast values
-  geom_point(color = "black", size = 3) +         # Points for each forecast value
-  geom_ribbon(aes(ymin = Lower, ymax = Upper),   # Ribbon for confidence intervals
-              fill = "gray", alpha = 0.25) +
-  labs(title = "Figure 1: Example of probabilistic forecasts",
-       subtitle = "The gray ribbon indicates the 95% confidence interval",
-       x = "Target Weeks",
-       y = "Forecast Values") +
-  theme_minimal() +
-  theme(plot.title = element_text(size = 16, face = "bold"),
-        plot.subtitle = element_text(size = 14))
-
-plt00
-
-ggsave(plt00, height = 4, width =7, filename="Fig1.jpg") 
-```
-
 Weighted interval scores for each state and each target week.
 
 ```{r}
@@ -720,7 +679,6 @@ df_W4 <- data.frame(
 head(df_W4)
 ```
 
-
 Filter only the flu season
 
 ```{r}
@@ -754,6 +712,126 @@ filtered_df_W4 <- df_W4 %>%
 head(filtered_df_W4)
 ```
 
+Fitting data.
+
+```{r}
+i  <- 57
+ii <- 8 # state number
+
+my_data = read.csv("NHSH_hospitalizations_seed/treated_influenza_hosp_dataframe_v2.csv")
+my_data$target_end_date<-as.Date(my_data$target_end_date) # set the dates as dates
+
+list_of_states <- split(my_data, my_data$state_name)
+
+# Convert to Date if not already
+list_of_states[[ii]]$target_end_date <- as.Date(list_of_states[[ii]]$target_end_date)
+
+# Define the date range
+end_date <- as.Date(AUTO_AVERAGE_WEEK1_list[[ii]]$target_end_date[i]-7)
+start_date <- end_date - 365*2  # 2 years before
+
+# Subset the data
+subset_data <- subset(list_of_states[[ii]], 
+                      target_end_date >= start_date & target_end_date <= end_date)
+
+# Plot
+plot(subset_data$target_end_date, subset_data$cases, type = "l",
+     xlab = "Date", ylab = "Cases", main = "Cases - Last 2 Years")
+```
+
+```{r}
+# 2) build your forecast_df for i=55, ii=8
+
+i  <- 57
+ii <- 8 # state number
+
+
+forecast_df <- data.frame(
+  Dates = c(
+    AUTO_AVERAGE_WEEK1_list[[ii]]$target_end_date[i],
+    AUTO_AVERAGE_WEEK2_list[[ii]]$target_end_date[i],
+    AUTO_AVERAGE_WEEK3_list[[ii]]$target_end_date[i],
+    AUTO_AVERAGE_WEEK4_list[[ii]]$target_end_date[i]
+  ),
+  Hosp  = c(
+    AUTO_AVERAGE_WEEK1_list[[ii]]$cases[i],
+    AUTO_AVERAGE_WEEK2_list[[ii]]$cases[i],
+    AUTO_AVERAGE_WEEK3_list[[ii]]$cases[i],
+    AUTO_AVERAGE_WEEK4_list[[ii]]$cases[i]
+  ),
+  Value = c(
+    AUTO_AVERAGE_WEEK1_list[[ii]]$forecasts[i],
+    AUTO_AVERAGE_WEEK2_list[[ii]]$forecasts[i],
+    AUTO_AVERAGE_WEEK3_list[[ii]]$forecasts[i],
+    AUTO_AVERAGE_WEEK4_list[[ii]]$forecasts[i]
+  ),
+  Lower = c(
+    AUTO_AVERAGE_WEEK1_list[[ii]][["0.025"]][i],
+    AUTO_AVERAGE_WEEK2_list[[ii]][["0.025"]][i],
+    AUTO_AVERAGE_WEEK3_list[[ii]][["0.025"]][i],
+    AUTO_AVERAGE_WEEK4_list[[ii]][["0.025"]][i]
+  ),
+  Upper = c(
+    AUTO_AVERAGE_WEEK1_list[[ii]][["0.975"]][i],
+    AUTO_AVERAGE_WEEK2_list[[ii]][["0.975"]][i],
+    AUTO_AVERAGE_WEEK3_list[[ii]][["0.975"]][i],
+    AUTO_AVERAGE_WEEK4_list[[ii]][["0.975"]][i]
+  )
+)
+
+
+conceptual_figure = ggplot() +
+  # 3a) two-year observed history as a black line (mapped to color for legend)
+  geom_point(data = subset_data, 
+            aes(x = target_end_date, y = cases, color = "Fitting data"), 
+            size = 2.5) +
+  
+  # 3b) forecast ribbon (not in legend)
+  geom_ribbon(data = forecast_df, 
+              aes(x = Dates, ymin = Lower, ymax = Upper), 
+              fill = "gray", alpha = 0.4) +
+  
+  # 3c) forecast mean (dashed blue line + hollow points)
+  geom_point(data = forecast_df, 
+            aes(x = Dates, y = Value, color = "Mean forecast"), 
+             size = 3) +
+  
+  geom_point(data = forecast_df, 
+             aes(x = Dates, y = Value, color = "Mean forecast"), 
+             shape = 21, fill = "white", size = 2) +
+  
+  # 3d) actual post-cutoff cases (mapped to color for legend)
+  geom_point(data = forecast_df, 
+             aes(x = Dates, y = Hosp, color = "Hospitalizations"), 
+             shape = 16, size = 2.5) +
+
+  # Manually define legend entries
+  scale_color_manual(name = "Legend",
+                     values = c("Fitting data" = "red", 
+                                "Mean forecast" = "cyan3",
+                                "Hospitalizations" = "black")) +
+    scale_x_date(
+    date_breaks = "1 month",
+    date_labels = "%b %y"
+  ) +
+  
+  labs(
+    title    = "Example of probabilistic forecasts",
+    subtitle = "Gray ribbon represents 95% confidence interval",
+    x        = "",
+    y        = "Hospitalizations"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 18, face = "bold"),
+    plot.subtitle = element_text(size = 14),
+    axis.text.x = element_text(angle = 45, hjust = 1))
+
+conceptual_figure
+# Save the combined plot
+ggsave("Fig1.jpg", conceptual_figure, width = 7, height = 4, dpi = 600)
+
+
+```
 Calculate mean weighted interval score for all forecast weeks on each model.
 
 ```{r}

@@ -42,6 +42,7 @@ library("broom")
 library("fields")
 library("ggpubr")
 library("patchwork")
+library("ggpattern")
 
 ```
 
@@ -728,7 +729,7 @@ list_of_states[[ii]]$target_end_date <- as.Date(list_of_states[[ii]]$target_end_
 
 # Define the date range
 end_date <- as.Date(AUTO_AVERAGE_WEEK1_list[[ii]]$target_end_date[i]-7)
-start_date <- end_date - 365*2  # 2 years before
+start_date <- end_date - (7*103)  # 2 years before
 
 # Subset the data
 subset_data <- subset(list_of_states[[ii]], 
@@ -742,7 +743,7 @@ plot(subset_data$target_end_date, subset_data$cases, type = "l",
 ```{r}
 # 2) build your forecast_df for i=55, ii=8
 
-i  <- 57
+i  <- 57 # target_end_date
 ii <- 8 # state number
 
 
@@ -1071,6 +1072,174 @@ Now, let's plot the best models by each state for each forecast horizon (1-4 wee
 
 ```{r}
 
+
+custom_colors <- c(
+  "AUTO_AR_LB" = colors_ar[1], "ES27_AR_LB" = colors_ar[1], "ES64_AR_LB" = colors_ar[1],
+  "AUTO_EPI_LB" = colors_epi[1], "ES27_EPI_LB" = colors_epi[1], "ES64_EPI_LB" = colors_epi[1],
+  "AUTO_TMP_LB" = colors_tmp[1], "ES27_TMP_LB" = colors_tmp[1], "ES64_TMP_LB" = colors_tmp[1],
+  "AUTO_ADJ_LB" = colors_adj[1], "ES27_ADJ_LB" = colors_adj[1], "ES64_ADJ_LB" = colors_adj[1],
+  "AUTO_AVG_LB" = colors_avg[1], "ES27_AVG_LB" = colors_avg[1], "ES64_AVG_LB" = colors_avg[1],
+  
+  
+  "AUTO_AR" = colors_ar[1], "ES27_AR" = colors_ar[1], "ES64_AR" = colors_ar[1],
+  "AUTO_EPI" = colors_epi[1], "ES27_EPI" = colors_epi[1], "ES64_EPI" = colors_epi[1],
+  "AUTO_TMP" = colors_tmp[1], "ES27_TMP" = colors_tmp[1], "ES64_TMP" = colors_tmp[1],
+  "AUTO_ADJ" = colors_adj[1], "ES27_ADJ" = colors_adj[1], "ES64_ADJ" = colors_adj[1],
+  "AUTO_AVG" = colors_avg[1], "ES27_AVG" = colors_avg[1], "ES64_AVG" = colors_avg[1]
+)
+
+# define a manual pattern scale
+custom_patterns <- c(
+  # AR
+  "AUTO_AR"      = "circle",      "AUTO_AR_LB"      = "circle",
+  "ES27_AR"      = "stripe",      "ES27_AR_LB"      = "stripe",
+  "ES64_AR"      = "crosshatch",  "ES64_AR_LB"      = "crosshatch",
+  # EPI
+  "AUTO_EPI"     = "circle",      "AUTO_EPI_LB"     = "circle",
+  "ES27_EPI"     = "stripe",      "ES27_EPI_LB"     = "stripe",
+  "ES64_EPI"     = "crosshatch",  "ES64_EPI_LB"     = "crosshatch",
+  # TMP
+  "AUTO_TMP"     = "circle",      "AUTO_TMP_LB"     = "circle",
+  "ES27_TMP"     = "stripe",      "ES27_TMP_LB"     = "stripe",
+  "ES64_TMP"     = "crosshatch",  "ES64_TMP_LB"     = "crosshatch",
+  # ADJ
+  "AUTO_ADJ"     = "circle",      "AUTO_ADJ_LB"     = "circle",
+  "ES27_ADJ"     = "stripe",      "ES27_ADJ_LB"     = "stripe",
+  "ES64_ADJ"     = "crosshatch",  "ES64_ADJ_LB"     = "crosshatch",
+  # AVG
+  "AUTO_AVG"     = "circle",      "AUTO_AVG_LB"     = "circle",
+  "ES27_AVG"     = "stripe",      "ES27_AVG_LB"     = "stripe",
+  "ES64_AVG"     = "crosshatch",  "ES64_AVG_LB"     = "crosshatch"
+)
+
+#custom_patterns <- custom_patterns[custom_patterns != "circle"]
+
+
+plot1 <- ggplot(W1, aes(x = Best_Result,
+                        pattern = Best_Result,
+                        fill    = Best_Result)) +
+  geom_bar_pattern(
+    colour        = NA,            # no border
+    pattern_fill  = "black",
+    pattern_size  = 0.2,
+    pattern_angle = 45             # set globally, not inside aes()
+  ) +
+  scale_fill_manual(values   = custom_colors) +
+  scale_pattern_manual(values = custom_patterns) +
+  labs(title = "Best model on the 48 U.S. states (W1)",
+       x = NULL, y = "Number of states") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~ Model_Type, scales = "free_x") +
+  guides(pattern_angle = "none")  # this line is optional now but safe
+
+
+plot1
+
+plot2 <- ggplot(W2, aes(x = Best_Result,
+                        pattern = Best_Result,
+                        fill    = Best_Result)) +
+  geom_bar_pattern(
+    colour        = NA,            # no border
+    pattern_fill  = "black",
+    pattern_size  = 0.2,
+    pattern_angle = 45             # set globally, not inside aes()
+  ) +
+  scale_fill_manual(values   = custom_colors) +
+  scale_pattern_manual(values = custom_patterns) +
+  labs(title = "Best model on the 48 U.S. states (W2)",
+       x = NULL, y = "Number of states") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~ Model_Type, scales = "free_x") +
+  guides(pattern_angle = "none")  # this line is optional now but safe
+
+
+plot2
+
+plot3 <- ggplot(W3, aes(x = Best_Result,
+                        pattern = Best_Result,
+                        fill    = Best_Result)) +
+  geom_bar_pattern(
+    colour        = NA,            # no border
+    pattern_fill  = "black",
+    pattern_size  = 0.2,
+    pattern_angle = 45             # set globally, not inside aes()
+  ) +
+  scale_fill_manual(values   = custom_colors) +
+  scale_pattern_manual(values = custom_patterns) +
+  labs(title = "Best model on the 48 U.S. states (W3)",
+       x = NULL, y = "Number of states") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~ Model_Type, scales = "free_x") +
+  guides(pattern_angle = "none")  # this line is optional now but safe
+
+plot3
+
+plot4 <- ggplot(W4, aes(x = Best_Result,
+                        pattern = Best_Result,
+                        fill    = Best_Result)) +
+  geom_bar_pattern(
+    colour        = NA,            # no border
+    pattern_fill  = "black",
+    pattern_size  = 0.2,
+    pattern_angle = 45             # set globally, not inside aes()
+  ) +
+  scale_fill_manual(values   = custom_colors) +
+  scale_pattern_manual(values = custom_patterns) +
+  labs(title = "Best model on the 48 U.S. states (W4)",
+       x = NULL, y = "Number of states") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  facet_wrap(~ Model_Type, scales = "free_x") +
+  guides(pattern_angle = "none")  # this line is optional now but safe
+
+plot4
+
+```
+
+
+```{r}
+
+library(ggpattern)
+library(ggplot2)
+library(dplyr)
+
+# Assign week labels
+W1$Week_Ahead <- "W1"
+W2$Week_Ahead <- "W2"
+W3$Week_Ahead <- "W3"
+W4$Week_Ahead <- "W4"
+
+# Combine all weeks
+all_weeks <- bind_rows(W1, W2, W3, W4)
+
+# Create the patterned plot
+combined_plot <- ggplot(all_weeks, aes(x = Best_Result, 
+                                       fill = Best_Result,
+                                       pattern = Best_Result)) +
+  geom_bar_pattern(
+    pattern_fill  = "black",
+    pattern_size  = 0.1,
+    pattern_angle = 45,  # set globally
+    colour        = NA
+  ) +
+  scale_fill_manual(values = custom_colors) +
+  scale_pattern_manual(values = custom_patterns) +  # define this before
+  labs(title = "Best model based on the lowest mean WIS",
+       subtitle = "Results for the 48 states on the contiguous U.S. by target week",
+       x = "", y = "Number of states",
+       fill = "Best model",
+       pattern = "Best model") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(size = 16, face = "bold"),legend.position = "none") +
+  facet_grid(Week_Ahead ~ Model_Type, scales = "free_x") +
+  guides(pattern_angle = "none")  # just in case
+
+
+# Save and display the plot
+ggsave("Fig4.jpg", combined_plot, width = 7, height = 6)
+print(combined_plot)
+```
+
+```{r}
 # Create a custom color mapping for each variable
 custom_colors <- c(
   "AUTO_AR_LB" = colors_ar[1], "ES27_AR_LB" = colors_ar[2], "ES64_AR_LB" = colors_ar[3],
@@ -1167,7 +1336,7 @@ combined_plot <- ggplot(all_weeks, aes(x = Best_Result, fill = Best_Result)) +
   facet_grid(Week_Ahead ~ Model_Type, scales = "free_x")
 
 # Save and display the plot
-ggsave("Fig4.jpg", combined_plot, width =8, height =5)
+#ggsave("Fig4.jpg", combined_plot, width =8, height =5)
 print(combined_plot)
 
 ```

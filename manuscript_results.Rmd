@@ -43,7 +43,7 @@ library("fields")
 library("ggpubr")
 library("patchwork")
 library("ggpattern")
-
+library("cowplot")
 ```
 
 Loading the results of each model and the shapefiles of the maps.
@@ -1071,8 +1071,6 @@ head(W4)
 Now, let's plot the best models by each state for each forecast horizon (1-4 weeks ahead). 
 
 ```{r}
-
-
 custom_colors <- c(
   "AUTO_AR_LB" = colors_ar[1], "ES27_AR_LB" = colors_ar[1], "ES64_AR_LB" = colors_ar[1],
   "AUTO_EPI_LB" = colors_epi[1], "ES27_EPI_LB" = colors_epi[1], "ES64_EPI_LB" = colors_epi[1],
@@ -1192,15 +1190,11 @@ plot4 <- ggplot(W4, aes(x = Best_Result,
   guides(pattern_angle = "none")  # this line is optional now but safe
 
 plot4
-
 ```
-
 
 ```{r}
 
-library(ggpattern)
-library(ggplot2)
-library(dplyr)
+
 
 # Assign week labels
 W1$Week_Ahead <- "W1"
@@ -1229,14 +1223,86 @@ combined_plot <- ggplot(all_weeks, aes(x = Best_Result,
        fill = "Best model",
        pattern = "Best model") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.title = element_text(size = 16, face = "bold"),legend.position = "none") +
-  facet_grid(Week_Ahead ~ Model_Type, scales = "free_x") +
-  guides(pattern_angle = "none")  # just in case
+        plot.title = element_text(size = 16, face = "bold"),legend.position = "left") +
+  facet_grid(Week_Ahead ~ Model_Type, scales = "free_x") #+
+ # guides(pattern_angle = "none")  # just in case
 
 
 # Save and display the plot
-ggsave("Fig4.jpg", combined_plot, width = 7, height = 6)
+#ggsave("Fig4.jpg", combined_plot, width = 7, height = 6)
 print(combined_plot)
+
+```
+
+```{r}
+
+# Define the custom patterns
+custom_patterns <- c("AUTO" = "circle", "ES27" = "stripe", "ES64" = "crosshatch")
+custom_fills <- c("AUTO" = "white", "ES27" = "white", "ES64" = "white")  # or any colors you like
+
+# Create the custom legend plot
+legend_data <- data.frame(
+  Model_Type = c("AUTO", "ES27", "ES64", "ES27", "ES64"),
+  Model_Family = c("AR","TMP", "EPI", "ADJ","AVG"),
+  x = 1:5,
+  y = 1
+)
+
+# Define patterns for model types
+custom_patterns <- c("AUTO" = "circle", "ES27" = "stripe", "ES64" = "crosshatch")
+
+# Define fill colors for approaches
+custom_fills <- c("AR" = colors_ar[1], "TMP"=colors_tmp[1], "EPI" = colors_epi[1], "ADJ" = colors_adj[1], "AVG" = colors_avg[1])
+
+# Custom legend plot
+custom_legend <- ggplot(legend_data, aes(x = factor(x), y = y, 
+                                         pattern = Model_Type, fill = Model_Family)) +
+  geom_bar_pattern(stat = "identity",
+                   pattern_fill = "black",
+                   pattern_density = 0.3,
+                   pattern_spacing = 0.05,
+                   pattern_size = 0.15,
+                   colour = "black",
+                   width = 0.7) +
+  scale_fill_manual(values = custom_fills, name = "Model Family") +
+  scale_pattern_manual(values = custom_patterns, name = "Model Type") +
+  theme_void() +
+  theme(
+    legend.position = "right",
+    legend.title = element_text(size = 12, face = "bold"),
+    legend.text = element_text(size = 10)
+  ) +
+  guides(
+    fill = guide_legend(
+      override.aes = list(pattern = "none", pattern_fill = NA, colour = NA)
+    ),
+    pattern = guide_legend(
+      override.aes = list(fill = "white", pattern_fill = "black")
+    )
+  )
+custom_legend
+```
+
+```{r}
+
+
+# Remove legends from combined_plot
+combined_plot_clean <- combined_plot + theme(legend.position = "none")
+
+# Extract only the legend from custom_legend
+
+legend_only <- cowplot::get_legend(custom_legend)
+
+# Combine your main plot with the custom legend
+final_plot <- combined_plot_clean + 
+  patchwork::plot_spacer() + 
+  patchwork::wrap_elements(legend_only) + 
+  plot_layout(widths = c(4, 0.05, 0.4))  # Adjust widths as needed
+
+# Display the result
+final_plot
+
+ggsave("Fig4.jpg", final_plot, width = 10, height = 6)
 ```
 
 ```{r}
@@ -1482,7 +1548,7 @@ Let's calculate the mean(WIS) improvement relative to the AUTO ARIMA model. We w
 ```{r}
 calculate_percentage_of_improvement <- function(data) {
   return(data.frame(
-    AUTO_AR = (data$AUTO_AR / data$AUTO_AR),
+    AUTO_AR = (((data$AUTO_AR / data$AUTO_AR)-1) * 100),
     
     ES27_AR = (((data$ES27_AR/data$AUTO_AR)-1) * 100),
     ES64_AR = (((data$ES64_AR/data$AUTO_AR )-1) * 100),
@@ -1598,6 +1664,103 @@ p_values_and_impr$Model_Type <- ifelse(grepl("_LB$", p_values_and_impr$Model), "
 # View the updated dataframe
 head(p_values_and_impr)
 p_values_and_impr
+```
+
+
+
+
+```{r}
+
+new_long_data <- summary_impr %>%
+  mutate(
+    LogBack = grepl("_LB$", Model),
+    Family = sub("_.*", "", Model),  # take everything before the first underscore
+    Method = sub("^.*?_(AR|ADJ|EPI|AVG|TMP)(_LB)?$", "\\1", Model)
+  )
+
+new_long_data <- new_long_data %>%
+  mutate(Model = ifelse(Model == "AUTO_AR", "AUTO_AAR", Model))
+
+model <- lm(m ~ Model, data = new_long_data)
+summary(model)
+
+model
+new_long_data$Model
+# Get tidy summary of coefficients
+tidy_model <- broom::tidy(model)
+
+# Filter out intercept for clarity if you want
+tidy_model_no_intercept <- tidy_model %>% filter(term != "(Intercept)")
+
+# Plot coefficients with 95% confidence intervals
+tidy_model_no_intercept <- tidy_model_no_intercept %>%
+  mutate(term = forcats::fct_reorder(term, estimate, .desc = TRUE))
+
+# Plot
+ggplot(tidy_model_no_intercept, aes(x = term, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = estimate - std.error * 1.96,
+                    ymax = estimate + std.error * 1.96),
+                width = 0.2) +
+  coord_flip() +  # flip for better readability
+  labs(
+    title = "Effect Size of Model Types on outcome",
+    subtitle =  "Estimates relative to baseline (intercept)",
+    y = "Estimate",
+    x = ""
+  ) +
+  theme_minimal()
+
+```
+
+
+```{r}
+
+new_long_data <- summary_impr %>%
+  mutate(
+    LogBack = grepl("_LB$", Model),
+    Type = sub("_.*", "", Model),  # take everything before the first underscore
+    Family = sub("^.*?_(AR|ADJ|EPI|AVG|TMP)(_LB)?$", "\\1", Model)
+  )
+
+new_long_data <- new_long_data %>%
+  mutate(Family = ifelse(Family == "AR", "AAR", Family))
+
+model <- lm(m ~ Type + Family + LogBack, data = new_long_data)
+summary(model)
+
+model
+new_long_data$Model
+# Get tidy summary of coefficients
+tidy_model <- broom::tidy(model)
+
+# Filter out intercept for clarity if you want
+tidy_model_no_intercept <- tidy_model %>% filter(term != "(Intercept)")
+
+# Plot coefficients with 95% confidence intervals
+tidy_model_no_intercept <- tidy_model_no_intercept %>%
+  mutate(term = forcats::fct_reorder(term, estimate, .desc = TRUE))
+
+# Plot
+effect_size<- ggplot(tidy_model_no_intercept, aes(x = term, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = estimate - std.error * 1.96,
+                    ymax = estimate + std.error * 1.96),
+                width = 0.2) +
+  coord_flip() +  # flip for better readability
+  labs(
+    title = "Effect size of model type, family and transformation on WIS difference",
+    subtitle =  "WIS Difference relative to the AUTO type, ARIMA family and LogBack False (intercept)",
+    y = "WIS Difference",
+    x = ""
+  ) +
+  theme_minimal() + theme(plot.title = element_text(size = 16, face = "bold"),
+                  plot.subtitle = element_text(size = 14))
+
+effect_size
+
+ggsave("Fig6.jpg", effect_size, width =10, height =5)
+
 ```
 
 Mean difference and standard deviation
@@ -1851,7 +2014,7 @@ combined_plot <- (ES_1WEEK | ES_2WEEK) /
 print(combined_plot) 
 
 # Save to file
-ggsave("Fig6.jpg", combined_plot, width =12, height =7)
+ggsave("Fig7.jpg", combined_plot, width =12, height =7)
 
 ```
 
@@ -2250,7 +2413,7 @@ reg2
 # Combine the plots vertically
 reg2_scatter <- reg2 | combined_regressions 
 reg2_scatter
-ggsave(reg2_scatter, height = 6, width = 12, filename="Fig7.jpg")  
+ggsave(reg2_scatter, height = 6, width = 12, filename="Fig8.jpg")  
 #ggsave(reg2, filename="reg2.jpg",height = 8, width = 10)
 ```
 
@@ -2391,7 +2554,7 @@ combined_plot <- (ES_1WEEK | ES_2WEEK) /
 print(combined_plot) 
 
 # Save to file
-ggsave("Fig8.jpg", combined_plot, width =12, height =7)
+ggsave("Fig9.jpg", combined_plot, width =12, height =7)
 ```
 
 REGRESSION MODELS
@@ -2769,7 +2932,7 @@ reg2<-ggplot(regression_models, aes(x = Week_Ahead, y = independent_variable, fi
   geom_text(aes(label = round(r_squared, 3)), color = "black", size = 6) +  # Text inside boxes
   scale_fill_manual(values = c("Significant" = "cyan", "Not Significant" = "gray")) +  
   labs(title = "Regression models R²",
-       subtitle = "Mean WIS differences (%) as dependent variable",
+       subtitle = "Mean WIS differences as dependent variable",
        x = "Target Week",
        y = "Independent Variables",
        fill = "Significance (p < 0.05)") +    
@@ -2783,7 +2946,7 @@ reg2
 
 reg2_scatter <- reg2 | combined_regressions 
 reg2_scatter
-ggsave(reg2_scatter, height = 6, width = 12, filename="Fig9.jpg")  
+ggsave(reg2_scatter, height = 6, width = 12, filename="Fig10.jpg")  
 #ggsave(reg2, filename="Fig9.jpg",height = 6, width = 8)
 ```
 
@@ -2821,7 +2984,7 @@ model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), col
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
   theme_minimal() +
   labs(
-    title = "Weekly mean WIS differences across all states",
+    title = "A) Weekly mean WIS differences across all states",
     subtitle = "AUTO_AVG_LB compared to baseline",
     x = "",
     y = "Mean difference"
@@ -2834,14 +2997,14 @@ model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), col
     date_breaks = "1 month",
     date_labels = "%b %y"
   ) +
-  scale_color_manual(
-    values = c(
-    "Week 1" = "#00BFC4",  # Bright cyan
-    "Week 2" = "#F8766D",  # Bright coral red
-    "Week 3" = "#7CAE00",  # Lime green
-    "Week 4" = "#C77CFF"   # Bright purple
+scale_color_manual(
+  values = c(
+    "Week 1" = "#4575B4",  # Blue
+    "Week 2" = "#91BFDB",  # Light blue
+    "Week 3" = "#E89C9C",  # Light red
+    "Week 4" = "#D73027"   # Red
   )
-  ) +
+) +
   theme(
     plot.title = element_text(size = 18, face = "bold"),
     plot.subtitle = element_text(size = 14),
@@ -2863,7 +3026,7 @@ total_hospitalizations_by_week <- AUTO_ADJACENT_WEEK1 %>%
 
 hospital_plot <-ggplot(total_hospitalizations_by_week, aes(x = target_end_date, y = mean_cases)) +
   geom_bar(stat = "identity",fill = "steelblue") +
-  labs(title = "Total influenza hospitalizations on the 48 states",
+  labs(title = "B) Total influenza hospitalizations on the 48 states",
        x = "",
        y = "Influenza hospitalizations") +
   scale_x_date(
@@ -2883,12 +3046,12 @@ hospital_plot
 ```{r}
 
 # Combine the plots vertically
-combined_plot <- hospital_plot / model_improv
+combined_plot <-  model_improv /hospital_plot 
 
 # Display (optional)
 combined_plot
 
 # Save the combined plot
-ggsave("Fig10.jpg", combined_plot, width = 7, height = 7, dpi = 600)
+ggsave("Fig11.jpg", combined_plot, width = 7, height = 7, dpi = 600)
 
 ```

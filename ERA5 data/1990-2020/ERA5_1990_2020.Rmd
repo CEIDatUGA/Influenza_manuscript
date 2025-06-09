@@ -23,9 +23,10 @@ library(MMWRweek)
 ```
 
 Downloading temperature and humidity data from the cloud.
+You may run this code in python.
 
 ```{python}
-# Importando a biblioteca do xarray e outras auxiliares
+# Libraries
 import xarray as xr
 import numpy as np
 import os

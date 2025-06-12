@@ -58,6 +58,9 @@ humidity=humidity.sel(lev=1000, lat=slice(20,60),lon=slice(-130,-60))
 # xarray dataset
 humidity.to_netcdf(path='ERA5_humidity_data_US_2010_2024.nc')
 ```
+
+After downloading the file you can use the code below to get mean weekly temperature for each state.
+
 Plotting temperature and humidity NetCDFs.
 
 ```{r}

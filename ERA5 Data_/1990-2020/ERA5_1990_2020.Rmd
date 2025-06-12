@@ -1,0 +1,167 @@
+---
+title: "ERA5 Temperature and Humidity climatologies for regression analysis"
+author: "Victor Felix"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document converts ERA5 NetCDF's with daily data into weekly data for each state on the contiguous U.S. 
+
+```{r}
+library(terra)
+library(dplyr)
+library(lubridate)
+library(tidyr)
+library(parallel)
+library(ncdf4)
+library(MMWRweek)
+```
+
+Downloading temperature and humidity data from the cloud.
+You may run this code in python.
+
+```{python}
+# Libraries
+import xarray as xr
+import numpy as np
+import os
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+import datetime as dt
+import pandas as pd
+import geopandas
+import regionmask
+import seaborn as sns
+import pytz
+import warnings
+warnings.filterwarnings("ignore")
+
+url='http://apdrc.soest.hawaii.edu/dods/public_data/Reanalysis_Data/ERA5/daily_3d/'
+temperature = xr.open_dataset(url+'Air_Temperature')
+temperature =temperature.sel(time=slice("1990-01-01","2020-12-31"))
+temperature = temperature.assign_coords(lon=(((temperature.lon + 180) % 360) - 180))
+temperature
+# xarray dataset
+temperature=temperature.sel(lev=1000, lat=slice(20,60),lon=slice(-130,-60))
+temperature.to_netcdf(path='ERA5_temperature_data_US_2010_2024.nc')
+
+url='http://apdrc.soest.hawaii.edu/dods/public_data/Reanalysis_Data/ERA5/daily_3d/'
+humidity= xr.open_dataset(url+'Specific_humidity')
+humidity=humidity.sel(time=slice("1990-01-01","2020-12-31"))
+humidity= humidity.assign_coords(lon=(((humidity.lon + 180) % 360) - 180))
+humidity=humidity.sel(lev=1000, lat=slice(20,60),lon=slice(-130,-60))
+# xarray dataset
+humidity.to_netcdf(path='ERA5_humidity_data_US_2010_2024.nc')
+```
+
+After downloading the file you can use the code below to get mean weekly temperature for each state.
+
+Plotting temperature and humidity NetCDFs.
+
+```{r}
+temp <- rast('ERA5_temperature_US_1990_2020.nc')  # Temperature
+humi <- rast('ERA5_humidity_data_US_1990_2020.nc')  # Temperature
+
+# Calculate the mean over the time dimension
+temp_mean <- mean(temp, na.rm = TRUE)  
+
+# Calculate the mean over the time dimension
+humi_mean <- mean(humi, na.rm = TRUE)  
+
+# Plot
+plot(temp_mean)
+plot(humi_mean)
+```
+
+Here I will load and inspect the states shapefiles. I will use them later in order to calculate weekly temperature and humidity for each state.
+
+```{r}
+# Codes and abbreviations of each U.S. state
+state_code<-read.csv("State_Codes.csv")
+
+# Read the shapefile
+US <- vect("states_shapefile/States_shapefile.shp")
+
+plot(US)
+
+# Loop through the first 48 state codes
+for (i in 1:48) {
+    code <- state_code$abbreviation[i]
+    
+    # Filter the SpatVector based on the state code
+    state_shapefile <- US[US$State_Code == code, ]
+    
+    # Plot the filtered state shapefile
+    plot(state_shapefile, main = paste("State:", code))
+}
+
+state_code
+```
+
+Here I develop a function that take states codes (for shapefiles selection) and NetCDFs with daily resolution (temperature or humidity) as inputs, and creates a dataframe with weekly values for each U.S. state.
+
+```{r}
+ERA5_mean_by_state<-function(state_code=state_code, my_netcdf) {
+  # Filter the state shapefile for the current state
+  state_shapefile <- US[US$State_Code == state_code$abbreviation, ]
+  # Create a mask for the state using terra's mask function
+  netcdf_state_daily <- mask(my_netcdf, state_shapefile)
+  # Calculate the mean for a given state
+  temp_mean <- mean(netcdf_state_daily, na.rm = TRUE)  
+  # Calculate the mean across the spatial dimensions (lat, lon)
+  state_mean <- global(temp_mean, mean, na.rm = TRUE)
+    # Rename the column to the state's location name
+  colnames(state_mean) <- state_code$location_name
+  return(state_mean)
+}
+```
+
+Here I select only the abbreviations and state codes of states on the contiguous U.S.
+
+```{r}
+# Split dataframe into a list of dataframes by row
+states_codes <- split(state_code, seq(nrow(state_code)))
+states_codes<-states_codes[1:48] # select only states up to Florida
+
+```
+
+Here I run the function to calculate mean weekly TEMPERATURE for all states on the contiguous U.S.
+
+```{r}
+# Run using mclapply
+
+mean_temperature_each_state_1990_2020 <- mclapply(states_codes, function(state_code) {
+  ERA5_mean_by_state(state_code = state_code, my_netcdf = temp)
+}, mc.cores = 1)
+
+
+mean_temperature_each_state_1990_2020_df<-bind_cols(mean_temperature_each_state_1990_2020)
+mean_temperature_each_state_1990_2020_df<-data.frame(t(mean_temperature_each_state_1990_2020_df))
+mean_temperature_each_state_1990_2020_df$STATE <-rownames(mean_temperature_each_state_1990_2020_df)
+rownames(mean_temperature_each_state_1990_2020_df) <- NULL
+mean_temperature_each_state_1990_2020_df
+write.csv(mean_temperature_each_state_1990_2020_df, file = "temperature_climatology_1990_2020.csv")
+```
+
+Here I run the function to calculate mean weekly SPECIFIC HUMIDITY for all states on the contiguous U.S.
+
+```{r}
+mean_humidity_each_state_1990_2020 <- mclapply(states_codes, function(state_code) {
+  ERA5_mean_by_state(state_code = state_code, my_netcdf = humi)
+}, mc.cores = 1)
+
+
+mean_humidity_each_state_1990_2020_df<-bind_cols(mean_humidity_each_state_1990_2020)
+mean_humidity_each_state_1990_2020_df<-data.frame(t(mean_humidity_each_state_1990_2020_df))
+mean_humidity_each_state_1990_2020_df$STATE <-rownames(mean_humidity_each_state_1990_2020_df)
+rownames(mean_humidity_each_state_1990_2020_df) <- NULL
+mean_humidity_each_state_1990_2020_df
+write.csv(mean_humidity_each_state_1990_2020_df, file = "humidity_climatology_1990_2020.csv")
+```
+
+

@@ -1,5 +1,5 @@
 #' ES_ADJACENT 
-#' This function utilizes ensembles and single automatic ARIMAX models which have mean cases by adjacent states as exogenous variables.
+#' This function use ensembles and single automatic ARIMAX models which have mean cases by adjacent states as exogenous variables.
 #' The function fits rolling windows of N weeks for the state under analysis and rolling windows of the same size with 1 week-lag for the exogenous variables to generate forecasts.
 #' It return some metrics that evaluate the performance of the models:
 #' target_end_date, abs_error, cases, forecast, 'N_of_models", weighted interval score (WIS), predictive quantiles (%)  

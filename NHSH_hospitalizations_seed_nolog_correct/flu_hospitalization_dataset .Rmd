@@ -33,7 +33,7 @@ state_codes<-read.csv("State_Codes.csv")
 Choosing U.S. states
 
 ```{r}
-states=state_codes$abbreviation[1:48] # removing Florida
+states=state_codes$abbreviation[1:48] # keeping only our 48 states
 ```
 
 Creating a list with multiple dataframes

@@ -1691,7 +1691,7 @@ ggplot(data, aes(x = independent_variable, y = r_squared, fill = Significant)) +
   facet_wrap(~Week_Ahead, ncol = 1)
 
 # Save the plot with specified size
-ggsave("regression_plot.jpg", width = 10, height = 14, dpi = 300)
+#ggsave("regression_plot.jpg", width = 10, height = 14, dpi = 300)
 ```
 
 ######################

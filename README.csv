@@ -6,7 +6,7 @@ This repository has 24 ARIMA and ARIMAX models which forecasts Influenza Hospita
 
 Our main folder has a Rmakdown that analyzes the results of our 24 models and generates manuscript figures.
 
-There are 3 model types: AUTO, ES27 and ES64. 
+There are 3 model types: AUTO_ARIMA, ES27 and ES64. 
 
 AUTO_ARIMA is a non-ensemble model which uses the best automatic fit. 
 

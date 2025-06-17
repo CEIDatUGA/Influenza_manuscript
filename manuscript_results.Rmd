@@ -1274,7 +1274,7 @@ plot4 <- ggplot(W4, aes(x = Best_Result,
 plot4
 ```
 
-Now I will combine all these plots.
+Now I will combine all these plots 2x2.
 
 ```{r}
 # Include columns with target week labels
@@ -1675,8 +1675,8 @@ for (target_week_ in names(datasets_list)) {
       geom_vline(aes(xintercept = mean_val), color = "red", linetype = "dashed", linewidth = 1) +
       geom_vline(aes(xintercept = mean_val - sd_val), color = "blue", linetype = "dotted", linewidth = 1) +
       geom_vline(aes(xintercept = mean_val + sd_val), color = "blue", linetype = "dotted", linewidth = 1) +
-      labs(title = paste("Histogram of", var, "in", dataset_name),
-           x = var, 
+      labs(title = paste("Histogram of", given_model, "target week", target_week_),
+           x = given_model, 
            y = "Frequency") +
       theme_minimal()
 

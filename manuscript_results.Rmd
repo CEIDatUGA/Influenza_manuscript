@@ -2043,7 +2043,7 @@ ggsave("Fig7.jpg", combined_plot, width =12, height =7)
 
 ```
 
-Loading datasets for regression analysis
+Loading datasets for regression models analysis
 
 ```{r}
 pop_data <- read.csv("NHSH_hospitalizations_seed/regression_features/population_data.csv") # resident population and population density

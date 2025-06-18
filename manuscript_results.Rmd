@@ -1859,7 +1859,7 @@ Now let's organize the data to plot some maps with the best models.
 W1_map <- data.frame(
   STATE = W1$STATE,
   percentage_improvement = W1_percentage_of_improvement$AUTO_AVG_LB,
-  AUTO_AVG=W1$AUTO_AVG_LB
+  AUTO_AVG_LB=W1$AUTO_AVG_LB
 )
 
 # Include geometry
@@ -1871,7 +1871,7 @@ W1_map <- states %>%
 W2_map <- data.frame(
   STATE = W2$STATE,
   percentage_improvement = W2_percentage_of_improvement$AUTO_AVG_LB,
-  AUTO_AVG=W2$AUTO_AVG_LB
+  AUTO_AVG_LB=W2$AUTO_AVG_LB
 )
 
 # Include geometry
@@ -1883,7 +1883,7 @@ W2_map <- states %>%
 W3_map <- data.frame(
   STATE = W3$STATE,
   percentage_improvement = W3_percentage_of_improvement$AUTO_AVG_LB,
-  AUTO_AVG=W3$AUTO_AVG_LB
+  AUTO_AVG_LB=W3$AUTO_AVG_LB
 )
 
 # Include geometry
@@ -1895,7 +1895,7 @@ W3_map <- states %>%
 W4_map <- data.frame(
   STATE = W4$STATE,
   percentage_improvement = W4_percentage_of_improvement$AUTO_AVG_LB,
-  AUTO_AVG=W4$AUTO_AVG_LB
+  AUTO_AVG_LB=W4$AUTO_AVG_LB
 )
 
 # Include geometry
@@ -1911,13 +1911,13 @@ Let's plot some maps with mean WIS for each state.
 ```{r}
 
 ES_1WEEK <- ggplot(W1_map) +
-  geom_sf(aes(fill = AUTO_AVG)) +  # Fill based on the best model
+  geom_sf(aes(fill = AUTO_AVG_LB)) +  # Fill based on the best model
   scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 352)) +  
   ggtitle("1 week ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
-  geom_sf_text(data = W1_map, aes(label = round(AUTO_AVG,0)),  # Round to whole numbers
+  geom_sf_text(data = W1_map, aes(label = round(AUTO_AVG_LB,0)),  # Round to whole numbers
                size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
@@ -1941,13 +1941,13 @@ ES_1WEEK
 ```{r}
 
 ES_2WEEK <- ggplot(W2_map) +
-  geom_sf(aes(fill = AUTO_AVG)) +  # Fill based on the best model
+  geom_sf(aes(fill = AUTO_AVG_LB)) +  # Fill based on the best model
   scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 352)) +  
   ggtitle("2 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
-  geom_sf_text(data = W2_map, aes(label = round(AUTO_AVG,0)),  # Round to whole numbers
+  geom_sf_text(data = W2_map, aes(label = round(AUTO_AVG_LB,0)),  # Round to whole numbers
                size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
@@ -1970,13 +1970,13 @@ ES_2WEEK
 ```{r}
 
 ES_3WEEK <- ggplot(W3_map) +
-  geom_sf(aes(fill = AUTO_AVG)) +  # Fill based on the best model
+  geom_sf(aes(fill = AUTO_AVG_LB)) +  # Fill based on the best model
   scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 352)) +  
   ggtitle("3 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
-  geom_sf_text(data = W3_map, aes(label = round(AUTO_AVG,0)),  # Round to whole numbers
+  geom_sf_text(data = W3_map, aes(label = round(AUTO_AVG_LB,0)),  # Round to whole numbers
                size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
@@ -1998,14 +1998,14 @@ ES_3WEEK
 ```{r}
 
 ES_4WEEK <- ggplot(W4_map) +
-  geom_sf(aes(fill = AUTO_AVG)) +
+  geom_sf(aes(fill = AUTO_AVG_LB)) +
   scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", 
                        midpoint = 100, limits = c(0, 352)) +  
   ggtitle("4 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
-  geom_sf_text(data = W4_map, aes(label = round(AUTO_AVG,0)),  
+  geom_sf_text(data = W4_map, aes(label = round(AUTO_AVG_LB,0)),  
                size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +
@@ -2066,9 +2066,7 @@ regression_models<-data.frame()
 
 ```
 
-Percentage of AUTO_ADJ mean WIS
-
-AUTO_ADJ WIS x RESIDENT POPULATION 2020
+AUTO_ADJ_LB WIS x RESIDENT POPULATION 2020
 
 ```{r}
 
@@ -2077,7 +2075,7 @@ for(i in c(1,2,3,4)){
   # Combining data for the same states
   WIS_pop_data <- inner_join(WIS_dataframes[[i]], pop_data, by = "STATE")
   # Fitting the regression model
-  model <- lm((WIS_pop_data$AUTO_AVG) ~ (WIS_pop_data$Resident_population_2020))
+  model <- lm((WIS_pop_data$AUTO_AVG_LB) ~ (WIS_pop_data$Resident_population_2020))
   # View the model summary
   model_summary <- summary(model)
   # Getting the R and p values for the plot
@@ -2109,7 +2107,7 @@ for(i in 1:4) {
   WIS_pop_data <- inner_join(WIS_dataframes[[i]], pop_data, by = "STATE")
   
   # Fit linear model
-  model <- lm(AUTO_AVG ~ Resident_population_2020, data = WIS_pop_data)
+  model <- lm(AUTO_AVG_LB ~ Resident_population_2020, data = WIS_pop_data)
   model_summary <- summary(model)
   
   # Save R² and p-values
@@ -2117,7 +2115,7 @@ for(i in 1:4) {
   p_value <- signif(model_summary$coefficients[2, 4], 3)
   
   # Create plot
-  p <- ggplot(WIS_pop_data, aes(x = Resident_population_2020, y = AUTO_AVG)) +
+  p <- ggplot(WIS_pop_data, aes(x = Resident_population_2020, y = AUTO_AVG_LB)) +
     geom_point(color = "steelblue", size = 2) +
     geom_smooth(method = "lm", se = FALSE, color = "darkred", linetype = "dashed") +
     labs(
@@ -2151,7 +2149,7 @@ for(i in c(1,2,3,4)){
 
   WIS_pop_data <- inner_join(WIS_dataframes[[i]], pop_data, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_pop_data$AUTO_AVG) ~ (WIS_pop_data$Population_density_2020))
+  model <- lm((WIS_pop_data$AUTO_AVG_LB) ~ (WIS_pop_data$Population_density_2020))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2199,7 +2197,7 @@ for(i in c(1,2,3,4)){
   WIS_sovi<-NULL
   WIS_sovi <- inner_join(WIS_dataframes[[i]], sovi_by_state, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_sovi$AUTO_AVG) ~ (WIS_sovi$weighted_mean))
+  model <- lm((WIS_sovi$AUTO_AVG_LB) ~ (WIS_sovi$weighted_mean))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2220,7 +2218,7 @@ AUTO_AVG WIS x BRIC SOCIAL
 for(i in 1:4){
   WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
   # Fit the regression model  
-  model <- lm((WIS_bric$AUTO_AVG) ~ (WIS_bric$weighted_mean_z_bric.social))
+  model <- lm((WIS_bric$AUTO_AVG_LB) ~ (WIS_bric$weighted_mean_z_bric.social))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2240,7 +2238,7 @@ AUTO_AVG WIS x BRIC ECONOMIC
 for(i in 1:4){
   WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_bric$AUTO_AVG) ~ (WIS_bric$weighted_mean_z_bric.economic))
+  model <- lm((WIS_bric$AUTO_AVG_LB) ~ (WIS_bric$weighted_mean_z_bric.economic))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2260,7 +2258,7 @@ AUTO_AVG WIS x BRIC Infrastructure
 for (i in 1:4){
   WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_bric$AUTO_AVG) ~ (WIS_bric$weighted_mean_z_bric.infrastructure))
+  model <- lm((WIS_bric$AUTO_AVG_LB) ~ (WIS_bric$weighted_mean_z_bric.infrastructure))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2281,7 +2279,7 @@ AUTO_AVG WIS x BRIC institutional
 for (i in 1:4){
   WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_bric$AUTO_AVG) ~ (WIS_bric$weighted_mean_z_bric.institutional))
+  model <- lm((WIS_bric$AUTO_AVG_LB) ~ (WIS_bric$weighted_mean_z_bric.institutional))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2302,7 +2300,7 @@ AUTO_AVG WIS x BRIC community
 for(i in 1:4){
   WIS_bric <- inner_join(WIS_dataframes[[1]], bric_by_state, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_bric$AUTO_AVG) ~ (WIS_bric$weighted_mean_z_bric.community))
+  model <- lm((WIS_bric$AUTO_AVG_LB) ~ (WIS_bric$weighted_mean_z_bric.community))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2322,7 +2320,7 @@ AUTO_AVG WIS x BRIC environment
 for(i in 1:4){
   WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_bric$AUTO_AVG) ~ (WIS_bric$weighted_mean_z_bric.environment))
+  model <- lm((WIS_bric$AUTO_AVG_LB) ~ (WIS_bric$weighted_mean_z_bric.environment))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2343,7 +2341,7 @@ for(i in 1:4){
   # BRIC INDEX
   WIS_bric <- inner_join(WIS_dataframes[[i]], bric_by_state, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_bric$AUTO_AVG) ~ (WIS_bric$weighted_mean_z_bric.total))
+  model <- lm((WIS_bric$AUTO_AVG_LB) ~ (WIS_bric$weighted_mean_z_bric.total))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2368,7 +2366,7 @@ for(i in 1:4){
   # TEMPERATURE DATA from ERA5
   WIS_temp <- inner_join(WIS_dataframes[[i]], temperature_data, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_temp$AUTO_AVG) ~ (WIS_temp$mean))
+  model <- lm((WIS_temp$AUTO_AVG_LB) ~ (WIS_temp$mean))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2393,7 +2391,7 @@ for(i in 1:4){
   # HUMIDITY DATA from ERA5
   WIS_humidity <- inner_join(WIS_dataframes[[i]], humidity_data, by = "STATE")
   # Fit the regression model
-  model <- lm((WIS_humidity$AUTO_AVG) ~ (WIS_humidity$mean))
+  model <- lm((WIS_humidity$AUTO_AVG_LB) ~ (WIS_humidity$mean))
   # View the model summary
   model_summary <- summary(model)
   # Extract R-squared and p-value
@@ -2442,7 +2440,7 @@ ggsave(reg2_scatter, height = 6, width = 12, filename="Fig8.jpg")
 ```
 
 
-Let's plot some maps with the with the mean (%) of difference between the AUTO_AVG and the AUTO ARIMA models for the same state.
+Let's plot some maps with the with the mean difference (%) between the AUTO_AVG and the AUTO ARIMA models for the same state.
 
 1 week ahead percentage of improvement
 
@@ -2595,7 +2593,7 @@ regression_models<-data.frame()
 
 Percentage of improvement regression analysis
 
-AUTO_AVG WIS x RESIDENT POPULATION 2020
+AUTO_AVG_LB WIS x RESIDENT POPULATION 2020
 
 ```{r}
 
@@ -2624,7 +2622,7 @@ for(i in c(1,2,3,4)){
 regression_models
 ```
 
-AUTO_AVG WIS x POPULATION DENSITY
+AUTO_AVG_LB WIS x POPULATION DENSITY
 
 ```{r}
 
@@ -2670,7 +2668,7 @@ colnames(bric_by_state)[1] <- "STATE"
 
 ```
 
-AUTO_AVG WIS x SOVI
+AUTO_AVG_LB WIS x SOVI
 
 ```{r}
 
@@ -2693,7 +2691,7 @@ for(i in c(1,2,3,4)){
 
 ```
 
-AUTO_AVG WIS x BRIC SOCIAL
+AUTO_AVG_LB WIS x BRIC SOCIAL
 
 ```{r}
 
@@ -2714,7 +2712,7 @@ for(i in 1:4){
 
 ```
 
-AUTO_AVG WIS x BRIC ECONOMIC
+AUTO_AVG_LB WIS x BRIC ECONOMIC
 
 ```{r}
 for(i in 1:4){
@@ -2733,7 +2731,7 @@ for(i in 1:4){
 
 ```
 
-AUTO_AVG WIS x BRIC Infrastructure
+AUTO_AVG_LB WIS x BRIC Infrastructure
 
 ```{r}
 
@@ -2754,8 +2752,7 @@ for (i in 1:4){
 
 ```
 
-
-best regression plot
+Plotting best regression model
 
 ```{r}
 
@@ -2807,7 +2804,7 @@ combined_regressions
 
 ```
 
-AUTO_AVG WIS x BRIC institutional
+AUTO_AVG_LB WIS x BRIC institutional
 
 ```{r}
 
@@ -2828,7 +2825,7 @@ for (i in 1:4){
 
 ```
 
-AUTO_AVG WIS x BRIC community
+AUTO_AVG_LB WIS x BRIC community
 
 ```{r}
 
@@ -2848,7 +2845,7 @@ for(i in 1:4){
 
 ```
 
-AUTO_AVG WIS x BRIC environment
+AUTO_AVG_LB WIS x BRIC environment
 
 ```{r}
 
@@ -2868,7 +2865,7 @@ for(i in 1:4){
 
 ```
 
-AUTO_AVG WIS x BRIC total
+AUTO_AVG_LB WIS x BRIC total
 
 ```{r}
 
@@ -2894,10 +2891,9 @@ Now we will look at regression models that uses mean temperature and specific hu
 
 -------------------
 
-AUTO_AVG WIS x Temperature ERA5 Data
+AUTO_AVG_LB WIS x Temperature ERA5 Data
 
 ```{r}
-
 
 for(i in 1:4){
   # TEMPERATURE DATA from ERA5
@@ -2916,7 +2912,7 @@ for(i in 1:4){
 }
 ```
 
-AUTO_AVG WIS x Specific Humidity ERA5 Data
+AUTO_AVG_LB WIS x Specific Humidity ERA5 Data
 
 ```{r}
 
@@ -2942,7 +2938,6 @@ for(i in 1:4){
 # Plot the table
 regression_models
 ```
-
 SUMMARY OF RESULTS 
 
 ```{r}
@@ -2973,6 +2968,8 @@ reg2_scatter
 ggsave(reg2_scatter, height = 6, width = 12, filename="Fig10.jpg")  
 #ggsave(reg2, filename="Fig9.jpg",height = 6, width = 8)
 ```
+
+Computing and plotting mean WIS improvement by epidemiological weeks.
 
 ```{r}
 # Create a list of data frames for the four weeks
@@ -3039,7 +3036,7 @@ model_improv
 
 #ggsave(model_improv, height = 4.5, width = 9,  filename="Fig10.jpg")  
 ```
-hospitalizations
+Total hospitalizations
 
 ```{r}
 
@@ -3065,7 +3062,7 @@ hospital_plot <-ggplot(total_hospitalizations_by_week, aes(x = target_end_date, 
 hospital_plot
 
 ```
-
+Combining model improvement and total hospitalizations
 
 ```{r}
 

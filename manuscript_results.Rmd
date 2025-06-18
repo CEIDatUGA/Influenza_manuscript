@@ -2056,7 +2056,7 @@ temperature_data<-read.csv("NHSH_hospitalizations_seed/regression_features/tempe
 
 REGRESSION MODELS
 
-We will run the regression for evaluating if the best model log(WIS) which represent its performance is related to given independent variables.
+Now we run regressions models for evaluating if the best model mean WIS in each state is related to given independent variables.
 
 ```{r}
 
@@ -2095,7 +2095,6 @@ for(i in c(1,2,3,4)){
 }
 
 regression_models
-
 
 ```
 

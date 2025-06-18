@@ -35,7 +35,6 @@ library("sf")
 library("forcats")
 library("ggplot2")
 library("sf")
-library("dplyr")
 library("scales") 
 library("ggplot2")
 library("broom")
@@ -1689,7 +1688,7 @@ summary_impr$WeekAhead<-as.numeric(summary_impr$WeekAhead)
 summary_impr
 ```
 
-Datasets with differences and Wilcoxon Holm adjusted p-values
+Datasets with mean differences, standard deviations and Wilcoxon Holm adjusted p-values
 
 ```{r}
 # 
@@ -1705,79 +1704,76 @@ p_values_and_impr$Model_Type <- ifelse(grepl("_LB$", p_values_and_impr$Model), "
 head(p_values_and_impr)
 p_values_and_impr
 ```
-
-
-
+ERASE
 
 ```{r}
 
-new_long_data <- summary_impr %>%
-  mutate(
-    LogBack = grepl("_LB$", Model),
-    Family = sub("_.*", "", Model),  # take everything before the first underscore
-    Method = sub("^.*?_(AR|ADJ|EPI|AVG|TMP)(_LB)?$", "\\1", Model)
-  )
+#new_long_data <- summary_impr %>%
+#  mutate(
+#    LogBack = grepl("_LB$", Model),
+#    Family = sub("_.*", "", Model),  # take everything before the first underscore
+#    Method = sub("^.*?_(AR|ADJ|EPI|AVG|TMP)(_LB)?$", "\\1", Model)
+#  )
 
-new_long_data <- new_long_data %>%
-  mutate(Model = ifelse(Model == "AUTO_AR", "AUTO_AAR", Model))
+#new_long_data <- new_long_data %>%
+#  mutate(Model = ifelse(Model == "AUTO_AR", "AUTO_AAR", Model))
 
-model <- lm(m ~ Model, data = new_long_data)
-summary(model)
+#model <- lm(m ~ Model, data = new_long_data)
+#summary(model)
 
-model
-new_long_data$Model
+#model
+#new_long_data$Model
 # Get tidy summary of coefficients
-tidy_model <- broom::tidy(model)
+#tidy_model <- broom::tidy(model)
 
 # Filter out intercept for clarity if you want
-tidy_model_no_intercept <- tidy_model %>% filter(term != "(Intercept)")
+#tidy_model_no_intercept <- tidy_model %>% filter(term != "(Intercept)")
 
 # Plot coefficients with 95% confidence intervals
-tidy_model_no_intercept <- tidy_model_no_intercept %>%
-  mutate(term = forcats::fct_reorder(term, estimate, .desc = TRUE))
+#tidy_model_no_intercept <- tidy_model_no_intercept %>%
+#  mutate(term = forcats::fct_reorder(term, estimate, .desc = TRUE))
 
 # Plot
-ggplot(tidy_model_no_intercept, aes(x = term, y = estimate)) +
-  geom_point() +
-  geom_errorbar(aes(ymin = estimate - std.error * 1.96,
-                    ymax = estimate + std.error * 1.96),
-                width = 0.2) +
-  coord_flip() +  # flip for better readability
-  labs(
-    title = "Effect Size of Model Types on outcome",
-    subtitle =  "Estimates relative to baseline (intercept)",
-    y = "Estimate",
-    x = ""
-  ) +
-  theme_minimal()
+#ggplot(tidy_model_no_intercept, aes(x = term, y = estimate)) +
+#  geom_point() +
+#  geom_errorbar(aes(ymin = estimate - std.error * 1.96,
+#                    ymax = estimate + std.error * 1.96),
+#                width = 0.2) +
+#  coord_flip() +  # flip for better readability
+#  labs(
+#    title = "Effect Size of Model Types on outcome",
+#    subtitle =  "Estimates relative to baseline (intercept)",
+#    y = "Estimate",
+#    x = ""
+#  ) +
+#  theme_minimal()
 
 ```
 
+Now let's use a regression model to evaluate effect size of each modelling approach.
 
 ```{r}
 
-new_long_data <- summary_impr %>%
+model_approaches <- summary_impr %>%
   mutate(
     LogBack = grepl("_LB$", Model),
     Type = sub("_.*", "", Model),  # take everything before the first underscore
     Family = sub("^.*?_(AR|ADJ|EPI|AVG|TMP)(_LB)?$", "\\1", Model)
   )
 
-new_long_data <- new_long_data %>%
-  mutate(Family = ifelse(Family == "AR", "AAR", Family))
+model_approaches <- model_approaches %>%
+  mutate(Family = ifelse(Family == "AR", "AAR", Family)) # rename because the intercept is in alphabetic order and I want to use the baseline
 
-model <- lm(m ~ Type + Family + LogBack, data = new_long_data)
-summary(model)
+# run the regression model
+model <- lm(m ~ Type + Family + LogBack, data = model_approaches)
 
-model
-new_long_data$Model
-# Get tidy summary of coefficients
+# extracting models coefficients
 tidy_model <- broom::tidy(model)
 
-# Filter out intercept for clarity if you want
+# filter out intercept
 tidy_model_no_intercept <- tidy_model %>% filter(term != "(Intercept)")
 
-# Plot coefficients with 95% confidence intervals
+# Reordering for plotting
 tidy_model_no_intercept <- tidy_model_no_intercept %>%
   mutate(term = forcats::fct_reorder(term, estimate, .desc = TRUE))
 
@@ -1787,7 +1783,7 @@ effect_size<- ggplot(tidy_model_no_intercept, aes(x = term, y = estimate)) +
   geom_errorbar(aes(ymin = estimate - std.error * 1.96,
                     ymax = estimate + std.error * 1.96),
                 width = 0.2) +
-  coord_flip() +  # flip for better readability
+  coord_flip() + 
   labs(
     title = "Effect size of model type, family and transformation on WIS difference",
     subtitle =  "WIS Difference relative to the AUTO type, ARIMA family and LogBack False (intercept)",
@@ -1806,10 +1802,6 @@ ggsave("Fig6.jpg", effect_size, width =10, height =5)
 Mean difference and standard deviation
 
 ```{r}
-
-library(ggplot2)
-library(dplyr)
-library(forcats)
 
 # Define significance threshold  
 alpha <- 0.05   

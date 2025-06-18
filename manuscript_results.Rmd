@@ -735,6 +735,7 @@ subset_data <- subset(list_of_states[[ii]],
 plot(subset_data$target_end_date, subset_data$cases, type = "l",
      xlab = "Date", ylab = "Cases", main = "Cases - Last 2 Years")
 ```
+Plotting conceptual image
 
 ```{r}
 i  <- 57 # forecast week
@@ -1750,59 +1751,9 @@ ERASE
 
 ```
 
-Now let's use a regression model to evaluate effect size of each modelling approach.
+Here we are plotting the mean differences and standard deviation
 
 ```{r}
-
-model_approaches <- summary_impr %>%
-  mutate(
-    LogBack = grepl("_LB$", Model),
-    Type = sub("_.*", "", Model),  # take everything before the first underscore
-    Family = sub("^.*?_(AR|ADJ|EPI|AVG|TMP)(_LB)?$", "\\1", Model)
-  )
-
-model_approaches <- model_approaches %>%
-  mutate(Family = ifelse(Family == "AR", "AAR", Family)) # rename because the intercept is in alphabetic order and I want to use the baseline
-
-# run the regression model
-model <- lm(m ~ Type + Family + LogBack, data = model_approaches)
-
-# extracting models coefficients
-tidy_model <- broom::tidy(model)
-
-# filter out intercept
-tidy_model_no_intercept <- tidy_model %>% filter(term != "(Intercept)")
-
-# Reordering for plotting
-tidy_model_no_intercept <- tidy_model_no_intercept %>%
-  mutate(term = forcats::fct_reorder(term, estimate, .desc = TRUE))
-
-# Plot
-effect_size<- ggplot(tidy_model_no_intercept, aes(x = term, y = estimate)) +
-  geom_point() +
-  geom_errorbar(aes(ymin = estimate - std.error * 1.96,
-                    ymax = estimate + std.error * 1.96),
-                width = 0.2) +
-  coord_flip() + 
-  labs(
-    title = "Effect size of model type, family and transformation on WIS difference",
-    subtitle =  "WIS Difference relative to the AUTO type, ARIMA family and LogBack False (intercept)",
-    y = "WIS Difference",
-    x = ""
-  ) +
-  theme_minimal() + theme(plot.title = element_text(size = 16, face = "bold"),
-                  plot.subtitle = element_text(size = 14))
-
-effect_size
-
-ggsave("Fig6.jpg", effect_size, width =10, height =5)
-
-```
-
-Mean difference and standard deviation
-
-```{r}
-
 # Define significance threshold  
 alpha <- 0.05   
 
@@ -1851,6 +1802,56 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
 # Print plot
 print(plot_m_heatmap)
 ggsave("Fig5.jpg", plot_m_heatmap, width = 14, height = 7 )
+
+```
+
+
+Now let's use a regression model to evaluate effect size of each modelling approach.
+
+```{r}
+
+model_approaches <- summary_impr %>%
+  mutate(
+    LogBack = grepl("_LB$", Model),
+    Type = sub("_.*", "", Model),  # take everything before the first underscore
+    Family = sub("^.*?_(AR|ADJ|EPI|AVG|TMP)(_LB)?$", "\\1", Model)
+  )
+
+model_approaches <- model_approaches %>%
+  mutate(Family = ifelse(Family == "AR", "AAR", Family)) # rename because the intercept is in alphabetic order and I want to use the baseline
+
+# run the regression model
+model <- lm(m ~ Type + Family + LogBack, data = model_approaches)
+
+# extracting models coefficients
+tidy_model <- broom::tidy(model)
+
+# filter out intercept
+tidy_model_no_intercept <- tidy_model %>% filter(term != "(Intercept)")
+
+# Reordering for plotting
+tidy_model_no_intercept <- tidy_model_no_intercept %>%
+  mutate(term = forcats::fct_reorder(term, estimate, .desc = TRUE))
+
+# Plot
+effect_size<- ggplot(tidy_model_no_intercept, aes(x = term, y = estimate)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = estimate - std.error * 1.96,
+                    ymax = estimate + std.error * 1.96),
+                width = 0.2) +
+  coord_flip() + 
+  labs(
+    title = "Effect size of model type, family and transformation on WIS difference",
+    subtitle =  "WIS Difference relative to the AUTO type, ARIMA family and LogBack False (intercept)",
+    y = "WIS Difference",
+    x = ""
+  ) +
+  theme_minimal() + theme(plot.title = element_text(size = 16, face = "bold"),
+                  plot.subtitle = element_text(size = 14))
+
+effect_size
+
+ggsave("Fig6.jpg", effect_size, width =10, height =5)
 
 ```
 

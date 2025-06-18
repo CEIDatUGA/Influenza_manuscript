@@ -1689,7 +1689,7 @@ summary_impr$WeekAhead<-as.numeric(summary_impr$WeekAhead)
 summary_impr
 ```
 
-Datasets with mean differences, standard deviations and Wilcoxon Holm adjusted p-values
+Let create a combined dataset with mean differences, standard deviations and Wilcoxon Holm adjusted p-values
 
 ```{r}
 # 
@@ -1698,7 +1698,7 @@ all_p_values<-rbind(p_values_wk1,p_values_wk2,p_values_wk3,p_values_wk4)
 
 p_values_and_impr <- merge(summary_impr, all_p_values, by = c("WeekAhead", "Model"))
 
-# Create a new column "Model_Type" based on whether "NoLg" is in the Model name
+# Create a new column "Model_Type" based on model with and withouth log-back transformation
 p_values_and_impr$Model_Type <- ifelse(grepl("_LB$", p_values_and_impr$Model), "LB", "no_LB")
 
 # View the updated dataframe
@@ -1754,22 +1754,20 @@ ERASE
 Here we are plotting the mean differences and standard deviation
 
 ```{r}
-# Define significance threshold  
-alpha <- 0.05   
 
-# Get model order based on WeekAhead == 1  
+# Get model order based based on lower values on WeekAhead == 1  
 model_order <- p_values_and_impr %>%
   filter(WeekAhead == 1) %>%
   arrange(desc(m)) %>%
-  pull(Model)  # Extract ordered model names
+  pull(Model) 
 
-# Prepare data with significance flag and ordering  
+# Prepare data with significance level, ordering, and model name
 p_df <- p_values_and_impr %>%
-  mutate(Significance = ifelse(p_values < alpha, "Significant", "Not Significant"),
+  mutate(Significance = ifelse(p_values < 0.05 , "Significant", "Not Significant"),
          Model_Type = ifelse(grepl("_LB$", Model), "With log-back transformation", "Without log-back transformation"),
-         Model = factor(Model, levels = model_order))  # Apply ordered factor
+         Model = factor(Model, levels = model_order))  
 
-# Heatmap plot with models ordered by WeekAhead == 1  
+# Heatmap plot  
 plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) +
   geom_tile(aes(fill = ifelse(Significance == "Significant", m, NA)), color = "black") +  # Fill only significant ones
   geom_tile(data = p_df %>% filter(Significance == "Not Significant"), 
@@ -1785,7 +1783,6 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
   name = "Mean difference", 
   limits = c(-35, 35)       
 )+
-  
   labs(title = "Mean differences between models' WIS and the baseline across 48 states",
        subtitle = "Gray boxes indicate models that are not significantly different from the baseline (p>0.05)",
          caption = "m = mean difference, sd = standard deviation",
@@ -1796,7 +1793,7 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
   plot.caption = element_text(size = 16),
     plot.title = element_text(size = 18, face = "bold"),
     plot.subtitle = element_text(size = 14),) +
-  facet_wrap(~ Model_Type, scales = "free_y")  # Separate NoLg and other models
+  facet_wrap(~ Model_Type, scales = "free_y") 
 
 
 # Print plot
@@ -1805,20 +1802,20 @@ ggsave("Fig5.jpg", plot_m_heatmap, width = 14, height = 7 )
 
 ```
 
-
 Now let's use a regression model to evaluate effect size of each modelling approach.
 
 ```{r}
-
+# get model approaches and mean improvement
 model_approaches <- summary_impr %>%
   mutate(
     LogBack = grepl("_LB$", Model),
-    Type = sub("_.*", "", Model),  # take everything before the first underscore
+    Type = sub("_.*", "", Model),  # extract the model type
     Family = sub("^.*?_(AR|ADJ|EPI|AVG|TMP)(_LB)?$", "\\1", Model)
   )
 
+# rename "AR" because the intercept is in alphabetic order and I want to use the baseline
 model_approaches <- model_approaches %>%
-  mutate(Family = ifelse(Family == "AR", "AAR", Family)) # rename because the intercept is in alphabetic order and I want to use the baseline
+  mutate(Family = ifelse(Family == "AR", "AAR", Family)) 
 
 # run the regression model
 model <- lm(m ~ Type + Family + LogBack, data = model_approaches)
@@ -1855,64 +1852,59 @@ ggsave("Fig6.jpg", effect_size, width =10, height =5)
 
 ```
 
-Now let's plot a map of percentage of WIS improvement for each state.
+Now let's organize the data to plot some maps with the best models.
 
 ```{r}
 # MAP 1 week ahead
-
 W1_map <- data.frame(
   STATE = W1$STATE,
   percentage_improvement = W1_percentage_of_improvement$AUTO_AVG_LB,
   AUTO_AVG=W1$AUTO_AVG_LB
 )
 
-# Merge the best model data with the states map
+# Include geometry
 W1_map <- states %>%
   left_join(W1_map, by = c("STATE")) %>%
   drop_na()
 
-################################### MAP 2 weeka ahead
-
+# MAP 2 weeks a ahead
 W2_map <- data.frame(
   STATE = W2$STATE,
   percentage_improvement = W2_percentage_of_improvement$AUTO_AVG_LB,
   AUTO_AVG=W2$AUTO_AVG_LB
 )
 
-# Merge the best model data with the states map
+# Include geometry
 W2_map <- states %>%
   left_join(W2_map, by = c("STATE"))%>%
   drop_na()
 
-##################################### MAP 3 weeka ahead
-
+# MAP 3 weeks a ahead
 W3_map <- data.frame(
   STATE = W3$STATE,
   percentage_improvement = W3_percentage_of_improvement$AUTO_AVG_LB,
   AUTO_AVG=W3$AUTO_AVG_LB
 )
 
-# Merge the best model data with the states map
+# Include geometry
 W3_map <- states %>%
   left_join(W3_map, by = c("STATE"))%>%
   drop_na() 
 
-############################### MAP 4 weeka ahead
-
+# MAP 4 weeks ahead
 W4_map <- data.frame(
   STATE = W4$STATE,
   percentage_improvement = W4_percentage_of_improvement$AUTO_AVG_LB,
   AUTO_AVG=W4$AUTO_AVG_LB
 )
 
-# Merge the best model data with the states map
+# Include geometry
 W4_map <- states %>%
   left_join(W4_map, by = c("STATE"))%>%
   drop_na()
 ```
 
-Let's plot some maps with the best models in each state and the percentage of improvement compared to the AUTO ARIMA models for the same state.
-Here I define some colors categories that I will use on the next maps.
+Let's plot some maps with mean WIS for each state.
 
 1 week ahead percentage of improvement
 
@@ -1921,7 +1913,7 @@ Here I define some colors categories that I will use on the next maps.
 ES_1WEEK <- ggplot(W1_map) +
   geom_sf(aes(fill = AUTO_AVG)) +  # Fill based on the best model
   scale_fill_gradient2(low = "skyblue", mid = "lightyellow2", high = "red", midpoint = 100, limits = c(0, 352)) +  
-  ggtitle("1 weeks ahead") +
+  ggtitle("1 week ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
@@ -2031,7 +2023,7 @@ ES_4WEEK
 #ggsave(ES_4WEEK,height = 4.5, width = 6.5,  filename="Fig4D.jpg")  
 ```
 
-Combine in a 2x2 grid
+Combining maps in a 2x2 grid
 
 ```{r}
 # Combine in a 2x2 grid

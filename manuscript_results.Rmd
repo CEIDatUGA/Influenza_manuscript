@@ -45,6 +45,7 @@ library("ggpattern")
 library("cowplot")
 library("lme4")
 library("ez")
+library("ggpubr")
 ```
 
 Loading the results of each model and the shapefiles of the maps.
@@ -1920,12 +1921,12 @@ ES_1WEEK <- ggplot(W1_map) +
   geom_sf_text(data = W1_map, aes(label = round(AUTO_AVG_LB,0)),  # Round to whole numbers
                size = 3,
                color = "black",
-               check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
+               check_overlap = TRUE,fontface = "bold") +  
   labs(
     fill = "mean WIS",  
        x = "",
        y = ""
-  )  # Adding a subtitle
+  )  
 
 x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
@@ -1955,7 +1956,7 @@ ES_2WEEK <- ggplot(W2_map) +
     fill = "mean WIS",
        x = "",
        y = ""
-  )  # Adding a subtitle
+  )  
 
 x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
@@ -1979,12 +1980,12 @@ ES_3WEEK <- ggplot(W3_map) +
   geom_sf_text(data = W3_map, aes(label = round(AUTO_AVG_LB,0)),  # Round to whole numbers
                size = 3,
                color = "black",
-               check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
+               check_overlap = TRUE,fontface = "bold") +  
   labs(
     fill = "mean WIS",
        x = "",
        y = ""
-  )  # Adding a subtitle
+  ) 
 
 x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
@@ -2129,7 +2130,6 @@ for(i in 1:4) {
   # Store the plot
   plot_list[[i]] <- p
 }
-
 
 # Combine the plots vertically
 combined_regressions <- wrap_plots(plot_list, ncol = 1)
@@ -2382,8 +2382,6 @@ for(i in 1:4){
 AUTO_AVG WIS x Specific Humidity ERA5 Data
 
 ```{r}
-library(ggpubr)
-
 # regression results 
 print(regression_models)
 
@@ -2439,29 +2437,28 @@ ggsave(reg2_scatter, height = 6, width = 12, filename="Fig8.jpg")
 #ggsave(reg2, filename="reg2.jpg",height = 8, width = 10)
 ```
 
-
-Let's plot some maps with the with the mean difference (%) between the AUTO_AVG and the AUTO ARIMA models for the same state.
+Let's plot some maps with the with the mean difference (%) between the AUTO_AVG_LB and the AUTO ARIMA models for the same state.
 
 1 week ahead percentage of improvement
 
 ```{r}
 
 ES_1WEEK <- ggplot(W1_map) +
-  geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
+  geom_sf(aes(fill = percentage_improvement)) +  
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
   ggtitle("1 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
-  geom_sf_text(data = W1_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
+  geom_sf_text(data = W1_map, aes(label = round(percentage_improvement,0)),
                size = 3,
                color = "black",
-               check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
+               check_overlap = TRUE,fontface = "bold") +  
   labs(
-    fill = "Mean difference",  # Label for the legend
+    fill = "Mean difference", 
        x = "",
        y = ""
-  )  # Adding a subtitle
+  )  
 
 x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
@@ -2470,23 +2467,24 @@ ES_1WEEK<-ES_1WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 
 #ggsave(ES_1WEEK,height = 4.5, width = 6.5,  filename="Fig5A.jpg")  
 ```
+
 2 weeks ahead
 
 ```{r}
 
 ES_2WEEK <- ggplot(W2_map) +
-  geom_sf(aes(fill = percentage_improvement)) +  # Fill based on the best model
+  geom_sf(aes(fill = percentage_improvement)) + 
   scale_fill_gradient2(low ="skyblue" , mid = "lightyellow", high = "darkred", midpoint = 0, limits = c(-60, 30)) +  
   ggtitle("2 weeks ahead") +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
-  geom_sf_text(data = W2_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
+  geom_sf_text(data = W2_map, aes(label = round(percentage_improvement,0)), 
                size = 3,
                color = "black",
-               check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
+               check_overlap = TRUE,fontface = "bold") + 
   labs(
-    fill = "Mean difference",  # Label for the legend
+    fill = "Mean difference",  
        x = "",
        y = ""
   )  # Adding a subtitle
@@ -2511,7 +2509,7 @@ ES_3WEEK <- ggplot(W3_map) +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
-  geom_sf_text(data = W3_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
+  geom_sf_text(data = W3_map, aes(label = round(percentage_improvement,0)),  
                size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
@@ -2528,6 +2526,7 @@ ES_3WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 
 #ggsave(ES_3WEEK, height = 4.5, width = 6.5, filename="Fig5C.jpg")  
 ```
+
 4 weeks ahead
 
 ```{r}
@@ -2538,7 +2537,7 @@ ES_4WEEK <- ggplot(W4_map) +
   theme_light() +
   theme(legend.position = "right",
     plot.title = element_text(hjust = 0.5)) +
-  geom_sf_text(data = W4_map, aes(label = round(percentage_improvement,0)),  # Round to whole numbers
+  geom_sf_text(data = W4_map, aes(label = round(percentage_improvement,0)), 
                size = 3,
                color = "black",
                check_overlap = TRUE,fontface = "bold") +  # Display percentage improvement in each state
@@ -2556,6 +2555,8 @@ ES_4WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 #ggsave(ES_4WEEK, height = 4.5, width = 6.5,  filename="Fig5D.jpg")  
 ```
 
+Combining plot on a 2x2 grid.
+
 ```{r}
 # Ensure each plot has coord_sf applied
 ES_1WEEK <- ES_1WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
@@ -2572,6 +2573,7 @@ combined_plot <- (ES_1WEEK | ES_2WEEK) /
     theme = theme(plot.title = element_text(size = 16, face = "bold"),
                   plot.subtitle = element_text(size = 14))
   )
+
 # Print
 print(combined_plot) 
 
@@ -2581,7 +2583,7 @@ ggsave("Fig9.jpg", combined_plot, width =12, height =7)
 
 REGRESSION MODELS
 
-We will run the regression for evaluating if the best model log(WIS) which represent its performance is related to given independent variables.
+Now we will run the regression models for evaluating if the best model percentage of improvement in each state is related to given independent variables.
 
 ```{r}
 
@@ -2969,7 +2971,7 @@ ggsave(reg2_scatter, height = 6, width = 12, filename="Fig10.jpg")
 #ggsave(reg2, filename="Fig9.jpg",height = 6, width = 8)
 ```
 
-Computing and plotting mean WIS improvement by epidemiological weeks.
+Here we will be computing and plotting mean WIS improvement by epidemiological weeks comparing the best model and the basiline model.
 
 ```{r}
 # Create a list of data frames for the four weeks

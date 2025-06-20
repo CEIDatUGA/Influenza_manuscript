@@ -2971,38 +2971,38 @@ ggsave(reg2_scatter, height = 6, width = 12, filename="Fig10.jpg")
 #ggsave(reg2, filename="Fig9.jpg",height = 6, width = 8)
 ```
 
-Here we will be computing and plotting mean WIS improvement by epidemiological weeks comparing the best model and the basiline model.
+Here we will be computing and plotting mean WIS improvement by epidemiological weeks comparing the best model and the baseline model.
 
 ```{r}
 # Create a list of data frames for the four weeks
 weeks <- 1:4
-summed_data_list <- list()
+results_by_epiweek_list <- list()
 
 for (week in weeks) {
   # Merge the data frames for the current week
-  data__ <- merge(get(paste0("filtered_df_W", week, "_NoLg")),
+  combined_dataframes_ <- merge(get(paste0("filtered_df_W", week, "_NoLg")),
                   get(paste0("filtered_df_W", week)))
   
   # Sum values by Julian date across all states
-  summed_data <- data__ %>%
+  mean_improvement_ <- combined_dataframes_ %>%
     group_by(Julian_date) %>%
     summarize(
       AUTO_AR = mean(AUTO_AR, na.rm = TRUE),  # Sum across all states
       AUTO_AVG_LB = mean(AUTO_AVG_LB, na.rm = TRUE)           # Sum across all states
     ) %>%
-    # Calculate the difference ratio
+    # Calculate the difference ratio in percentage
     mutate(Difference =  ((AUTO_AVG_LB / AUTO_AR)-1)*100,
            Week = paste0("Week ", week))
   
-  # Store the summarized data in the list
-  summed_data_list[[week]] <- summed_data
+  # Store the mean improvement by julian date
+  results_by_epiweek_list[[week]] <- mean_improvement_
 }
 
 # Combine all weeks into a single data frame
-summed_data_all <- bind_rows(summed_data_list)
+results_by_epiweek_all <- bind_rows(results_by_epiweek_list)
 
-# Plot the difference using ggplot2
-model_improv<-ggplot(summed_data_all, aes(x = Julian_date, y = (Difference), color = Week)) +
+# Plot the results
+model_improv<-ggplot(results_by_epiweek_all, aes(x = Julian_date, y = (Difference), color = Week)) +
   geom_point(size = 2.5) +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed", size = 0.8) +
   theme_minimal() +
@@ -3042,11 +3042,13 @@ Total hospitalizations
 
 ```{r}
 
+# get total hospitalizations for the 48 states
 total_hospitalizations_by_week <- AUTO_ADJACENT_WEEK1 %>%
-  filter(epiweek >= 40 | epiweek <= 20) %>%  # Apply filter AFTER epiweek exists
+  filter(epiweek >= 40 | epiweek <= 20) %>%  
   group_by(target_end_date) %>%
   summarise(mean_cases = sum(cases, na.rm = TRUE))
 
+# plotting results
 hospital_plot <-ggplot(total_hospitalizations_by_week, aes(x = target_end_date, y = mean_cases)) +
   geom_bar(stat = "identity",fill = "steelblue") +
   labs(title = "B) Total influenza hospitalizations on the 48 states",
@@ -3067,11 +3069,8 @@ hospital_plot
 Combining model improvement and total hospitalizations
 
 ```{r}
-
-# Combine the plots vertically
+# Combining results in a single plot
 combined_plot <-  model_improv /hospital_plot 
-
-# Display (optional)
 combined_plot
 
 # Save the combined plot

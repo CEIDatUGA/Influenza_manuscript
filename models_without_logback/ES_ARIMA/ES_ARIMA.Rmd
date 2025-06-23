@@ -7,7 +7,7 @@ output:
   html_document: default
 ---
 
-Here we run ensembles and single automatic ARIMA models for forecasting weekly hospitalizations in states on the contiguous U.S. The models fit on a rolling window of previous 104 weeks to generate forecasts. It returns some metrics that evaluate the performance of the models: target_end_date, abs_error, cases, forecast, number of models, weighted interval score (WIS) and predictive quantiles (%). The user defines if it will use an AUTO ARIMA (auto=TRUE), or ensembles of 27 (ES27=TRUE) or ensembles of 64 models (ES64=TRUE). It can also choose the number of weeks ahead for each forecast, and the size of the rolling window which is set as 104 (2 years).
+Here we run ensembles and single automatic ARIMA models for forecasting weekly hospitalizations in 48 states on the contiguous U.S. The models fit on a rolling window of previous 104 weeks to generate forecasts. These models do not include log-back transformations. It returns some metrics that evaluate the performance of the models: target_end_date, abs_error, cases, forecast, number of models, weighted interval score (WIS) and predictive quantiles (%). The user defines if it will use an AUTO ARIMA (auto=TRUE), or ensembles of 27 (ES27=TRUE) or ensembles of 64 models (ES64=TRUE). It can also choose the number of weeks ahead for each forecast, and the size of the rolling window which is set as 104 (2 years).
 
 
 ```{r}

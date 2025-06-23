@@ -10,8 +10,8 @@ Our main folder has a Rmakdown (manuscript_results) that generates images and an
 There are 3 subfolders in our main folder: 
 
 ERA5 data (which has the code for treating the temperature and humidity data which we later use in some of our models and analysis)
-NHSH hospitalizations seed (which has the models that use log-back transformations)  
-Hospitalization seed no_log correct (which has the models that do not use log-back transformations) 
+models_with_logback (which has the models that use log-back transformations)  
+models_without_logback (which has the models that do not use log-back transformations) 
 
 ##########################################################################
 In each hospitalization models' subfolder we have 5 major model families each in a given folder: 

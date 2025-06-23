@@ -52,13 +52,13 @@ Loading the results of each model and the shapefiles of the maps.
 
 ```{r}
 
-load("NHSH_hospitalizations_seed_nolog_correct/ES_ARIMA/ARIMA_MODELS_influenza_hospitalization_nolog.Rdata")
-load("NHSH_hospitalizations_seed_nolog_correct/ES_ADJACENT/ADJACENT_MODELS_influenza_hospitalization_nolog.Rdata")
-load("NHSH_hospitalizations_seed_nolog_correct/ES_EPIWEEK/EPIWEEK_MODELS_influenza_hospitalization_nolog.Rdata")
-load("NHSH_hospitalizations_seed_nolog_correct/ES_TEMPERATURE/TEMPERATURE_MODELS_influenza_hospitalization_nolog.Rdata")
-load("NHSH_hospitalizations_seed_nolog_correct/ES_AVERAGE/AVERAGE_MODELS_influenza_hospitalization_nolog.Rdata")
+load("models_without_logback/ES_ARIMA/ARIMA_MODELS_influenza_hospitalization_nolog.Rdata")
+load("models_without_logback/ES_ADJACENT/ADJACENT_MODELS_influenza_hospitalization_nolog.Rdata")
+load("models_without_logback/ES_EPIWEEK/EPIWEEK_MODELS_influenza_hospitalization_nolog.Rdata")
+load("models_without_logback/ES_TEMPERATURE/TEMPERATURE_MODELS_influenza_hospitalization_nolog.Rdata")
+load("models_without_logback/ES_AVERAGE/AVERAGE_MODELS_influenza_hospitalization_nolog.Rdata")
 
-states <- read_sf("NHSH_hospitalizations_seed_nolog_correct/shapefiles/cb_2018_us_state_500k.shp")
+states <- read_sf("models_without_logback/shapefiles/cb_2018_us_state_500k.shp")
 
 states <- states %>%
   rename(STATE = NAME)
@@ -472,11 +472,11 @@ plt1
 Loading model with log-back transformations.
 
 ```{r}
-load("NHSH_hospitalizations_seed/ES_ARIMA/ARIMA_MODELS_influenza_hospitalization.Rdata")
-load("NHSH_hospitalizations_seed/ES_ADJACENT/ADJACENT_MODELS_influenza_hospitalization.Rdata")
-load("NHSH_hospitalizations_seed/ES_EPIWEEK/EPIWEEK_MODELS_influenza_hospitalization.Rdata")
-load("NHSH_hospitalizations_seed/ES_TEMPERATURE/TEMPERATURE_MODELS_influenza_hospitalization.Rdata")
-load("NHSH_hospitalizations_seed/ES_AVERAGE/AVERAGE_MODELS_influenza_hospitalization.Rdata")
+load("models_with_logback/ES_ARIMA/ARIMA_MODELS_influenza_hospitalization.Rdata")
+load("models_with_logback/ES_ADJACENT/ADJACENT_MODELS_influenza_hospitalization.Rdata")
+load("models_with_logback/ES_EPIWEEK/EPIWEEK_MODELS_influenza_hospitalization.Rdata")
+load("models_with_logback/ES_TEMPERATURE/TEMPERATURE_MODELS_influenza_hospitalization.Rdata")
+load("models_with_logback/ES_AVERAGE/AVERAGE_MODELS_influenza_hospitalization.Rdata")
 ```
 
 ------------

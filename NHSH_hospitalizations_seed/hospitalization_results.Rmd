@@ -6,7 +6,7 @@ output:
   pdf_document: default
 ---
 
-This document summarizes the results of the 12 models that were developed: AUTO ARIMA, AUTO ADJACENT, AUTO EPIWEEK, ES27 TEMPERATURE, ES27 ARIMA, ES27 ADJACENT, ES27 EPIWEEK, ES64 TEMPERATURE, ES64 ARIMA, ES64 ADJACENT, ES64 EPIWEEK, ES64 TEMPERATURE. It has a series of histograms and maps that compare the results of these models based on their WIS. You can read more about the specific covariates and ensemble techniques of these models in their own Rmarkdown documents. 
+This document summarizes the results of the 12 models with log-back transformations that were developed: AUTO ARIMA, AUTO ADJACENT, AUTO EPIWEEK, ES27 TEMPERATURE, ES27 ARIMA, ES27 ADJACENT, ES27 EPIWEEK, ES64 TEMPERATURE, ES64 ARIMA, ES64 ADJACENT, ES64 EPIWEEK, ES64 TEMPERATURE. It has a series of histograms and maps that compare the results of these models based on their WIS. You can read more about the specific covariates and ensemble techniques of these models in their own Rmarkdown documents. 
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)

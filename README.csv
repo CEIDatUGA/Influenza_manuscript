@@ -32,7 +32,7 @@ Each model family include results of 3 model types: AUTO, ES27 and ES64. AUTO is
 
 ###########################################################################
 
-Each folder also includes a Rmakrdown which process the NHSH hospitalizations dataset and a few additional datasets which we used for modeling or analysis (SoVI, BRICs, shapefiles, temperature, humidity).
+Each folder also includes a Rmakrdown which process the NHSH hospitalizations dataset and a few additional datasets which we used for modeling or analysis (shapefiles and regression_features).
 
 ###########################################################################
 

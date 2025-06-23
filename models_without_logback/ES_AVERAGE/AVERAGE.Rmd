@@ -54,8 +54,6 @@ list_of_states <- split(my_data, my_data$state_name)
 
 AUTO AVERAGE WEEK1 - ALL STATES
 
-IF YOU WANT A FAST RESULT RUN ONLY THE AUTO_example, the others take longer.
-
 ```{r}
 
 start_time <- Sys.time()

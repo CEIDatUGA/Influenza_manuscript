@@ -64,7 +64,6 @@ states <- states %>%
   rename(STATE = NAME)
 
 ```
-
 ------------
 1 Week ahead
 ------------
@@ -115,7 +114,6 @@ df_W1_NoLg <- data.frame(
 
 head(df_W1_NoLg)
 ```
-
 ------------
 2 Weeks ahead
 -------------
@@ -166,7 +164,6 @@ df_W2_NoLg <- data.frame(
 
 head(df_W2_NoLg)
 ```
-
 -------------
 3 Weeks ahead
 -------------

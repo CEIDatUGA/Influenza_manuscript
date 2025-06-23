@@ -719,7 +719,7 @@ Fitting data.
 i  <- 57 # forecasted week
 ii <- 8 # state number
 
-my_data = read.csv("NHSH_hospitalizations_seed/treated_influenza_hosp_dataframe_v2.csv")
+my_data = read.csv("models_with_logback/treated_influenza_hosp_dataframe_v2.csv")
 my_data$target_end_date<-as.Date(my_data$target_end_date) # set the dates as dates
 
 list_of_states <- split(my_data, my_data$state_name)
@@ -2047,11 +2047,11 @@ ggsave("Fig7.jpg", combined_plot, width =12, height =7)
 Loading datasets for regression models analysis
 
 ```{r}
-pop_data <- read.csv("NHSH_hospitalizations_seed/regression_features/population_data.csv") # resident population and population density
-sovi_data <- read.csv("NHSH_hospitalizations_seed/regression_features/sovi_2010.2014.csv") # SOVI index
-bric_data<-read.csv("NHSH_hospitalizations_seed/regression_features/bric2015.csv") # BRIC index
-humidity_data<-read.csv("NHSH_hospitalizations_seed/regression_features/humidity_climatology_1990_2020.csv") # ERA5 Specific Humidity
-temperature_data<-read.csv("NHSH_hospitalizations_seed/regression_features/temperature_climatology_1990_2020.csv") # ERA5 Specific Temperature
+pop_data <- read.csv("models_with_logback/regression_features/population_data.csv") # resident population and population density
+sovi_data <- read.csv("models_with_logback/regression_features/sovi_2010.2014.csv") # SOVI index
+bric_data<-read.csv("models_with_logback/regression_features/bric2015.csv") # BRIC index
+humidity_data<-read.csv("models_with_logback/regression_features/humidity_climatology_1990_2020.csv") # ERA5 Specific Humidity
+temperature_data<-read.csv("models_with_logback/regression_features/temperature_climatology_1990_2020.csv") # ERA5 Specific Temperature
 
 ```
 

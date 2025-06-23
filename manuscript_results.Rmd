@@ -2758,29 +2758,29 @@ Plotting best regression model
 
 ```{r}
 
-# Prepare a list to hold your plots
+# Prepare a list of plots
 bric_plots <- list()
 
 for (i in 1:4) {
-  # 1) Join the WIS and BRIC data
+  # Join the WIS and BRIC data
   WIS_bric <- inner_join(
     WIS_dataframes[[i]],
     bric_by_state,
     by = "STATE"
   )
   
-  # 2) Fit the linear model
+  # Fit the linear model
   model <- lm(
     percentage_improvement ~ weighted_mean_z_bric.infrastructure,
     data = WIS_bric
   )
   ms <- summary(model)
   
-  # 3) Extract R² and p‐value
+  # Extract R-squared and p-value
   r2 <- round(ms$r.squared, 3)
   p  <- signif(ms$coefficients[2, 4], 3)
   
-  # 4) Build the ggplot
+  # Build the ggplot
   p <- ggplot(WIS_bric,
               aes(x = weighted_mean_z_bric.infrastructure,
                   y = percentage_improvement)) +
@@ -2794,7 +2794,7 @@ for (i in 1:4) {
     ) +
     theme_minimal()
   
-  # 5) Store it
+  # Store it
   bric_plots[[i]] <- p
 }
 

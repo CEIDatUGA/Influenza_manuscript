@@ -4,18 +4,17 @@ This repository has 24 ARIMA and ARIMAX models which forecasts Influenza Hospita
 
 ########################################################################
 
-Our main folder has a Rmakdown that analyzes the results of our 24 models and generates manuscript figures.
+Our main folder has a Rmakdown (manuscript_results) that generates images and analysis for our 24 models.
 
 #########################################################################
 There are 3 subfolders in our main folder: 
 
-
-ERA5 data (which has the code for treating the temperature and humidity data which we later use in our models)
+ERA5 data (which has the code for treating the temperature and humidity data which we later use in some of our models and analysis)
 NHSH hospitalizations seed (which has the models that use log-back transformations)  
-Hospitalization seed no_log coorect (which has the models that do not use log-back transformations) 
+Hospitalization seed no_log correct (which has the models that do not use log-back transformations) 
 
 ##########################################################################
-In each hospitalization models' folders we have 5 major model families each in a given folder: 
+In each hospitalization models' subfolder we have 5 major model families each in a given folder: 
 
 ES_ARIMA: Ensembles and single best ARIMA models. 
 
@@ -27,13 +26,13 @@ ES_ADJACENT: Ensembles and single best ARIMAX models with 1-week-lag using mean 
 
 ES_AVERAGE: Ensembles and single best ARIMAX models with 1-week-lag using average of hospitalizations across the U.S as covariate.
 
+###
+
+Each model family include results of 3 model types: AUTO, ES27 and ES64. AUTO is a non-ensemble model which uses the best automatic fitting model. The other 2 model types are ensembles which combine 27 or 64 ARIMA or ARIMAX models. These are loaded and evaluated in the "manuscript_results.Rmd" file.
+
 ###########################################################################
 
-Each model family has results for 3 model types: AUTO, ES27 and ES64. AUTO is a non-ensemble model which uses the best automatic fitting model. The other 2 model types are ensembles which combine 27 or 64 ARIMA or ARIMAX models.
-
-###########################################################################
-
-Each folder also includes a makrdown which process the NHSH hospitalizations dataset and a few additional datasets which we used for modeling or analysis.
+Each folder also includes a Rmakrdown which process the NHSH hospitalizations dataset and a few additional datasets which we used for modeling or analysis (SoVI, BRICs, shapefiles, temperature, humidity).
 
 ###########################################################################
 

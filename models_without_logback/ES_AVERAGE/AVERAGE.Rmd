@@ -1,5 +1,5 @@
 ---
-title: "AVERAGE STATES ARIMAX MODEL - Influenza hospitalization data - no log-back transformation"
+title: "AVERAGE STATES ARIMAX MODEL - without log-back transformations"
 author: "Victor Felix"
 date: "`r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -7,8 +7,7 @@ output:
   html_document: default
 ---
 
-This function utilizes ensembles and single automatic ARIMAX models which have mean hospitalization on U.S. states as exogenous variables. The function fits on a rolling window of previous 104 weeks for the state under analysis and a rolling windows with the same size with 1 week-lag for the exogenous variables to generate forecasts. It return some metrics that evaluate the performance of the mod
-els:target_end_date, abs_error, cases, forecast, 'N_of_models", weighted interval score (WIS), predictive quantiles. The user can choose a  single best automatic ARIMAXs (auto=TRUE), or ensembles of 27 permutations of 0,1,2 pdq's (ES27=TRUE) or 64 permutations of 0,1,2,3 pdq's (ES64=TRUE). The user also chooses the number of weeks ahead for each forecast, and the size of the rolling window which is set as 2 years (104 weeks).
+Here we run ensembles and single automatic ARIMAX models for forecasting weekly hospitalizations in 48 states on the contiguous U.S. These model use mean hospitalization across the U.S. states as exogenous variables. The function fits on a rolling window of previous 104 weeks for the state under analysis and a rolling windows with the same size with 1 week-lag for the exogenous variables to generate forecasts. These models do not include log-back transformations. It return some metrics that evaluate the performance of the models:target_end_date, abs_error, cases, forecast, 'N_of_models", weighted interval score (WIS), predictive quantiles. The user can choose a  single best automatic ARIMAXs (auto=TRUE), or ensembles of 27 permutations of 0,1,2 pdq's (ES27=TRUE) or 64 permutations of 0,1,2,3 pdq's (ES64=TRUE). The user also chooses the number of weeks ahead for each forecast, and the size of the rolling window which is set as 2 years (104 weeks).
 
 ```{r}
 knitr::opts_chunk$set(echo = TRUE)

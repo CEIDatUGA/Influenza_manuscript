@@ -114,6 +114,7 @@ df_W1_NoLg <- data.frame(
 
 head(df_W1_NoLg)
 ```
+
 ------------
 2 Weeks ahead
 -------------
@@ -164,6 +165,7 @@ df_W2_NoLg <- data.frame(
 
 head(df_W2_NoLg)
 ```
+
 -------------
 3 Weeks ahead
 -------------
@@ -823,101 +825,101 @@ ggsave("Fig1.jpg", conceptual_figure, width = 7, height = 4, dpi = 600)
 Evaluating other forecasts
 
 ```{r}
-plot_forecast <- function(i, ii,
-                          list_of_states,
-                          AUTO_AVERAGE_WEEK1_list,
-                          AUTO_AVERAGE_WEEK2_list,
-                          AUTO_AVERAGE_WEEK3_list,
-                          AUTO_AVERAGE_WEEK4_list) {
+#plot_forecast <- function(i, ii,
+#                          list_of_states,
+#                          AUTO_AVERAGE_WEEK1_list,
+#                          AUTO_AVERAGE_WEEK2_list,
+#                          AUTO_AVERAGE_WEEK3_list,
+#                          AUTO_AVERAGE_WEEK4_list) {
 
   # Define date range for 2-year history
-  end_date <- as.Date(AUTO_AVERAGE_WEEK1_list[[ii]]$target_end_date[i] - 7)
-  start_date <- end_date - (7 * 103)
+#  end_date <- as.Date(AUTO_AVERAGE_WEEK1_list[[ii]]$target_end_date[i] - 7)
+#  start_date <- end_date - (7 * 103)
 
   # Subset observed data
-  subset_data <- subset(list_of_states[[ii]],
-                        target_end_date >= start_date & target_end_date <= end_date)
+#  subset_data <- subset(list_of_states[[ii]],
+#                        target_end_date >= start_date & target_end_date <= end_date)
 
   # Build forecast dataframe
-  forecast_df <- data.frame(
-    Dates = c(
-      AUTO_AVERAGE_WEEK1_list[[ii]]$target_end_date[i],
-      AUTO_AVERAGE_WEEK2_list[[ii]]$target_end_date[i],
-      AUTO_AVERAGE_WEEK3_list[[ii]]$target_end_date[i],
-      AUTO_AVERAGE_WEEK4_list[[ii]]$target_end_date[i]
-    ),
-    Hosp = c(
-      AUTO_AVERAGE_WEEK1_list[[ii]]$cases[i],
-      AUTO_AVERAGE_WEEK2_list[[ii]]$cases[i],
-      AUTO_AVERAGE_WEEK3_list[[ii]]$cases[i],
-      AUTO_AVERAGE_WEEK4_list[[ii]]$cases[i]
-    ),
-    Value = c(
-      AUTO_AVERAGE_WEEK1_list[[ii]]$forecasts[i],
-      AUTO_AVERAGE_WEEK2_list[[ii]]$forecasts[i],
-      AUTO_AVERAGE_WEEK3_list[[ii]]$forecasts[i],
-      AUTO_AVERAGE_WEEK4_list[[ii]]$forecasts[i]
-    ),
-    Lower = c(
-      AUTO_AVERAGE_WEEK1_list[[ii]][["0.025"]][i],
-      AUTO_AVERAGE_WEEK2_list[[ii]][["0.025"]][i],
-      AUTO_AVERAGE_WEEK3_list[[ii]][["0.025"]][i],
-      AUTO_AVERAGE_WEEK4_list[[ii]][["0.025"]][i]
-    ),
-    Upper = c(
-      AUTO_AVERAGE_WEEK1_list[[ii]][["0.975"]][i],
-      AUTO_AVERAGE_WEEK2_list[[ii]][["0.975"]][i],
-      AUTO_AVERAGE_WEEK3_list[[ii]][["0.975"]][i],
-      AUTO_AVERAGE_WEEK4_list[[ii]][["0.975"]][i]
-    )
-  )
+#  forecast_df <- data.frame(
+#    Dates = c(
+#      AUTO_AVERAGE_WEEK1_list[[ii]]$target_end_date[i],
+#      AUTO_AVERAGE_WEEK2_list[[ii]]$target_end_date[i],
+#      AUTO_AVERAGE_WEEK3_list[[ii]]$target_end_date[i],
+#      AUTO_AVERAGE_WEEK4_list[[ii]]$target_end_date[i]
+#    ),
+#    Hosp = c(
+#      AUTO_AVERAGE_WEEK1_list[[ii]]$cases[i],
+#      AUTO_AVERAGE_WEEK2_list[[ii]]$cases[i],
+#      AUTO_AVERAGE_WEEK3_list[[ii]]$cases[i],
+#      AUTO_AVERAGE_WEEK4_list[[ii]]$cases[i]
+#    ),
+#    Value = c(
+#      AUTO_AVERAGE_WEEK1_list[[ii]]$forecasts[i],
+#      AUTO_AVERAGE_WEEK2_list[[ii]]$forecasts[i],
+#      AUTO_AVERAGE_WEEK3_list[[ii]]$forecasts[i],
+#      AUTO_AVERAGE_WEEK4_list[[ii]]$forecasts[i]
+#    ),
+#    Lower = c(
+#      AUTO_AVERAGE_WEEK1_list[[ii]][["0.025"]][i],
+#      AUTO_AVERAGE_WEEK2_list[[ii]][["0.025"]][i],
+#      AUTO_AVERAGE_WEEK3_list[[ii]][["0.025"]][i],
+#      AUTO_AVERAGE_WEEK4_list[[ii]][["0.025"]][i]
+#    ),
+#    Upper = c(
+#      AUTO_AVERAGE_WEEK1_list[[ii]][["0.975"]][i],
+#      AUTO_AVERAGE_WEEK2_list[[ii]][["0.975"]][i],
+#      AUTO_AVERAGE_WEEK3_list[[ii]][["0.975"]][i],
+#      AUTO_AVERAGE_WEEK4_list[[ii]][["0.975"]][i]
+#    )
+#  )
 
   # Build the plot
-  ggplot() +
-    geom_point(data = subset_data,
-               aes(x = target_end_date, y = cases, color = "Fitting data"),
-               size = 2.5) +
-    geom_ribbon(data = forecast_df,
-                aes(x = Dates, ymin = Lower, ymax = Upper),
-                fill = "gray", alpha = 0.4) +
-    geom_point(data = forecast_df,
-               aes(x = Dates, y = Value, color = "Mean forecast"),
-               size = 3) +
-    geom_point(data = forecast_df,
-               aes(x = Dates, y = Value, color = "Mean forecast"),
-               shape = 21, fill = "white", size = 2) +
-    geom_point(data = forecast_df,
-               aes(x = Dates, y = Hosp, color = "Hospitalizations"),
-               shape = 16, size = 2.5) +
-    scale_color_manual(name = "Legend",
-                       values = c("Fitting data" = "red",
-                                  "Mean forecast" = "cyan3",
-                                  "Hospitalizations" = "black")) +
-    scale_x_date(date_breaks = "1 month", date_labels = "%b %y") +
-    labs(title = paste("State:", names(list_of_states)[ii], "- Week Index:", i),
-         subtitle = "Gray ribbon represents 95% confidence interval",
-         x = "", y = "Hospitalizations") +
-    theme_minimal() +
-    theme(plot.title = element_text(size = 18, face = "bold"),
-          plot.subtitle = element_text(size = 14),
-          axis.text.x = element_text(angle = 45, hjust = 1))
-}
+#  ggplot() +
+#    geom_point(data = subset_data,
+#               aes(x = target_end_date, y = cases, color = "Fitting data"),
+#               size = 2.5) +
+#    geom_ribbon(data = forecast_df,
+#                aes(x = Dates, ymin = Lower, ymax = Upper),
+#                fill = "gray", alpha = 0.4) +
+#    geom_point(data = forecast_df,
+#               aes(x = Dates, y = Value, color = "Mean forecast"),
+#               size = 3) +
+#    geom_point(data = forecast_df,
+#               aes(x = Dates, y = Value, color = "Mean forecast"),
+#               shape = 21, fill = "white", size = 2) +
+#    geom_point(data = forecast_df,
+#               aes(x = Dates, y = Hosp, color = "Hospitalizations"),
+#               shape = 16, size = 2.5) +
+#    scale_color_manual(name = "Legend",
+#                       values = c("Fitting data" = "red",
+#                                  "Mean forecast" = "cyan3",
+#                                  "Hospitalizations" = "black")) +
+#    scale_x_date(date_breaks = "1 month", date_labels = "%b %y") +
+#    labs(title = paste("State:", names(list_of_states)[ii], "- Week Index:", i),
+#         subtitle = "Gray ribbon represents 95% confidence interval",
+#         x = "", y = "Hospitalizations") +
+#    theme_minimal() +
+#    theme(plot.title = element_text(size = 18, face = "bold"),
+#          plot.subtitle = element_text(size = 14),
+#          axis.text.x = element_text(angle = 45, hjust = 1))
+#}
 
-for (ii in 1:48) {
-  for (i in 60:70) {
+#for (ii in 1:48) {
+#  for (i in 60:70) {
     # Safely check if index exists
-    if (i <= nrow(AUTO_AVERAGE_WEEK1_list[[ii]])) {
-      p <- plot_forecast(i, ii,
-                         list_of_states,
-                         AUTO_AVERAGE_WEEK1_list,
-                         AUTO_AVERAGE_WEEK2_list,
-                         AUTO_AVERAGE_WEEK3_list,
-                         AUTO_AVERAGE_WEEK4_list)
+#    if (i <= nrow(AUTO_AVERAGE_WEEK1_list[[ii]])) {
+#      p <- plot_forecast(i, ii,
+#                         list_of_states,
+#                         AUTO_AVERAGE_WEEK1_list,
+#                         AUTO_AVERAGE_WEEK2_list,
+#                         AUTO_AVERAGE_WEEK3_list,
+#                         AUTO_AVERAGE_WEEK4_list)
       # Show the plot
-      print(p)
-    }
-  }
-}
+#      print(p)
+#    }
+#  }
+#}
 
 ```
 
@@ -1370,11 +1372,11 @@ combined_plot_clean <- combined_plot + theme(legend.position = "none")
 # Extract only the custom legend
 legend_only <- cowplot::get_legend(custom_legend)
 
-# Combine your main plot with the custom legend
+# Combine main plot with the custom legend
 figure4 <- combined_plot_clean + 
   patchwork::plot_spacer() + 
   patchwork::wrap_elements(legend_only) + 
-  plot_layout(widths = c(4, 0.05, 0.4))  # Adjust widths as needed
+  plot_layout(widths = c(4, 0.05, 0.4))  
 
 # Display the result
 figure4
@@ -1382,109 +1384,8 @@ figure4
 ggsave("Fig4.jpg", figure4, width = 10, height = 6)
 
 ```
-
-ERASE
-
-```{r}
-# Create a custom color mapping for each variable
-custom_colors <- c(
-  "AUTO_AR_LB" = colors_ar[1], "ES27_AR_LB" = colors_ar[2], "ES64_AR_LB" = colors_ar[3],
-  "AUTO_EPI_LB" = colors_epi[1], "ES27_EPI_LB" = colors_epi[2], "ES64_EPI_LB" = colors_epi[3],
-  "AUTO_TMP_LB" = colors_tmp[1], "ES27_TMP_LB" = colors_tmp[2], "ES64_TMP_LB" = colors_tmp[3],
-  "AUTO_ADJ_LB" = colors_adj[1], "ES27_ADJ_LB" = colors_adj[2], "ES64_ADJ_LB" = colors_adj[3],
-  "AUTO_AVG_LB" = colors_avg[1], "ES27_AVG_LB" = colors_avg[2], "ES64_AVG_LB" = colors_avg[3],
-  
-  
-  "AUTO_AR" = colors_ar[1], "ES27_AR" = colors_ar[2], "ES64_AR" = colors_ar[3],
-  "AUTO_EPI" = colors_epi[1], "ES27_EPI" = colors_epi[2], "ES64_EPI" = colors_epi[3],
-  "AUTO_TMP" = colors_tmp[1], "ES27_TMP" = colors_tmp[2], "ES64_TMP" = colors_tmp[3],
-  "AUTO_ADJ" = colors_adj[1], "ES27_ADJ" = colors_adj[2], "ES64_ADJ" = colors_adj[3],
-  "AUTO_AVG" = colors_avg[1], "ES27_AVG" = colors_avg[2], "ES64_AVG" = colors_avg[3]
-)
-
-# --------- WEEK1 MODELS ------------- #
-plot1<- ggplot(W1, aes(x = Best_Result, fill = Best_Result)) +  
-  geom_bar() +  
-  scale_fill_manual(values = custom_colors) +  
-  labs(title = "Best model on the 48 U.S. states (W1)",       
-       x = "", y = "Number of states") +  
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
-  facet_wrap(~ Model_Type, scales = "free_x")
-
-plot1
-
-#ggsave("week1_best_models.jpg", plot1)
-
-# --------- WEEK2 MODELS ------------- #
-plot2<-ggplot(W2, aes(x = Best_Result, fill = Best_Result))  +  
-  geom_bar() +  
-  scale_fill_manual(values = custom_colors) +  
-  labs(title = "Best model on the 48 U.S. states (W2)",       
-       x = "", y = "Number of states") +  
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
-  facet_wrap(~ Model_Type, scales = "free_x")
-
-#ggsave("week2_best_models.jpg", plot2)
-
-plot2
-
-# --------- WEEK3 MODELS ------------- #
-plot3<-ggplot(W3, aes(x = Best_Result, fill = Best_Result))  +  
-  geom_bar() +  
-  scale_fill_manual(values = custom_colors) +  
-  labs(title = "Best model on the 48 U.S. states (W3)",       
-       x = "", y = "Number of states") +  
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
-  facet_wrap(~ Model_Type, scales = "free_x")
-plot3
-
-#ggsave("week3_best_models.jpg", plot3)
-
-# --------- WEEK4 MODELS ------------- #
-plot4<-ggplot(W4, aes(x = Best_Result, fill = Best_Result)) +  
-  geom_bar() +  
-  scale_fill_manual(values = custom_colors) +  
-  labs(title = "Best model on the 48 U.S. states (W4)",       
-       x = "", y = "Number of states") +  
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
-  facet_wrap(~ Model_Type, scales = "free_x")
-plot4
-
-#ggsave("week4_best_models.jpg", plot4)
-
-```
-
-ERASE
-
-```{r}
-# Add a column to indicate the week ahead
-W1$Week_Ahead <- "W1"
-W2$Week_Ahead <- "W2"
-W3$Week_Ahead <- "W3"
-W4$Week_Ahead <- "W4"
-
-# Combine all weeks into one dataframe
-all_weeks <- bind_rows(W1, W2, W3, W4)
-
-# Create the plot
-combined_plot <- ggplot(all_weeks, aes(x = Best_Result, fill = Best_Result)) +
-  geom_bar() +
-  scale_fill_manual(values = custom_colors) +
-  labs(title = "Best model based on the lowest mean WIS",
-       subtitle = "Results for the 48 states on the contiguous U.S. by target week",
-       x = "", y = "Number of states",
-       fill = "Best model" ) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        plot.title = element_text(size = 16, face = "bold")) +
-  facet_grid(Week_Ahead ~ Model_Type, scales = "free_x")
-
-# Save and display the plot
-#ggsave("Fig4.jpg", combined_plot, width =8, height =5)
-print(combined_plot)
-
-```
  
-Now we use a Wilcox test with Holm p-value adjustment for repeated comparisons to evaluate the differences in model performances. 
+Now we use a Wilcoxon test with Holm p-value adjustment for repeated comparisons to evaluate the differences in model performances. 
 
 1 WEEK AHEAD - Wilcoxon test with Holm p-value adjustment
 
@@ -1696,57 +1597,12 @@ all_p_values<-rbind(p_values_wk1,p_values_wk2,p_values_wk3,p_values_wk4)
 
 p_values_and_impr <- merge(summary_impr, all_p_values, by = c("WeekAhead", "Model"))
 
-# Create a new column "Model_Type" based on model with and withouth log-back transformation
+# Create a new column "Model_Type" based on model with and without log-back transformation
 p_values_and_impr$Model_Type <- ifelse(grepl("_LB$", p_values_and_impr$Model), "LB", "no_LB")
 
 # View the updated dataframe
 head(p_values_and_impr)
 p_values_and_impr
-```
-ERASE
-
-```{r}
-
-#new_long_data <- summary_impr %>%
-#  mutate(
-#    LogBack = grepl("_LB$", Model),
-#    Family = sub("_.*", "", Model),  # take everything before the first underscore
-#    Method = sub("^.*?_(AR|ADJ|EPI|AVG|TMP)(_LB)?$", "\\1", Model)
-#  )
-
-#new_long_data <- new_long_data %>%
-#  mutate(Model = ifelse(Model == "AUTO_AR", "AUTO_AAR", Model))
-
-#model <- lm(m ~ Model, data = new_long_data)
-#summary(model)
-
-#model
-#new_long_data$Model
-# Get tidy summary of coefficients
-#tidy_model <- broom::tidy(model)
-
-# Filter out intercept for clarity if you want
-#tidy_model_no_intercept <- tidy_model %>% filter(term != "(Intercept)")
-
-# Plot coefficients with 95% confidence intervals
-#tidy_model_no_intercept <- tidy_model_no_intercept %>%
-#  mutate(term = forcats::fct_reorder(term, estimate, .desc = TRUE))
-
-# Plot
-#ggplot(tidy_model_no_intercept, aes(x = term, y = estimate)) +
-#  geom_point() +
-#  geom_errorbar(aes(ymin = estimate - std.error * 1.96,
-#                    ymax = estimate + std.error * 1.96),
-#                width = 0.2) +
-#  coord_flip() +  # flip for better readability
-#  labs(
-#    title = "Effect Size of Model Types on outcome",
-#    subtitle =  "Estimates relative to baseline (intercept)",
-#    y = "Estimate",
-#    x = ""
-#  ) +
-#  theme_minimal()
-
 ```
 
 Here we are plotting the mean differences and standard deviation
@@ -2461,8 +2317,6 @@ x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
 
 ES_1WEEK<-ES_1WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
-
-#ggsave(ES_1WEEK,height = 4.5, width = 6.5,  filename="Fig5A.jpg")  
 ```
 
 2 weeks ahead
@@ -2491,8 +2345,6 @@ x_limits <- c(-125, -67)  # Set the desired longitude range
 y_limits <- c(25, 50)    # Set the desired latitude range
 
 ES_2WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
-
-#ggsave(ES_2WEEK, height = 4.5, width = 6.5, filename="Fig5B.jpg")  
 ```
 
 3 weeks ahead
@@ -2521,7 +2373,6 @@ y_limits <- c(25, 50)    # Set the desired latitude range
 
 ES_3WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 
-#ggsave(ES_3WEEK, height = 4.5, width = 6.5, filename="Fig5C.jpg")  
 ```
 
 4 weeks ahead
@@ -2549,7 +2400,6 @@ y_limits <- c(25, 50)    # Set the desired latitude range
 
 ES_4WEEK + coord_sf(xlim = x_limits, ylim = y_limits)
 
-#ggsave(ES_4WEEK, height = 4.5, width = 6.5,  filename="Fig5D.jpg")  
 ```
 
 Combining plot on a 2x2 grid.
@@ -3033,7 +2883,6 @@ scale_color_manual(
 
 model_improv
 
-#ggsave(model_improv, height = 4.5, width = 9,  filename="Fig10.jpg")  
 ```
 Total hospitalizations
 

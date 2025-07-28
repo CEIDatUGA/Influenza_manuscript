@@ -1640,7 +1640,7 @@ plot_m_heatmap <- ggplot(p_df, aes(x = factor(WeekAhead), y = Model, fill = m)) 
   labs(title = "Mean differences between models' WIS and the baseline across 48 states",
        subtitle = "Gray boxes indicate models that are not significantly different from the baseline (p>0.05)",
          caption = "m = mean difference, sd = standard deviation",
-       x = "Target Ahead",
+       x = "Target Week",
        y = "") + 
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
@@ -1695,7 +1695,7 @@ effect_size<- ggplot(tidy_model_no_intercept, aes(x = term, y = estimate)) +
     title = "Effect size of model type, family and transformation on WIS difference",
     subtitle =  "WIS Difference relative to the AUTO type, ARIMA family and LogBack False (intercept)",
     y = "WIS Difference",
-    x = ""
+    x = "Model components"
   ) +
   theme_minimal() + theme(plot.title = element_text(size = 16, face = "bold"),
                   plot.subtitle = element_text(size = 14))

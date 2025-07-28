@@ -2834,8 +2834,8 @@ for (week in weeks) {
   mean_improvement_ <- combined_dataframes_ %>%
     group_by(Julian_date) %>%
     summarize(
-      AUTO_AR = mean(AUTO_AR, na.rm = TRUE),  # Sum across all states
-      AUTO_AVG_LB = mean(AUTO_AVG_LB, na.rm = TRUE)           # Sum across all states
+      AUTO_AR = mean(AUTO_AR, na.rm = TRUE),  # Mean across all states
+      AUTO_AVG_LB = mean(AUTO_AVG_LB, na.rm = TRUE) # Mean across all states
     ) %>%
     # Calculate the difference ratio in percentage
     mutate(Difference =  ((AUTO_AVG_LB / AUTO_AR)-1)*100,

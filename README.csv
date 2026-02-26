@@ -6,7 +6,7 @@ It also includes a CDC FluSight baseline model adapted to our work.
 
 ####
 
-Our main folder has a Rmakdown that generates images and analysis for our 24 models
+Our main folder has a Rmakdown that generates images and analysis for our 30 models
 manuscript_results.Rmd
 It also has a Rmarkdown which generates images and analysis comparing the models and the FLuSight baseline.
 flusight_comparison.Rmd
